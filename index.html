@@ -2,37 +2,60 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>Supabase 연동 테스트</title>
-  <!-- 1. Supabase 라이브러리를 반드시 최상단에 먼저 로드 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase 데이터 연동</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: 40px auto; padding: 0 20px; line-height: 1.5; }
+    input { width: 70%; padding: 8px; box-sizing: border-box; }
+    button { padding: 8px 15px; cursor: pointer; }
+    ul { margin-top: 20px; padding-left: 20px; }
+    li { margin-bottom: 6px; }
+    .status { color: #666; font-size: 0.9em; margin-top: 10px; }
+  </style>
 </head>
 <body>
 
-  <h1>데이터 기록 테스트</h1>
-  <input type="text" id="contentInput" placeholder="기록할 내용을 입력하세요">
-  <button id="saveBtn">저장하기</button>
+  <h2>데이터 기록 테스트</h2>
+  <div>
+    <input type="text" id="contentInput" placeholder="기록할 내용을 입력하세요">
+    <button id="saveBtn">저장하기</button>
+  </div>
+  <div id="statusMsg" class="status"></div>
 
   <h3>저장된 목록</h3>
   <ul id="list"></ul>
 
   <script>
-    // 2. 라이브러리가 로드되었는지 확인 후 클라이언트 생성
     const SUPABASE_URL = 'https://nolhrriuxhuhgduekyae.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_YRJgWCiyxTxGvM81uZZu-w_66OxefD8';
-
-    // supabase 라이브러리 존재 여부 체크
-    if (!window.supabase) {
-      alert('Supabase 라이브러리를 불러오지 못했습니다. 인터넷 연결이나 스크립트 주소를 확인해주세요.');
-    }
+    const TABLE_NAME = 'bankhar0328';
 
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const TABLE_NAME = 'bankhar0328';
 
     const saveBtn = document.getElementById('saveBtn');
     const contentInput = document.getElementById('contentInput');
     const list = document.getElementById('list');
+    const statusMsg = document.getElementById('statusMsg');
 
-    // 데이터 저장
+    // 테이블 내 실제 사용 가능한 데이터 열(Column) 이름을 자동 탐색
+    async function getTargetColumn() {
+      const { data, error } = await supabaseClient
+        .from(TABLE_NAME)
+        .select('*')
+        .limit(1);
+
+      if (!error && data && data.length > 0) {
+        const keys = Object.keys(data[0]);
+        // 시스템 자동 생성 컬럼(id, created_at)을 제외한 첫 번째 사용자 정의 컬럼 선택
+        const target = keys.find(k => k !== 'id' && k !== 'created_at');
+        if (target) return target;
+      }
+      // 기본값
+      return 'content';
+    }
+
+    // 1. 데이터 저장
     saveBtn.addEventListener('click', async () => {
       const text = contentInput.value.trim();
       if (!text) {
@@ -40,25 +63,59 @@
         return;
       }
 
-      const { data, error } = await supabaseClient
+      statusMsg.textContent = '저장 중...';
+
+      // 실제 존재하는 컬럼 확인
+      const targetCol = await getTargetColumn();
+      const insertPayload = {};
+      insertPayload[targetCol] = text;
+
+      const { error } = await supabaseClient
         .from(TABLE_NAME)
-        .insert([{ content: text }]);
+        .insert([insertPayload]);
 
       if (error) {
+        // 만약 content 컬럼이 없다는 에러인 경우 title 등의 범용 필드로 2차 재시도
+        if (error.code === 'PGRST204') {
+          const fallbackCols = ['title', 'text', 'memo', 'name'];
+          let recovered = false;
+
+          for (const col of fallbackCols) {
+            const retryPayload = {};
+            retryPayload[col] = text;
+            const retryRes = await supabaseClient.from(TABLE_NAME).insert([retryPayload]);
+            if (!retryRes.error) {
+              recovered = true;
+              break;
+            }
+          }
+
+          if (recovered) {
+            statusMsg.textContent = '';
+            alert('성공적으로 저장되었습니다!');
+            contentInput.value = '';
+            loadData();
+            return;
+          }
+        }
+
         console.error('저장 실패 상세:', error);
+        statusMsg.textContent = '';
         alert('저장 실패: ' + error.message);
       } else {
+        statusMsg.textContent = '';
         alert('성공적으로 저장되었습니다!');
         contentInput.value = '';
         loadData();
       }
     });
 
-    // 데이터 조회
+    // 2. 데이터 조회
     async function loadData() {
       const { data, error } = await supabaseClient
         .from(TABLE_NAME)
-        .select('*');
+        .select('*')
+        .order('id', { ascending: false });
 
       if (error) {
         console.error('조회 실패 상세:', error);
@@ -68,7 +125,10 @@
       list.innerHTML = '';
       data.forEach(item => {
         const li = document.createElement('li');
-        li.textContent = item.content || JSON.stringify(item);
+        // id와 created_at 외의 실제 입력값 추출
+        const keys = Object.keys(item);
+        const displayKey = keys.find(k => k !== 'id' && k !== 'created_at');
+        li.textContent = displayKey ? item[displayKey] : JSON.stringify(item);
         list.appendChild(li);
       });
     }
