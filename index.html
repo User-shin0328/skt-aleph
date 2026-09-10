@@ -1,81 +1,58 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <title>Supabase 연동 테스트</title>
-  <!-- Supabase 공식 라이브러리 로드 -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
+<script>
+  const SUPABASE_URL = 'https://nolhrriuxhuhgduekyae.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_YRJgWCiyxTxGvM81uZZu-w_66OxefD8';
 
-  <h1>데이터 기록 테스트</h1>
-  <input type="text" id="contentInput" placeholder="기록할 내용을 입력하세요">
-  <button id="saveBtn">저장하기</button>
+  // 변수명을 supabase -> supabaseClient 로 변경
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  <h3>저장된 목록</h3>
-  <ul id="list"></ul>
+  const TABLE_NAME = 'bankhar0328';
 
-  <script>
-    // 1. 전달해주신 URL과 공개 키가 설정된 부분
-    const SUPABASE_URL = 'https://nolhrriuxhuhgduekyae.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_YRJgWCiyxTxGvM81uZZu-w_66OxefD8';
+  const saveBtn = document.getElementById('saveBtn');
+  const contentInput = document.getElementById('contentInput');
+  const list = document.getElementById('list');
 
-    // 2. Supabase 클라이언트 생성
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // 주의: 'bankhar0328'이 방금 Supabase에서 만드신 테이블 이름이라면 그대로 두시고, 
-    // 실제 테이블 이름이 다르다면 아래 TABLE_NAME 값을 수정해주세요.
-    const TABLE_NAME = 'bankhar0328';
-
-    const saveBtn = document.getElementById('saveBtn');
-    const contentInput = document.getElementById('contentInput');
-    const list = document.getElementById('list');
-
-    // 3. 데이터 저장
-    saveBtn.addEventListener('click', async () => {
-      const text = contentInput.value.trim();
-      if (!text) {
-        alert('내용을 입력해주세요.');
-        return;
-      }
-
-      // 테이블의 컬럼 이름(아래 예시에서는 content)에 맞게 객체를 전송합니다.
-      const { data, error } = await supabase
-        .from(TABLE_NAME)
-        .insert([{ content: text }]);
-
-      if (error) {
-        console.error('저장 실패 상세:', error);
-        alert('저장 실패: ' + error.message);
-      } else {
-        alert('성공적으로 저장되었습니다!');
-        contentInput.value = '';
-        loadData();
-      }
-    });
-
-    // 4. 데이터 조회 (새로고침해도 유지되는지 확인)
-    async function loadData() {
-      const { data, error } = await supabase
-        .from(TABLE_NAME)
-        .select('*');
-
-      if (error) {
-        console.error('조회 실패 상세:', error);
-        return;
-      }
-
-      list.innerHTML = '';
-      data.forEach(item => {
-        const li = document.createElement('li');
-        // 불러올 컬럼명(content)을 표시
-        li.textContent = item.content || JSON.stringify(item);
-        list.appendChild(li);
-      });
+  // 데이터 저장
+  saveBtn.addEventListener('click', async () => {
+    const text = contentInput.value.trim();
+    if (!text) {
+      alert('내용을 입력해주세요.');
+      return;
     }
 
-    // 화면 로드 시 즉시 데이터 불러오기
-    loadData();
-  </script>
-</body>
-</html>
+    // supabaseClient 사용
+    const { data, error } = await supabaseClient
+      .from(TABLE_NAME)
+      .insert([{ content: text }]);
+
+    if (error) {
+      console.error('저장 실패 상세:', error);
+      alert('저장 실패: ' + error.message);
+    } else {
+      alert('성공적으로 저장되었습니다!');
+      contentInput.value = '';
+      loadData();
+    }
+  });
+
+  // 데이터 조회
+  async function loadData() {
+    // supabaseClient 사용
+    const { data, error } = await supabaseClient
+      .from(TABLE_NAME)
+      .select('*');
+
+    if (error) {
+      console.error('조회 실패 상세:', error);
+      return;
+    }
+
+    list.innerHTML = '';
+    data.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item.content || JSON.stringify(item);
+      list.appendChild(li);
+    });
+  }
+
+  loadData();
+</script>
