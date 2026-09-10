@@ -35,7 +35,7 @@
     const contentInput = document.getElementById('contentInput');
     const list = document.getElementById('list');
 
-    // 1. 데이터 저장
+    // 1. 데이터 저장 (실제 확인된 컬럼명인 'name' 사용)
     saveBtn.addEventListener('click', async () => {
       const text = contentInput.value.trim();
       if (!text) {
@@ -45,7 +45,7 @@
 
       const { data, error } = await supabaseClient
         .from(TABLE_NAME)
-        .insert([{ content: text }]);
+        .insert([{ name: text }]);
 
       if (error) {
         console.error('저장 실패 상세:', error);
@@ -72,12 +72,13 @@
       list.innerHTML = '';
       data.forEach(item => {
         const li = document.createElement('li');
-        li.textContent = item.content || JSON.stringify(item);
+        // 저장된 name 값 출력
+        li.textContent = item.name || JSON.stringify(item);
         list.appendChild(li);
       });
     }
 
-    // 초기 실행
+    // 초기 화면 로드 시 실행
     loadData();
   </script>
 </body>
