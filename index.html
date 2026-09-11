@@ -1,115 +1,916 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>나를 소개하는 한 페이지 - T01</title>
+  <title>신재원 | 보안 & 개발 학습 블로그 (Shin.Dev Log)</title>
+  
+  <!-- Pretendard & JetBrains Mono Fonts -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              emerald: '#10b981',
+              cyan: '#06b6d4',
+              violet: '#8b5cf6',
+              dark: '#0a0d14',
+              card: '#111726',
+              border: '#1e293b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons & Supabase JS SDK -->
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f8fafc; color: #1e293b; padding: 40px 20px; line-height: 1.6; }
-    .container { max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-    h1 { font-size: 1.75rem; margin-bottom: 8px; color: #0f172a; }
-    .subtitle { color: #64748b; margin-bottom: 24px; font-weight: 500; }
-    .section { margin-bottom: 28px; }
-    .section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; color: #334155; }
-    .tags { display: flex; flex-wrap: wrap; gap: 8px; }
-    .tag { background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; }
-    .input-group { display: flex; gap: 8px; margin-top: 12px; }
-    input { flex: 1; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; }
-    button { background: #2563eb; color: #ffffff; border: none; padding: 10px 18px; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
-    button:hover { background: #1d4ed8; }
-    ul { list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
-    li { background: #f1f5f9; padding: 10px 14px; border-radius: 6px; font-size: 0.9rem; word-break: break-all; }
+    body {
+      background-color: #080b11;
+      color: #e2e8f0;
+      font-family: 'Pretendard', sans-serif;
+      overflow-x: hidden;
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #080b11;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    /* Subtle cursor blinking */
+    .cursor-blink {
+      display: inline-block;
+      width: 8px;
+      height: 18px;
+      background-color: #10b981;
+      animation: blink 1.2s infinite;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    /* Ambient Background Glow */
+    .ambient-glow {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(6, 182, 212, 0.05) 35%, rgba(139, 92, 246, 0.02) 70%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
   </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col relative selection:bg-emerald-500/20 selection:text-emerald-300">
 
-  <div class="container">
-    <!-- 1. 나를 소개하는 섹션 (T01 핵심) -->
-    <h1>반갑습니다, 마음근력 3대500 신재원입니다</h1>
-    <p class="subtitle">할게 너무 많습니다.</p>
+  <!-- Ambient Glow Effect -->
+  <div class="ambient-glow"></div>
 
-    <div class="section">
-      <div class="section-title">관심 분야 & 목표</div>
-      <p>AI 도구를 활용해 문제를 빠르게 정의하고, 실제 배포 가능한 소프트웨어를 만드는 데 집중하고 있습니다. 꾸준한 리추얼과 기록을 통해 매일 더 나은 개발 습관을 만들어갑니다.</p>
-    </div>
+  <!-- 1. Header & Navigation -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl bg-[#080b11]/80 border-b border-slate-800/80 transition-all duration-300">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-2 text-slate-100 font-mono font-bold text-lg tracking-tight hover:text-emerald-400 transition-colors">
+        <span class="text-emerald-400">&gt;</span>
+        <span>SHIN.DEV</span>
+        <span class="text-xs text-slate-500 font-normal px-2 py-0.5 rounded bg-slate-800/60 border border-slate-700/50">LOG</span>
+        <span class="cursor-blink"></span>
+      </a>
 
-    <div class="section">
-      <div class="section-title">주요 키워드</div>
-      <div class="tags">
-        <span class="tag">#모의해킹</span>
-        <span class="tag">#네트워크</span>
-        <span class="tag">#정보보안</span>
-        <span class="tag">#빨리취업하고싶다</span>
+      <!-- Search Input in Header (Desktop) -->
+      <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
+        <div class="relative w-full">
+          <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="학습 노트, 키워드, 기술 검색 (예: Wireshark, SQL, Linux)..." 
+            class="w-full pl-9 pr-4 py-1.5 text-sm bg-slate-900/90 text-slate-200 placeholder-slate-500 rounded-lg border border-slate-800 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 transition-all"
+          />
+        </div>
+      </div>
+
+      <!-- Navigation & Auth -->
+      <div class="flex items-center gap-3">
+        <a href="#posts-section" class="text-sm font-medium text-slate-300 hover:text-emerald-400 transition-colors hidden sm:block">노트 목록</a>
+        <a href="#guestbook-section" class="text-sm font-medium text-slate-300 hover:text-emerald-400 transition-colors hidden sm:block">방명록</a>
+        
+        <!-- GitHub Repo Link -->
+        <a href="https://github.com/User-shin0328/skt-aleph2" target="_blank" rel="noopener noreferrer" 
+           class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/60 transition-colors" title="GitHub 저장소 바로가기">
+          <i data-lucide="github" class="w-5 h-5"></i>
+        </a>
+
+        <!-- Supabase GitHub Auth Button / Status -->
+        <div id="authContainer" class="flex items-center">
+          <button id="loginBtn" class="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-200 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition-all shadow-sm">
+            <i data-lucide="log-in" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>GitHub 로그인</span>
+          </button>
+          
+          <div id="userInfo" class="hidden items-center gap-2">
+            <img id="userAvatar" src="" alt="Avatar" class="w-7 h-7 rounded-full border border-emerald-500/40">
+            <span id="userName" class="text-xs font-mono font-medium text-slate-300 hidden sm:inline"></span>
+            <button id="logoutBtn" class="p-1.5 text-slate-400 hover:text-rose-400 rounded-md hover:bg-slate-800 transition-colors" title="로그아웃">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- 2. 동작 검증용 한 줄 방명록 (Supabase 연동) -->
-    <div class="section">
-      <div class="section-title">한 줄 응원 남기기</div>
-      <div class="input-group">
-        <input type="text" id="contentInput" placeholder="응원의 한 마디를 입력하세요">
-        <button id="saveBtn">등록</button>
+    <!-- Mobile Search (Sub-bar) -->
+    <div class="md:hidden px-4 pb-3 pt-1 border-t border-slate-800/40">
+      <div class="relative w-full">
+        <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+        <input 
+          type="text" 
+          id="searchInputMobile" 
+          placeholder="공부 노트 검색..." 
+          class="w-full pl-9 pr-4 py-2 text-sm bg-slate-900 text-slate-200 placeholder-slate-500 rounded-lg border border-slate-800 focus:border-emerald-500 focus:outline-none"
+        />
       </div>
-      <ul id="list"></ul>
+    </div>
+  </header>
+
+  <!-- 2. Main Content Container -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 relative z-10 space-y-12">
+    
+    <!-- Hero / Profile Card -->
+    <section class="relative rounded-2xl bg-gradient-to-b from-[#101726] to-[#0c101a] border border-slate-800/90 p-6 sm:p-8 shadow-xl overflow-hidden">
+      <!-- Decorative Grid Pattern -->
+      <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="space-y-3 max-w-2xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Study & Engineering Note</span>
+          </div>
+
+          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+            <span>반갑습니다, 신재원입니다</span>
+            <span class="text-xs font-mono font-normal text-emerald-400 px-2.5 py-1 bg-emerald-950/60 border border-emerald-800/60 rounded-md">마음근력 3대 500 💪</span>
+          </h1>
+
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+            AI 도구를 활용해 문제를 빠르게 정의하고, 실제 배포 가능한 소프트웨어와 견고한 보안 시스템을 구축하는 데 집중하고 있습니다.
+            매일 꾸준한 기록과 실습을 통해 더 나은 엔지니어로 성장해갑니다.
+          </p>
+
+          <!-- Key Interest Badges -->
+          <div class="flex flex-wrap gap-2 pt-2">
+            <span class="px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-cyan-950/40 text-cyan-300 border border-cyan-800/50 flex items-center gap-1.5">
+              <i data-lucide="shield" class="w-3.5 h-3.5"></i> #모의해킹
+            </span>
+            <span class="px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-blue-950/40 text-blue-300 border border-blue-800/50 flex items-center gap-1.5">
+              <i data-lucide="network" class="w-3.5 h-3.5"></i> #네트워크
+            </span>
+            <span class="px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-emerald-950/40 text-emerald-300 border border-emerald-800/50 flex items-center gap-1.5">
+              <i data-lucide="lock" class="w-3.5 h-3.5"></i> #정보보안
+            </span>
+            <span class="px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-violet-950/40 text-violet-300 border border-violet-800/50 flex items-center gap-1.5">
+              <i data-lucide="cpu" class="w-3.5 h-3.5"></i> #AI_Tooling
+            </span>
+            <span class="px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-amber-950/40 text-amber-300 border border-amber-800/50 flex items-center gap-1.5">
+              <i data-lucide="terminal" class="w-3.5 h-3.5"></i> #시스템분석
+            </span>
+          </div>
+        </div>
+
+        <!-- Quick Stats Widget -->
+        <div class="flex md:flex-col gap-3 min-w-[200px] border-t md:border-t-0 md:border-l border-slate-800/80 pt-4 md:pt-0 md:pl-6">
+          <div class="flex-1 bg-slate-900/70 border border-slate-800 p-3 rounded-xl">
+            <div class="text-xs text-slate-400">작성된 학습 노트</div>
+            <div class="text-xl font-bold font-mono text-emerald-400 mt-0.5" id="statsPostCount">5개</div>
+          </div>
+          <div class="flex-1 bg-slate-900/70 border border-slate-800 p-3 rounded-xl">
+            <div class="text-xs text-slate-400">남겨진 응원글</div>
+            <div class="text-xl font-bold font-mono text-cyan-400 mt-0.5" id="statsFeedbackCount">불러오는 중...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Category & Filter Section -->
+    <section id="posts-section" class="space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="book-open" class="w-5 h-5 text-emerald-400"></i>
+            <span>학습 노트 (Study Log)</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">이론 학습 및 실습을 통해 정리한 기술 아카이브입니다.</p>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full" id="categoryFilters">
+          <button data-cat="all" class="cat-filter-btn active px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition-all whitespace-nowrap">
+            전체 보기
+          </button>
+          <button data-cat="network" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition-all whitespace-nowrap">
+            네트워크
+          </button>
+          <button data-cat="security" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition-all whitespace-nowrap">
+            모의해킹/보안
+          </button>
+          <button data-cat="linux" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition-all whitespace-nowrap">
+            리눅스/시스템
+          </button>
+          <button data-cat="dev" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition-all whitespace-nowrap">
+            개발 & AI
+          </button>
+        </div>
+      </div>
+
+      <!-- Posts Grid -->
+      <div id="postsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Javascript will populate posts dynamically -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyPostsState" class="hidden text-center py-16 bg-slate-900/40 rounded-xl border border-slate-800">
+        <i data-lucide="file-question" class="w-10 h-10 text-slate-600 mx-auto mb-3"></i>
+        <p class="text-slate-400 text-sm font-medium">검색 조건에 맞는 학습 노트가 없습니다.</p>
+        <button onclick="resetFilters()" class="mt-3 text-xs text-emerald-400 hover:underline">필터 초기화</button>
+      </div>
+    </section>
+
+    <!-- 4. Guestbook / Feedback Section (Supabase Connected) -->
+    <section id="guestbook-section" class="space-y-6 pt-6 border-t border-slate-800/80">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="message-square-quote" class="w-5 h-5 text-cyan-400"></i>
+            <span>방명록 & 응원 한마디</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Supabase 실시간 데이터베이스에 안전하게 기록됩니다.</p>
+        </div>
+
+        <button id="refreshGuestbookBtn" class="self-start sm:self-auto flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800 transition-all">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="refreshIcon"></i>
+          <span>새로고침</span>
+        </button>
+      </div>
+
+      <!-- Guestbook Form & Live Feed Card -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Input Form -->
+        <div class="lg:col-span-1 bg-[#101726]/90 border border-slate-800 rounded-xl p-5 shadow-lg h-fit space-y-4">
+          <div class="flex items-center gap-2 text-slate-200 font-semibold text-sm">
+            <i data-lucide="send" class="w-4 h-4 text-cyan-400"></i>
+            <span>응원 메시지 남기기</span>
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">작성자 닉네임</label>
+              <input 
+                type="text" 
+                id="authorInput" 
+                placeholder="닉네임 (기본: 익명 러너)" 
+                class="w-full px-3 py-2 text-xs bg-slate-900/90 text-slate-200 placeholder-slate-500 rounded-lg border border-slate-800 focus:border-cyan-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">메시지 내용</label>
+              <textarea 
+                id="messageInput" 
+                rows="3" 
+                placeholder="신재원 님에게 전하는 응원이나 질문을 남겨보세요!" 
+                class="w-full px-3 py-2 text-xs bg-slate-900/90 text-slate-200 placeholder-slate-500 rounded-lg border border-slate-800 focus:border-cyan-500 focus:outline-none resize-none"
+              ></textarea>
+            </div>
+
+            <button 
+              id="submitGuestbookBtn" 
+              class="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-medium text-xs rounded-lg transition-all shadow-md flex items-center justify-center gap-2"
+            >
+              <span>등록하기</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <div class="pt-2 border-t border-slate-800 text-[11px] text-slate-500 flex items-center justify-between">
+            <span class="flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Supabase Connected
+            </span>
+            <span class="font-mono text-slate-600">table: bankhar0328</span>
+          </div>
+        </div>
+
+        <!-- Live Feed -->
+        <div class="lg:col-span-2 space-y-3">
+          <div id="guestbookFeed" class="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
+            <div class="text-center py-10 text-slate-500 text-xs">방명록 데이터를 불러오는 중입니다...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 5. Detail Modal for Reading Posts -->
+  <div id="postModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-[#0f1523] border border-slate-700/80 rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+        <div class="flex items-center gap-2">
+          <span id="modalCategory" class="px-2.5 py-0.5 rounded text-xs font-mono font-medium"></span>
+          <span id="modalDate" class="text-xs text-slate-400 font-mono"></span>
+        </div>
+        <button id="closeModalBtn" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-6 flex-1 text-slate-300 text-sm leading-relaxed" id="modalContent">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-3 border-t border-slate-800/80 bg-slate-900/40 flex items-center justify-between text-xs text-slate-400">
+        <span class="flex items-center gap-1.5 font-mono">
+          <i data-lucide="user" class="w-3.5 h-3.5 text-emerald-400"></i> 작성자: 신재원
+        </span>
+        <button id="closeModalBottomBtn" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition-colors">
+          닫기
+        </button>
+      </div>
     </div>
   </div>
 
+  <!-- 6. Footer -->
+  <footer class="border-t border-slate-800/80 bg-[#06080d] py-8 text-slate-500 text-xs mt-16 relative z-10">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-slate-300 font-bold">&gt; SHIN.LOG</span>
+        <span>— Continuous Learning & Security Ritual</span>
+      </div>
+      <div class="flex items-center gap-4 text-slate-400">
+        <a href="https://github.com/User-shin0328" target="_blank" class="hover:text-emerald-400 transition-colors">GitHub Profile</a>
+        <span>•</span>
+        <a href="https://skt-aleph-gilt.vercel.app/" class="hover:text-emerald-400 transition-colors">Vercel Live</a>
+        <span>•</span>
+        <span>© 2026 Jaewon Shin</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-800 text-slate-100 border border-slate-700 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400" id="toastIcon"></i>
+    <span id="toastMsg">알림 메시지</span>
+  </div>
+
+  <!-- JavaScript Application Logic -->
   <script>
+    // --- Supabase Config ---
     const SUPABASE_URL = 'https://nolhrriuxhuhgduekyae.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_YRJgWCiyxTxGvM81uZZu-w_66OxefD8';
     const TABLE_NAME = 'bankhar0328';
 
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const saveBtn = document.getElementById('saveBtn');
-    const contentInput = document.getElementById('contentInput');
-    const list = document.getElementById('list');
+    // --- High-Quality Study Posts Data ---
+    const STUDY_POSTS = [
+      {
+        id: 'post-1',
+        title: 'TCP 3-Way Handshake와 Wireshark 패킷 캡처 실습 해부',
+        category: 'network',
+        categoryLabel: '네트워크',
+        categoryColor: 'bg-cyan-950/70 text-cyan-400 border border-cyan-800/60',
+        date: '2026.09.10',
+        readTime: '6분 읽기',
+        summary: 'TCP 연결 수립 과정에서 SYN, SYN-ACK, ACK 플래그와 시퀀스 번호(Sequence Number)가 교환되는 메커니즘을 Wireshark 패킷 덤프로 상세 분석합니다.',
+        tags: ['#Wireshark', '#TCP/IP', '#패킷분석', '#네트워크기초'],
+        content: `
+          <h2 class="text-xl font-bold text-white mb-3">1. TCP 3-Way Handshake란?</h2>
+          <p class="mb-4">TCP(Transmission Control Protocol)는 신뢰성 있는 연결형 서비스를 제공하기 위해 데이터를 전송하기 전 반드시 양단 간의 논리적 통신 경로를 수립합니다. 이 과정을 <strong>3-Way Handshake</strong>라고 부릅니다.</p>
+          
+          <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-xs mb-5 overflow-x-auto text-cyan-300">
+            [Client] ------------------ SYN (Seq = X) -----------------> [Server] (LISTEN -> SYN_RCVD)<br>
+            [Client] <---------- SYN + ACK (Seq=Y, Ack=X+1) ---------- [Server]<br>
+            [Client] (ESTABLISHED) ----- ACK (Ack=Y+1) ---------------> [Server] (ESTABLISHED)
+          </div>
 
-    // 한 줄 등록
-    saveBtn.addEventListener('click', async () => {
-      const text = contentInput.value.trim();
-      if (!text) {
-        alert('내용을 입력해주세요.');
-        return;
+          <h3 class="text-base font-bold text-slate-200 mb-2">단계별 패킷 플래그 분석</h3>
+          <ul class="list-disc list-inside space-y-2 mb-4 text-slate-300">
+            <li><strong>Step 1 [SYN]:</strong> 클라이언트가 서버에 연결 요청(SYN 플래그=1). 난수로 생성된 초기 시퀀스 번호(ISN: Initial Sequence Number = X)를 전송합니다.</li>
+            <li><strong>Step 2 [SYN + ACK]:</strong> 서버가 요청을 수락하고 클라이언트의 시퀀스 번호에 1을 더한 확인 응답 번호(ACK = X+1)와 서버 자신의 ISN(Seq = Y)을 동봉해 응답합니다.</li>
+            <li><strong>Step 3 [ACK]:</strong> 클라이언트는 서버의 응답을 수신하고 서버 시퀀스에 1을 더한 ACK 번호(ACK = Y+1)를 전송하여 세션(ESTABLISHED)을 활성화합니다.</li>
+          </ul>
+
+          <div class="p-3.5 bg-emerald-950/30 border border-emerald-800/50 rounded-lg mb-4 text-emerald-300 text-xs">
+            💡 <strong>보안 관점 (SYN Flooding 공격):</strong><br>
+            공격자가 무수한 위조 IP로 SYN 패킷만 대량 전송하고 마지막 ACK를 보내지 않으면, 서버의 백로그 큐(Backlog Queue)가 고갈되어 정상 사용자가 접속하지 못하는 DoS 공격이 발생합니다. 이에 대응하기 위해 SYN Cookie 기법이 널리 활용됩니다.
+          </div>
+        `
+      },
+      {
+        id: 'post-2',
+        title: '웹 모의해킹 기초: SQL Injection 취약점 원리와 공격/방어 분석',
+        category: 'security',
+        categoryLabel: '모의해킹/보안',
+        categoryColor: 'bg-emerald-950/70 text-emerald-400 border border-emerald-800/60',
+        date: '2026.09.08',
+        readTime: '8분 읽기',
+        summary: '사용자 입력값 검증 부재로 인해 SQL 쿼리 로직이 변조되는 SQLi의 기본 원리, Error-based/Union-based 기법, 그리고 Prepared Statement 방어 원리를 정리합니다.',
+        tags: ['#모의해킹', '#SQLi', '#웹보안', '#OWASP_Top10'],
+        content: `
+          <h2 class="text-xl font-bold text-white mb-3">1. SQL Injection (SQLi) 개요</h2>
+          <p class="mb-4">웹 애플리케이션이 사용자의 입력값을 적절히 필터링하지 않고 동적으로 SQL 쿼리를 조합할 때, 공격자가 악의적인 SQL 구문을 삽입하여 데이터베이스를 비정상적으로 조작하거나 탈취하는 공격입니다.</p>
+
+          <h3 class="text-base font-bold text-slate-200 mb-2">2. 인증 우회 (Authentication Bypass) 취약 코드 예시</h3>
+          <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-xs mb-4 text-slate-300">
+            <span class="text-rose-400">// 취약한 SQL 동적 조합 코드</span><br>
+            SELECT * FROM users WHERE username = '<span class="text-yellow-300">' OR '1'='1' -- </span>' AND password = '...'
+          </div>
+          <p class="mb-4">입력란에 <code class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-300 font-mono">' OR '1'='1' --</code>을 주입하면, WHERE 조건식이 항상 참(True)이 되고 뒷부분의 패스워드 검증 쿼리가 주석 처리되어 패스워드 없이도 최상위 관리자 권한으로 로그인할 수 있습니다.</p>
+
+          <h3 class="text-base font-bold text-slate-200 mb-2">3. 핵심 대응 방안: Prepared Statement (바인딩 쿼리)</h3>
+          <p class="mb-4">가장 근본적이고 확실한 방어 기법은 파라미터화된 쿼리(Parameterized Query)를 사용하는 것입니다. 쿼리의 문법적 구조를 미리 컴파일하고, 사용자 입력값은 단순한 리터럴 문자열 데이터로만 취급되므로 쿼리 로직이 결코 변조되지 않습니다.</p>
+        `
+      },
+      {
+        id: 'post-3',
+        title: 'Linux 서버 보안 점검 및 필수 관리 명령어 치트시트',
+        category: 'linux',
+        categoryLabel: '리눅스/시스템',
+        categoryColor: 'bg-amber-950/70 text-amber-400 border border-amber-800/60',
+        date: '2026.09.05',
+        readTime: '5분 읽기',
+        summary: '서버 취약점 진단 시 필수적으로 점검하는 열린 포트 확인(ss, netstat), 프로세스 모니터링, SetUID 파일 탐색 및 퍼미션 관리 핵심 명령어 모음입니다.',
+        tags: ['#Linux', '#서버보안', '#SetUID', '#네트워크점검'],
+        content: `
+          <h2 class="text-xl font-bold text-white mb-3">1. 리눅스 보안 분석을 위한 필수 명령어</h2>
+          <p class="mb-4">모의해킹이나 리눅스 침해사고 분석 시 가장 먼저 확인해야 하는 시스템 정보 점검 명령어들입니다.</p>
+
+          <div class="space-y-3 mb-5 font-mono text-xs">
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+              <span class="text-emerald-400 font-bold"># 열려있는 TCP 포트 및 리스닝 프로세스 확인</span><br>
+              <span class="text-slate-200">ss -tulpn | grep LISTEN</span>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+              <span class="text-emerald-400 font-bold"># SetUID 설정된 위험 바이너리 파일 전수 조사</span><br>
+              <span class="text-slate-200">find / -perm -4000 -type f -exec ls -la {} + 2>/dev/null</span>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+              <span class="text-emerald-400 font-bold"># 최근 접속 실패 로그 (무차별 대입 공격 확인)</span><br>
+              <span class="text-slate-200">lastb | head -n 20</span>
+            </div>
+          </div>
+
+          <p class="text-slate-300">특히 SetUID(4000) 권한이 부여된 파일은 일반 사용자가 실행하더라도 root 소유자 권한으로 실행되므로, 권한 상승(Privilege Escalation) 벡터가 되는지 정기적으로 auditctl 및 find 명령어로 검증해야 합니다.</p>
+        `
+      },
+      {
+        id: 'post-4',
+        title: 'AI 코딩 도구를 활용한 고속 프로토타이핑 & 학습 리추얼',
+        category: 'dev',
+        categoryLabel: '개발 & AI',
+        categoryColor: 'bg-violet-950/70 text-violet-400 border border-violet-800/60',
+        date: '2026.09.02',
+        readTime: '4분 읽기',
+        summary: 'LLM과 AI 어시스턴트를 단순 코드 생성을 넘어 아키텍처 검증, 디버깅 파트너, 그리고 반복 학습 도구로 체계화하는 개발 리추얼 실천기입니다.',
+        tags: ['#AI_Tooling', '#생산성', '#개발리추얼', '#성장기록'],
+        content: `
+          <h2 class="text-xl font-bold text-white mb-3">1. AI 도구를 효과적으로 다루는 원칙</h2>
+          <p class="mb-4">AI 도구를 "무작정 맡기는 것"이 아니라, 명확한 맥락(Context)과 제약 조건을 제시하고 생성된 결과물을 직접 검증(Verification)하는 태도가 실력 향상의 핵심입니다.</p>
+
+          <h3 class="text-base font-bold text-slate-200 mb-2">실천 루틴 3단계</h3>
+          <ol class="list-decimal list-inside space-y-2 mb-4 text-slate-300">
+            <li><strong>목표의 분해:</strong> 거대한 기능을 한 번에 요청하지 않고 모듈별, 단계별로 나누어 점진적으로 발전시킵니다.</li>
+            <li><strong>에러 로그의 정밀 전달:</strong> 추상적인 질문 대신 콘솔 로그와 네트워크 응답 페이로드를 정확히 공유합니다.</li>
+            <li><strong>학습 기록화:</strong> 해결된 버그와 새로 배운 개념은 즉시 블로그 스터디 로그로 정리하여 내 지식으로 만듭니다.</li>
+          </ol>
+        `
+      },
+      {
+        id: 'post-5',
+        title: 'Cisco Packet Tracer를 활용한 소규모 사설망 구축 및 라우팅',
+        category: 'network',
+        categoryLabel: '네트워크',
+        categoryColor: 'bg-cyan-950/70 text-cyan-400 border border-cyan-800/60',
+        date: '2026.08.28',
+        readTime: '7분 읽기',
+        summary: 'VLAN 구성, 서브넷팅 계산(CIDR /24 -> /26), 그리고 기본 게이트웨이와 정적 라우팅(Static Route)을 시뮬레이터로 직접 검증한 결과입니다.',
+        tags: ['#PacketTracer', '#서브넷마스크', '#VLAN', '#라우팅'],
+        content: `
+          <h2 class="text-xl font-bold text-white mb-3">1. 패킷 트레이서 사설망 실습 환경</h2>
+          <p class="mb-4">보안 점검을 수행하기 위해서는 네트워크 망이 어떤 토폴로지로 분리되어 있는지 이해하는 것이 필수입니다. 라우터와 24포트 스위치를 연결하여 부서별 네트워크 분리 실습을 진행했습니다.</p>
+          <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-xs mb-4 text-slate-300">
+            VLAN 10 (개발망): 192.168.10.0/26 (GW: .1)<br>
+            VLAN 20 (보안망): 192.168.20.0/26 (GW: .1)<br>
+            Inter-VLAN Routing (Router-on-a-Stick via Sub-interfaces)
+          </div>
+          <p class="text-slate-300">IEEE 802.1Q 트렁킹 프로토콜을 활성화하여 단일 물리 링크를 통해 다중 VLAN 패킷이 라우터의 가상 서브인터페이스(Fa0/0.10, Fa0/0.20)로 캡슐화되어 전달되는 과정을 관찰했습니다.</p>
+        `
       }
+    ];
 
-      const { data, error } = await supabaseClient
-        .from(TABLE_NAME)
-        .insert([{ name: text }]);
+    // --- State Management ---
+    let activeCategory = 'all';
+    let searchQuery = '';
+    let currentUser = null;
 
-      if (error) {
-        console.error('저장 실패:', error);
-        alert('저장 실패: ' + error.message);
+    // --- DOM Elements ---
+    const postsGrid = document.getElementById('postsGrid');
+    const emptyPostsState = document.getElementById('emptyPostsState');
+    const searchInput = document.getElementById('searchInput');
+    const searchInputMobile = document.getElementById('searchInputMobile');
+    const categoryFilters = document.getElementById('categoryFilters');
+    
+    // Auth DOM
+    const loginBtn = document.getElementById('loginBtn');
+    const userInfo = document.getElementById('userInfo');
+    const userAvatar = document.getElementById('userAvatar');
+    const userName = document.getElementById('userName');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    // Guestbook DOM
+    const guestbookFeed = document.getElementById('guestbookFeed');
+    const authorInput = document.getElementById('authorInput');
+    const messageInput = document.getElementById('messageInput');
+    const submitGuestbookBtn = document.getElementById('submitGuestbookBtn');
+    const refreshGuestbookBtn = document.getElementById('refreshGuestbookBtn');
+    const refreshIcon = document.getElementById('refreshIcon');
+    const statsFeedbackCount = document.getElementById('statsFeedbackCount');
+
+    // Modal DOM
+    const postModal = document.getElementById('postModal');
+    const modalCategory = document.getElementById('modalCategory');
+    const modalDate = document.getElementById('modalDate');
+    const modalContent = document.getElementById('modalContent');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const closeModalBottomBtn = document.getElementById('closeModalBottomBtn');
+
+    // --- Toast Notification ---
+    function showToast(msg, isSuccess = true) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      const toastIcon = document.getElementById('toastIcon');
+
+      toastMsg.textContent = msg;
+      if (isSuccess) {
+        toastIcon.setAttribute('data-lucide', 'check-circle');
+        toastIcon.className = 'w-4 h-4 text-emerald-400';
       } else {
-        alert('응원이 등록되었습니다!');
-        contentInput.value = '';
-        loadData();
+        toastIcon.setAttribute('data-lucide', 'alert-triangle');
+        toastIcon.className = 'w-4 h-4 text-rose-400';
       }
+      lucide.createIcons();
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    // --- Render Posts ---
+    function renderPosts() {
+      const query = searchQuery.trim().toLowerCase();
+      
+      const filtered = STUDY_POSTS.filter(post => {
+        const matchesCategory = (activeCategory === 'all') || (post.category === activeCategory);
+        const matchesSearch = !query || 
+          post.title.toLowerCase().includes(query) ||
+          post.summary.toLowerCase().includes(query) ||
+          post.tags.some(t => t.toLowerCase().includes(query));
+        return matchesCategory && matchesSearch;
+      });
+
+      postsGrid.innerHTML = '';
+
+      if (filtered.length === 0) {
+        emptyPostsState.classList.remove('hidden');
+      } else {
+        emptyPostsState.classList.add('hidden');
+        filtered.forEach(post => {
+          const card = document.createElement('div');
+          card.className = "group relative bg-[#101726]/80 hover:bg-[#131c30] border border-slate-800 hover:border-emerald-500/50 rounded-xl p-5 transition-all duration-300 flex flex-col justify-between cursor-pointer hover:shadow-lg hover:-translate-y-1";
+          card.onclick = () => openPostModal(post);
+
+          card.innerHTML = `
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="px-2.5 py-0.5 rounded text-[11px] font-mono font-medium ${post.categoryColor}">
+                  ${post.categoryLabel}
+                </span>
+                <span class="text-[11px] font-mono text-slate-500">${post.readTime}</span>
+              </div>
+              
+              <h3 class="text-base font-bold text-slate-100 group-hover:text-emerald-400 transition-colors mb-2 line-clamp-2">
+                ${post.title}
+              </h3>
+              
+              <p class="text-slate-400 text-xs leading-relaxed line-clamp-3 mb-4">
+                ${post.summary}
+              </p>
+            </div>
+
+            <div>
+              <div class="flex flex-wrap gap-1.5 mb-4">
+                ${post.tags.map(tag => `<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800/80 text-slate-400 border border-slate-700/50">${tag}</span>`).join('')}
+              </div>
+              
+              <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-500 font-mono">
+                <span>${post.date}</span>
+                <span class="text-emerald-400 font-medium group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                  자세히 읽기 <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                </span>
+              </div>
+            </div>
+          `;
+          postsGrid.appendChild(card);
+        });
+      }
+
+      lucide.createIcons();
+    }
+
+    // --- Modal Functions ---
+    function openPostModal(post) {
+      modalCategory.textContent = post.categoryLabel;
+      modalCategory.className = `px-2.5 py-0.5 rounded text-xs font-mono font-medium ${post.categoryColor}`;
+      modalDate.textContent = `${post.date} · ${post.readTime}`;
+
+      modalContent.innerHTML = `
+        <h1 class="text-xl sm:text-2xl font-bold text-white mb-4 leading-snug">${post.title}</h1>
+        <div class="flex flex-wrap gap-1.5 mb-6">
+          ${post.tags.map(t => `<span class="text-xs font-mono px-2.5 py-1 rounded bg-slate-800 text-emerald-400 border border-slate-700">${t}</span>`).join('')}
+        </div>
+        <div class="space-y-4 text-slate-300">
+          ${post.content}
+        </div>
+      `;
+
+      postModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    }
+
+    function closeModal() {
+      postModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    closeModalBtn.addEventListener('click', closeModal);
+    if (closeModalBottomBtn) closeModalBottomBtn.addEventListener('click', closeModal);
+    postModal.addEventListener('click', (e) => {
+      if (e.target === postModal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
     });
 
-    // 목록 불러오기
-    async function loadData() {
-      const { data, error } = await supabaseClient
-        .from(TABLE_NAME)
-        .select('*')
-        .order('id', { ascending: false });
+    // --- Search & Filter Logic ---
+    function setupFilterEvents() {
+      categoryFilters.addEventListener('click', (e) => {
+        const btn = e.target.closest('.cat-filter-btn');
+        if (!btn) return;
 
-      if (error) {
-        console.error('조회 실패:', error);
+        document.querySelectorAll('.cat-filter-btn').forEach(b => {
+          b.classList.remove('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/40');
+          b.classList.add('bg-slate-900', 'text-slate-400', 'border-slate-800');
+        });
+
+        btn.classList.remove('bg-slate-900', 'text-slate-400', 'border-slate-800');
+        btn.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/40');
+
+        activeCategory = btn.getAttribute('data-cat');
+        renderPosts();
+      });
+
+      const handleSearch = (e) => {
+        searchQuery = e.target.value;
+        if (e.target === searchInput && searchInputMobile) searchInputMobile.value = searchQuery;
+        if (e.target === searchInputMobile && searchInput) searchInput.value = searchQuery;
+        renderPosts();
+      };
+
+      searchInput.addEventListener('input', handleSearch);
+      if (searchInputMobile) searchInputMobile.addEventListener('input', handleSearch);
+    }
+
+    function resetFilters() {
+      activeCategory = 'all';
+      searchQuery = '';
+      if (searchInput) searchInput.value = '';
+      if (searchInputMobile) searchInputMobile.value = '';
+      
+      document.querySelectorAll('.cat-filter-btn').forEach(b => {
+        if (b.getAttribute('data-cat') === 'all') {
+          b.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/40');
+          b.classList.remove('bg-slate-900', 'text-slate-400', 'border-slate-800');
+        } else {
+          b.classList.remove('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/40');
+          b.classList.add('bg-slate-900', 'text-slate-400', 'border-slate-800');
+        }
+      });
+      renderPosts();
+    }
+
+    // --- Supabase Guestbook (bankhar0328) ---
+    async function loadGuestbook() {
+      refreshIcon.classList.add('animate-spin');
+      try {
+        const { data, error } = await supabase
+          .from(TABLE_NAME)
+          .select('*')
+          .order('id', { ascending: false });
+
+        if (error) throw error;
+
+        statsFeedbackCount.textContent = `${data ? data.length : 0}개`;
+        guestbookFeed.innerHTML = '';
+
+        if (!data || data.length === 0) {
+          guestbookFeed.innerHTML = `
+            <div class="text-center py-10 bg-slate-900/30 rounded-xl border border-slate-800/80 text-slate-500 text-xs">
+              첫 번째 응원의 메시지를 남겨보세요!
+            </div>
+          `;
+          return;
+        }
+
+        data.forEach(item => {
+          const card = document.createElement('div');
+          card.className = "bg-slate-900/80 border border-slate-800/80 rounded-xl p-3.5 hover:border-slate-700 transition-colors flex items-start justify-between gap-3";
+          
+          const rawText = item.name || '';
+          let author = '익명 러너';
+          let message = rawText;
+
+          if (rawText.includes('::')) {
+            const parts = rawText.split('::');
+            author = parts[0].trim();
+            message = parts.slice(1).join('::').trim();
+          }
+
+          card.innerHTML = `
+            <div class="space-y-1 flex-1">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-cyan-400 font-mono flex items-center gap-1">
+                  <i data-lucide="user-check" class="w-3 h-3"></i> ${escapeHtml(author)}
+                </span>
+                <span class="text-[10px] text-slate-500 font-mono">#${item.id}</span>
+              </div>
+              <p class="text-slate-200 text-xs leading-relaxed whitespace-pre-wrap word-break">${escapeHtml(message)}</p>
+            </div>
+          `;
+          guestbookFeed.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error('방명록 조회 실패:', err);
+        statsFeedbackCount.textContent = '연결 확인';
+        guestbookFeed.innerHTML = `
+          <div class="text-center py-6 bg-rose-950/20 border border-rose-900/40 rounded-xl text-rose-300 text-xs">
+            방명록을 불러오는 중 오류가 발생했습니다.<br>
+            <span class="text-slate-500 text-[10px]">${err.message || ''}</span>
+          </div>
+        `;
+      } finally {
+        setTimeout(() => refreshIcon.classList.remove('animate-spin'), 400);
+        lucide.createIcons();
+      }
+    }
+
+    async function submitGuestbook() {
+      const author = authorInput.value.trim() || (currentUser?.user_metadata?.user_name || '익명 러너');
+      const message = messageInput.value.trim();
+
+      if (!message) {
+        showToast('메시지 내용을 입력해주세요.', false);
+        messageInput.focus();
         return;
       }
 
-      list.innerHTML = '';
-      data.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = item.name || JSON.stringify(item);
-        list.appendChild(li);
+      submitGuestbookBtn.disabled = true;
+      submitGuestbookBtn.innerHTML = `<span>등록 중...</span>`;
+
+      try {
+        const formattedPayload = `${author} :: ${message}`;
+        const { error } = await supabase
+          .from(TABLE_NAME)
+          .insert([{ name: formattedPayload }]);
+
+        if (error) throw error;
+
+        showToast('응원이 성공적으로 등록되었습니다!');
+        messageInput.value = '';
+        await loadGuestbook();
+      } catch (err) {
+        console.error('등록 실패:', err);
+        showToast('등록 실패: ' + err.message, false);
+      } finally {
+        submitGuestbookBtn.disabled = false;
+        submitGuestbookBtn.innerHTML = `<span>등록하기</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>`;
+        lucide.createIcons();
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    // --- Supabase Auth (GitHub OAuth) ---
+    async function initAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      updateAuthUI(session?.user);
+
+      supabase.auth.onAuthStateChange((_event, session) => {
+        updateAuthUI(session?.user);
+      });
+
+      loginBtn.addEventListener('click', async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'github',
+          options: {
+            redirectTo: window.location.origin
+          }
+        });
+        if (error) showToast('로그인 요청 실패: ' + error.message, false);
+      });
+
+      logoutBtn.addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        showToast('로그아웃 되었습니다.');
       });
     }
 
-    loadData();
+    function updateAuthUI(user) {
+      currentUser = user;
+      if (user) {
+        loginBtn.classList.add('hidden');
+        userInfo.classList.remove('hidden');
+        userInfo.classList.add('flex');
+        
+        const ghUsername = user.user_metadata?.user_name || user.email?.split('@')[0] || 'GitHub User';
+        userName.textContent = ghUsername;
+        userAvatar.src = user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(ghUsername)}&background=10b981&color=fff`;
+        authorInput.value = ghUsername;
+      } else {
+        loginBtn.classList.remove('hidden');
+        userInfo.classList.add('hidden');
+        userInfo.classList.remove('flex');
+        authorInput.value = '';
+      }
+    }
+
+    // --- Init ---
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      renderPosts();
+      setupFilterEvents();
+      loadGuestbook();
+      initAuth();
+
+      submitGuestbookBtn.addEventListener('click', submitGuestbook);
+      refreshGuestbookBtn.addEventListener('click', loadGuestbook);
+    });
   </script>
 </body>
 </html>
