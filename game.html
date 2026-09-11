@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>WESTERN RUNNER — 서부의 총잡이 러너 (과제 2)</title>
+  <title>미니게임 — 서부의 총잡이 러너 (WESTERN RUNNER)</title>
   
   <!-- Pretendard & JetBrains Mono Fonts -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
@@ -232,13 +232,17 @@
           <span class="text-zinc-500">점수:</span>
           <span id="scoreVal" class="hud-val">0</span>
         </div>
+        <div class="hud-stat" title="시간 경과에 따라 증가하는 질주 속도">
+          <span class="text-zinc-500">속도:</span>
+          <span id="speedVal" class="hud-val text-[#ba9578]">1.0x</span>
+        </div>
         <div class="hud-stat" title="역대 최장 생존 기록">
           <span class="text-zinc-500">🏆최장생존:</span>
           <span id="bestSurvivalVal" class="hud-val">30.0s</span>
         </div>
       </div>
 
-      <!-- 효과 제어 버튼 (카드 5) -->
+      <!-- 효과 제어 버튼 -->
       <div class="flex items-center gap-2">
         <button id="muteBtn" class="btn" type="button" aria-pressed="false" title="효과음 켜기/끄기">
           <span id="muteIcon">🔊</span>
@@ -259,13 +263,18 @@
 
       <!-- 시작 화면 오버레이 -->
       <div id="startOverlay" class="overlay">
-        <div class="overlay-card space-y-4">
-          <div class="text-xs font-mono text-[#ba9578] uppercase tracking-widest">[ 서부의 총잡이 러너 : 과제 2 ]</div>
-          <h1 class="text-xl sm:text-2xl font-bold text-white font-mono">WESTERN RUNNER</h1>
-          <p class="text-xs text-[#a1a1aa] leading-relaxed">
-            30초 동안 굴러오는 회전초와 날카로운 선인장을 피해 달리세요!<br>
+        <div class="overlay-card space-y-4 max-w-md">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#ba9578]/40 bg-[#8c674b]/15 text-xs font-mono font-bold text-[#ba9578] uppercase tracking-widest mx-auto">
+            <span>ARCADE</span>
+            <span class="text-zinc-600">•</span>
+            <span>WESTERN RUNNER</span>
+          </div>
+          <h1 class="text-3xl sm:text-5xl font-black text-[#ba9578] font-mono tracking-tight">미니게임</h1>
+          <div class="text-sm sm:text-base font-bold text-white font-mono -mt-2">서부의 총잡이 러너</div>
+          <p class="text-xs sm:text-sm text-[#a1a1aa] leading-relaxed">
+            30초 동안 시간이 지날수록 <span class="text-[#ba9578] font-bold">속도가 빨라지고</span> 사막의 수많은 장애물이 쏟아집니다!<br>
             <strong class="text-white font-semibold">★ 공중에서 한 번 더 눌러 '2단 점프' 가능!</strong><br>
-            거대한 <span class="text-[#ba9578] font-bold">2단 복합 장애물</span>은 2단 점프로만 뛰어넘을 수 있습니다.
+            거대한 <span class="text-[#ba9578] font-bold">[2단점프!] 선인장</span>은 2단 점프로만 뛰어넘을 수 있습니다.
           </p>
 
           <!-- 역대 최장 기록 명예의 전당 배너 -->
@@ -277,8 +286,8 @@
           </div>
 
           <div class="pt-2">
-            <button id="startBtn" class="btn btn-primary w-full py-2.5 text-sm justify-center" type="button">
-              <span>게임 시작 (Space)</span>
+            <button id="startBtn" class="btn btn-primary w-full py-3 text-sm sm:text-base font-bold justify-center shadow-lg" type="button">
+              <span>미니게임 시작 (Space)</span>
             </button>
           </div>
         </div>
@@ -524,6 +533,7 @@
     // DOM UI
     const timeVal = document.getElementById('timeVal');
     const scoreVal = document.getElementById('scoreVal');
+    const speedVal = document.getElementById('speedVal');
     const bestSurvivalVal = document.getElementById('bestSurvivalVal');
     const startBestRecord = document.getElementById('startBestRecord');
     const muteBtn = document.getElementById('muteBtn');
@@ -562,7 +572,9 @@
 
     // 게임 상태 (State)
     const GAME_DURATION = 30.0; // 30초 루프
-    const BASE_SPEED = 7.0;     // 카드 3 확정 속도
+    const INITIAL_SPEED = 6.8;  // 초기 시작 속도
+    const MAX_SPEED = 11.0;     // 시간이 줄어들수록 점진적 증가하는 최고 속도
+    let currentSpeed = INITIAL_SPEED;
     let gameState = 'IDLE';     // IDLE, PLAYING, PAUSED, GAMEOVER, SUCCESS
     let lastTime = 0;
     let remainingTime = GAME_DURATION;
@@ -601,6 +613,7 @@
       remainingTime = GAME_DURATION;
       currentScore = 0;
       survivalTime = 0;
+      currentSpeed = INITIAL_SPEED;
       player.y = GROUND_Y - player.height;
       player.velocityY = 0;
       player.jumpCount = 0;
@@ -608,7 +621,7 @@
       player.lastJumpTime = 0;
       player.doubleJumpEffect = 0;
       obstacles = [];
-      nextObstacleTimer = 1.0;
+      nextObstacleTimer = 0.8;
       bgOffset = 0;
 
       startOverlay.classList.add('hidden');
@@ -618,6 +631,7 @@
 
       timeVal.textContent = remainingTime.toFixed(1) + 's';
       scoreVal.textContent = '0';
+      if (speedVal) speedVal.textContent = '1.0x';
       lastTime = performance.now();
       requestAnimationFrame(gameLoop);
     }
@@ -729,7 +743,7 @@
     });
 
     // ==========================================
-    // 5. 프레임 업데이트 & 장애물 스폰 (2단 점프 전용 거대 장애물 추가!)
+    // 5. 프레임 업데이트 & 가속 & 장애물 고빈도 랜덤 스폰
     // ==========================================
     function gameLoop(currentTime) {
       if (gameState !== 'PLAYING') return;
@@ -737,11 +751,8 @@
       const dt = Math.min((currentTime - lastTime) / 1000, 0.1);
       lastTime = currentTime;
 
-      // 시간 및 점수
+      // 1) 시간 차감
       remainingTime -= dt;
-      currentScore += Math.floor(dt * 10);
-      scoreVal.textContent = currentScore;
-
       if (remainingTime <= 0) {
         remainingTime = 0;
         timeVal.textContent = '0.0s';
@@ -750,7 +761,20 @@
       }
       timeVal.textContent = remainingTime.toFixed(1) + 's';
 
-      // 플레이어 물리
+      // 2) 시간이 줄어들수록 점진적으로 질주 속도 가속 (6.8 -> 11.0)
+      const progress = Math.min(Math.max((GAME_DURATION - remainingTime) / GAME_DURATION, 0), 1);
+      currentSpeed = INITIAL_SPEED + (MAX_SPEED - INITIAL_SPEED) * Math.pow(progress, 0.85);
+      const speedMultiplier = currentSpeed / INITIAL_SPEED;
+
+      if (speedVal) {
+        speedVal.textContent = speedMultiplier.toFixed(1) + 'x';
+      }
+
+      // 점수 가산 (후반부 고속일수록 점수 가산율 상승)
+      currentScore += Math.floor(dt * 10 * speedMultiplier);
+      scoreVal.textContent = currentScore;
+
+      // 3) 플레이어 물리 (점프 & 중력)
       player.velocityY += player.gravity;
       player.y += player.velocityY;
 
@@ -765,9 +789,11 @@
         player.doubleJumpEffect--;
       }
 
-      bgOffset += BASE_SPEED * 60 * dt * 0.5;
+      // 배경 스크롤 가속 연동
+      bgOffset += currentSpeed * 60 * dt * 0.5;
 
-      // 장애물 스폰 (일반 선인장, 회전초, 그리고 ★ 2단 점프로만 피하는 거대 선인장!)
+      // 4) 장애물 고빈도 랜덤 스폰
+      // 회전초, 일반 선인장, 쌍둥이 선인장, 2단 점프 거대 선인장이 쉴 틈 없이 랜덤하게 쏟아짐
       nextObstacleTimer -= dt;
       if (nextObstacleTimer <= 0) {
         const rand = Math.random();
@@ -776,20 +802,25 @@
         let height = 44;
 
         if (rand < 0.28) {
-          // ★ 2단 점프로만 피하는 거대 2단 선인장 (높이 74px!)
+          // ★ 2단 점프로만 피할 수 있는 거대 3단 선인장 (높이 74px)
           type = 'tall_cactus';
           width = 30;
           height = 74;
-        } else if (rand < 0.65) {
-          // 회전초
+        } else if (rand < 0.52) {
+          // 회전초 (Tumbleweed)
           type = 'tumbleweed';
           width = 26;
           height = 26;
-        } else {
-          // 일반 선인장
+        } else if (rand < 0.76) {
+          // 일반 선인장 (Single Cactus)
           type = 'cactus';
           width = 24;
           height = 44;
+        } else {
+          // 와이드 쌍둥이 선인장 (Double Cactus)
+          type = 'double_cactus';
+          width = 44;
+          height = 46;
         }
 
         obstacles.push({
@@ -801,19 +832,25 @@
           rotation: 0
         });
 
-        // 거대 장애물 뒤에는 여유 시간 조금 더 제공
-        nextObstacleTimer = (type === 'tall_cactus') ? 2.0 + Math.random() * 0.8 : 1.2 + Math.random() * 1.3;
+        // 장애물 생성 간격: 속도가 빨라질수록 더욱 빈번하게 등장 (기존 대비 2배 이상 빈도)
+        if (type === 'tall_cactus') {
+          // 2단 점프 후 착지 텀을 보장하면서도 자주 등장 (~1.0s - 1.4s)
+          nextObstacleTimer = (1.15 + Math.random() * 0.45) / Math.sqrt(speedMultiplier);
+        } else {
+          // 일반/쌍둥이/회전초는 0.55s ~ 0.95s로 매우 긴장감 있게 쏟아짐
+          nextObstacleTimer = (0.62 + Math.random() * 0.45) / speedMultiplier;
+        }
       }
 
-      // 장애물 이동 및 충돌 검사
+      // 5) 장애물 이동 및 충돌 검사 (현재 속도 연동)
       for (let i = obstacles.length - 1; i >= 0; i--) {
         const obs = obstacles[i];
-        obs.x -= BASE_SPEED * 60 * dt;
+        obs.x -= currentSpeed * 60 * dt;
         if (obs.type === 'tumbleweed') {
-          obs.rotation += 0.12;
+          obs.rotation += 0.14 * speedMultiplier;
         }
 
-        // 충돌 박스
+        // 충돌 판정 박스
         const padX = 6;
         const padY = 5;
         if (
@@ -832,7 +869,7 @@
         }
       }
 
-      // 렌더
+      // 6) 렌더링
       render();
 
       requestAnimationFrame(gameLoop);
@@ -913,6 +950,20 @@
           ctx.fillRect(obs.x, obs.y + 6, 6, 12);
           ctx.fillRect(obs.x + 16, obs.y + 18, 8, 6);
           ctx.fillRect(obs.x + 18, obs.y + 12, 6, 12);
+        } else if (obs.type === 'double_cactus') {
+          // 와이드 쌍둥이 선인장 (Double Cactus)
+          ctx.fillStyle = '#4e3621';
+          // 작은 선인장
+          ctx.fillRect(obs.x + 4, obs.y + 6, 8, obs.height - 6);
+          ctx.fillRect(obs.x, obs.y + 18, 6, 6);
+          ctx.fillRect(obs.x, obs.y + 12, 5, 8);
+          // 큰 선인장
+          ctx.fillStyle = '#61442c';
+          ctx.fillRect(obs.x + 22, obs.y, 9, obs.height);
+          ctx.fillRect(obs.x + 16, obs.y + 14, 7, 6);
+          ctx.fillRect(obs.x + 16, obs.y + 8, 5, 8);
+          ctx.fillRect(obs.x + 31, obs.y + 20, 8, 6);
+          ctx.fillRect(obs.x + 33, obs.y + 14, 6, 8);
         } else {
           // 회전초 (Tumbleweed)
           ctx.save();
