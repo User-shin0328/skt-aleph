@@ -1,130 +1,164 @@
 <!DOCTYPE html>
-<html lang="ko" class="dark">
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>신재원 — 엔지니어링 포트폴리오</title>
   
-  <!-- Pretendard & JetBrains Mono Fonts -->
+  <!-- Pretendard & JetBrains Mono Fonts (모바일 최적화) -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS CDN (보조용) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-          colors: {
-            black: '#09090b',
-            dark: {
-              900: '#0d0d10',
-              800: '#141418',
-              700: '#1c1c22',
-              600: '#27272f'
-            },
-            brown: {
-              300: '#d5bba2',
-              400: '#ba9578',
-              500: '#a27b5c',
-              600: '#8c674b',
-              700: '#6e4f38',
-              800: '#4d3626',
-              900: '#322318'
-            }
-          }
-        }
-      }
-    }
-  </script>
 
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
+  <!-- 완벽한 모바일 독립형 임베디드 CSS (CDN 차단/지연 시에도 100% 완벽 렌더링) -->
   <style>
-    body {
-      background-color: #09090b;
-      color: #f4f4f5;
-      font-family: 'Pretendard', sans-serif;
-      overflow-x: hidden;
-      line-height: 1.6;
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    /* Tab Focus Accessibility (Brown Ring) */
+    :root {
+      --bg-black: #09090b;
+      --card-bg: #141418;
+      --sub-bg: #0d0d10;
+      --border-zinc: #27272a;
+      --border-light: #3f3f46;
+      --brown-main: #ba9578;
+      --brown-accent: #a27b5c;
+      --brown-btn: #8c674b;
+      --brown-hover: #a27b5c;
+      --text-white: #f4f4f5;
+      --text-gray: #a1a1aa;
+      --text-darkgray: #71717a;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-white);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 포커스 접근성 */
     a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
-      outline: 2px solid #ba9578 !important;
+      outline: 2px solid var(--brown-main) !important;
       outline-offset: 2px !important;
     }
 
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 7px;
-      height: 7px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #09090b;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #27272a;
-      border-radius: 3px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #8c674b;
+    /* 모바일 반응형 래퍼 */
+    .container-box {
+      width: 100%;
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 0 16px;
     }
 
-    /* Reduced Motion Mode */
+    @media (min-width: 640px) {
+      .container-box {
+        padding: 0 24px;
+      }
+    }
+
+    /* 카드 베이스 */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-zinc);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    @media (min-width: 640px) {
+      .card {
+        padding: 28px;
+        margin-bottom: 32px;
+      }
+    }
+
+    /* 스크롤바 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-black);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-zinc);
+      border-radius: 3px;
+    }
+
+    /* 움직임 감소 모드 */
     .reduced-motion *, .reduced-motion *::before, .reduced-motion *::after {
       animation-duration: 0.001ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.001ms !important;
       scroll-behavior: auto !important;
     }
+
+    /* 인라인 SVG 아이콘 공통 */
+    .svg-icon {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      vertical-align: -2px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-brown-800 selection:text-white">
+<body class="min-h-screen flex flex-col selection:bg-[#4d3626] selection:text-white">
 
-  <!-- 본문 건너뛰기 링크 (접근성) -->
+  <!-- 본문 건너뛰기 링크 (모바일/스크린리더) -->
   <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-4 py-2 bg-[#8c674b] text-white rounded-md font-medium text-xs">
     본문으로 바로가기
   </a>
 
   <!-- 헤더 네비게이션 -->
-  <header class="sticky top-0 z-40 bg-[#09090b]/90 backdrop-blur-md border-b border-zinc-800 transition-colors">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+  <header class="sticky top-0 z-40 bg-[#09090b]/95 backdrop-blur-md border-b border-[#27272a]">
+    <div class="container-box h-16 flex items-center justify-between">
       
       <!-- 로고 및 사이트명 -->
-      <a href="#" class="flex items-center gap-2 text-white font-mono font-bold text-sm sm:text-base tracking-tight hover:text-[#ba9578] transition-colors">
+      <a href="#" class="flex items-center gap-1.5 text-white font-mono font-bold text-sm sm:text-base tracking-tight hover:text-[#ba9578] transition-colors">
         <span class="text-[#ba9578] font-bold">&gt;</span>
-        <span class="text-white">SHIN JAEWON</span>
-        <span class="text-xs text-[#a1a1aa] font-normal px-2 py-0.5 rounded bg-[#141418] border border-zinc-800 hidden sm:inline">PORTFOLIO</span>
+        <span>SHIN JAEWON</span>
+        <span class="text-[10px] sm:text-xs text-[#a1a1aa] font-normal px-1.5 py-0.5 rounded bg-[#141418] border border-[#27272a] ml-1">PORTFOLIO</span>
       </a>
 
-      <!-- 헤더 우측 도구: 공개 상태, 모션 제어, 깃허브 링크 -->
-      <div class="flex items-center gap-3">
+      <!-- 헤더 우측 도구 -->
+      <div class="flex items-center gap-2 sm:gap-3">
         <!-- 공개 상태 뱃지 -->
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono bg-[#141418] text-zinc-300 border border-[#a27b5c]/40">
-          <span class="w-2 h-2 rounded-full bg-[#ba9578]"></span>
-          <span class="hidden md:inline">시크릿 창 무인증 열림</span>
-          <span class="md:hidden">전체 공개</span>
+        <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded text-[10px] sm:text-[11px] font-mono bg-[#141418] text-zinc-300 border border-[#a27b5c]/40">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#ba9578]"></span>
+          <span class="hidden sm:inline">시크릿 창 무인증 열림</span>
+          <span class="sm:hidden">전체 공개</span>
         </span>
 
         <!-- 움직임 줄이기 토글 스위치 -->
         <button 
           id="motionToggleBtn" 
           type="button"
-          class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono text-zinc-300 bg-[#141418] hover:bg-zinc-800 border border-zinc-700 rounded-md transition-colors"
+          class="flex items-center gap-1 px-2 py-1 text-[11px] sm:text-xs font-mono text-zinc-300 bg-[#141418] hover:bg-zinc-800 border border-zinc-700 rounded transition-colors"
           title="페이지 내 애니메이션 전환 효과를 켜거나 끕니다"
           aria-pressed="false"
         >
-          <i data-lucide="eye" class="w-3.5 h-3.5 text-[#ba9578]" id="motionIcon"></i>
-          <span id="motionText">움직임 켜짐</span>
+          <!-- Eye SVG -->
+          <svg class="svg-icon text-[#ba9578]" id="motionIcon" viewBox="0 0 24 24">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span id="motionText">움직임</span>
         </button>
 
         <!-- GitHub 저장소 링크 -->
@@ -132,167 +166,182 @@
           href="https://github.com/User-shin0328/skt-aleph" 
           target="_blank" 
           rel="noopener noreferrer" 
-          class="p-2 text-[#a1a1aa] hover:text-white rounded-md hover:bg-zinc-800 transition-colors" 
+          class="p-1.5 text-[#a1a1aa] hover:text-white rounded hover:bg-zinc-800 transition-colors" 
           title="GitHub 소스코드 저장소"
         >
-          <i data-lucide="github" class="w-4 h-4"></i>
+          <svg class="svg-icon" style="width:16px; height:16px;" viewBox="0 0 24 24">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+            <path d="M9 18c-4.51 2-5-2-7-2"/>
+          </svg>
         </a>
       </div>
     </div>
   </header>
 
   <!-- 본문 컨테이너 -->
-  <main id="main-content" class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 space-y-10">
+  <main id="main-content" class="flex-1 container-box py-6 sm:py-8 space-y-6 sm:space-y-8">
 
     <!-- 1. 프로필 소개 -->
-    <section class="rounded-xl bg-[#141418] border border-zinc-800 p-6 sm:p-8 shadow-sm">
-      <div class="space-y-3 max-w-3xl">
-        <div class="inline-flex items-center gap-2 text-xs font-mono font-medium text-[#ba9578] uppercase tracking-wider">
-          <span>Security & Network Engineering</span>
-          <span class="text-zinc-600">/</span>
-          <span>Profile Archive</span>
-        </div>
-        
-        <p class="text-white text-base sm:text-lg leading-relaxed font-semibold">
-          체계적인 계획과 정리, 문제의 밑바닥까지 파고드는 집요한 탐구력, 그리고 팀원의 성장을 돕는 공감으로 견고한 IT 보안 및 네트워크 환경을 구축합니다.
-        </p>
-        
-        <p class="text-[#a1a1aa] text-xs sm:text-sm leading-relaxed">
-          전공 진입 초기부터 산업 수요를 분석하여 공인 기술 자격을 단계별로 취득하였고, 자동화 도구 개발 과정에서 겪은 네트워크 인터페이스 오류를 집요하게 추적해 해결하며 실무 엔지니어링 역량을 다져왔습니다.
-        </p>
+    <section class="card space-y-3">
+      <div class="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium text-[#ba9578] uppercase tracking-wider">
+        <span>Security &amp; Network Engineering</span>
+        <span class="text-zinc-600">/</span>
+        <span>Profile Archive</span>
       </div>
+      
+      <p class="text-white text-base sm:text-lg leading-relaxed font-semibold">
+        체계적인 계획과 정리, 문제의 밑바닥까지 파고드는 집요한 탐구력, 그리고 팀원의 성장을 돕는 공감으로 견고한 IT 보안 및 네트워크 환경을 구축합니다.
+      </p>
+      
+      <p class="text-[#a1a1aa] text-xs sm:text-sm leading-relaxed">
+        전공 진입 초기부터 산업 수요를 분석하여 공인 기술 자격을 단계별로 취득하였고, 자동화 도구 개발 과정에서 겪은 네트워크 인터페이스 오류를 집요하게 추적해 해결하며 실무 엔지니어링 역량을 다져왔습니다.
+      </p>
     </section>
 
     <!-- 2. 시스템 공개 및 보호 범위 -->
-    <section class="rounded-xl bg-[#141418] border border-zinc-800 p-6 sm:p-7 space-y-6">
-      <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
-        <h2 class="text-lg sm:text-xl font-bold text-[#ba9578] flex items-center gap-2">
+    <section class="card space-y-5">
+      <div class="flex items-center justify-between border-b border-[#27272a] pb-3">
+        <h2 class="text-base sm:text-lg font-bold text-[#ba9578] flex items-center gap-2">
           <span>시스템 공개 및 보호 범위</span>
         </h2>
-        <span class="text-xs font-mono text-[#a1a1aa]">System Disclosure & Security Scope</span>
+        <span class="text-[11px] font-mono text-[#a1a1aa]">Security &amp; Scope</span>
       </div>
 
       <!-- 한 문장 시스템 목적 -->
-      <div class="bg-[#09090b] border border-zinc-800/90 rounded-lg p-4 space-y-1.5">
-        <div class="text-xs font-mono text-[#ba9578] font-medium">[시스템 목적]</div>
-        <p class="text-sm text-white leading-relaxed font-medium">
+      <div class="bg-[#09090b] border border-[#27272a] rounded-lg p-3.5 space-y-1">
+        <div class="text-[11px] font-mono text-[#ba9578] font-medium">[시스템 목적]</div>
+        <p class="text-xs sm:text-sm text-white leading-relaxed font-medium">
           "이 페이지는 정보보안 및 네트워크 엔지니어링 역량을 확인하고자 하는 채용 담당자와 동료 개발자에게 기술적 강점과 실증 근거를 투명하게 공개하기 위해 구축된 웹 포트폴리오 시스템입니다."
         </p>
       </div>
 
       <!-- 시스템 관점의 공개 / 보호 그리드 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
         <!-- 시스템 공개 정보 -->
-        <div class="bg-[#09090b] border border-zinc-800 rounded-lg p-4 space-y-3">
-          <div class="flex items-center gap-2 text-xs font-mono text-[#ba9578] font-semibold border-b border-zinc-800 pb-2">
-            <i data-lucide="check" class="w-4 h-4 text-[#ba9578]"></i>
+        <div class="bg-[#09090b] border border-[#27272a] rounded-lg p-3.5 space-y-2.5">
+          <div class="flex items-center gap-1.5 text-xs font-mono text-[#ba9578] font-semibold border-b border-[#27272a] pb-2">
+            <!-- Check SVG -->
+            <svg class="svg-icon text-[#ba9578]" viewBox="0 0 24 24">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
             <span>시스템 공개 대상 정보 (3개)</span>
           </div>
           <ul class="space-y-2 text-xs text-zinc-300">
-            <li class="flex items-start gap-2">
+            <li class="flex items-start gap-1.5">
               <span class="text-[#ba9578] font-mono mt-0.5">01.</span>
-              <span><strong class="text-white">프론트엔드 소스코드 및 커밋 이력:</strong> GitHub 공개 저장소를 통해 버전 관리 및 배포 파일 전면 공개</span>
+              <span><strong class="text-white">프론트엔드 소스코드 및 커밋 이력:</strong> GitHub 공개 저장소를 통해 배포 파일 전면 공개</span>
             </li>
-            <li class="flex items-start gap-2">
+            <li class="flex items-start gap-1.5">
               <span class="text-[#ba9578] font-mono mt-0.5">02.</span>
-              <span><strong class="text-white">웹 표준 기술 스택 및 라이브러리 명세:</strong> Tailwind CSS, Lucide Icons, Supabase REST API 구조 전면 공개</span>
+              <span><strong class="text-white">웹 표준 기술 스택 명세:</strong> HTML5, Pure CSS, Tailwind CSS, REST API 연동 구조 공개</span>
             </li>
-            <li class="flex items-start gap-2">
+            <li class="flex items-start gap-1.5">
               <span class="text-[#ba9578] font-mono mt-0.5">03.</span>
-              <span><strong class="text-white">커뮤니티 피드백 데이터:</strong> 데이터베이스에 등록된 공개 작성자 닉네임 및 응원 메시지 내용</span>
+              <span><strong class="text-white">커뮤니티 피드백 데이터:</strong> 데이터베이스에 등록된 공개 작성자 닉네임 및 응원 메시지</span>
             </li>
           </ul>
         </div>
 
         <!-- 시스템 보호 정보 -->
-        <div class="bg-[#09090b] border border-zinc-800 rounded-lg p-4 space-y-3">
-          <div class="flex items-center gap-2 text-xs font-mono text-zinc-300 font-semibold border-b border-zinc-800 pb-2">
-            <i data-lucide="shield-alert" class="w-4 h-4 text-zinc-400"></i>
+        <div class="bg-[#09090b] border border-[#27272a] rounded-lg p-3.5 space-y-2.5">
+          <div class="flex items-center gap-1.5 text-xs font-mono text-zinc-300 font-semibold border-b border-[#27272a] pb-2">
+            <!-- Shield SVG -->
+            <svg class="svg-icon text-zinc-400" viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
             <span>시스템 보호 및 비공개 정보 (3개)</span>
           </div>
           <ul class="space-y-2 text-xs text-zinc-300">
-            <li class="flex items-start gap-2">
+            <li class="flex items-start gap-1.5">
               <span class="text-zinc-500 font-mono mt-0.5">01.</span>
-              <span><strong class="text-zinc-200">데이터베이스 관리자 마스터 키:</strong> 백엔드 서비스 롤 키(Service Role Secret Key) 및 비공개 토큰</span>
+              <span><strong class="text-zinc-200">데이터베이스 관리자 마스터 키:</strong> 백엔드 서비스 롤 키(Service Role Key) 및 토큰</span>
             </li>
-            <li class="flex items-start gap-2">
+            <li class="flex items-start gap-1.5">
               <span class="text-zinc-500 font-mono mt-0.5">02.</span>
-              <span><strong class="text-zinc-200">인프라 관리자 접근 계정:</strong> 클라우드 호스팅(Vercel) 인프라 관리자 인증 정보 및 환경변수 원문</span>
+              <span><strong class="text-zinc-200">인프라 관리자 접근 계정:</strong> 클라우드 호스팅 인프라 관리자 인증 정보 및 환경변수 원문</span>
             </li>
-            <li class="flex items-start gap-2">
+            <li class="flex items-start gap-1.5">
               <span class="text-zinc-500 font-mono mt-0.5">03.</span>
-              <span><strong class="text-zinc-200">방문자 개인 메타데이터:</strong> 방문자 및 작성자의 비공개 네트워크 IP 주소, 브라우저 세션 식별 정보</span>
+              <span><strong class="text-zinc-200">방문자 개인 메타데이터:</strong> 방문자 및 작성자의 비공개 네트워크 IP, 브라우저 세션 식별 정보</span>
             </li>
           </ul>
         </div>
       </div>
 
       <!-- 배포 주소 안내 -->
-      <div class="bg-[#09090b] border border-zinc-800 p-3 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-        <div class="flex items-center gap-2">
-          <i data-lucide="external-link" class="w-4 h-4 text-[#ba9578]"></i>
+      <div class="bg-[#09090b] border border-[#27272a] p-3 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-1.5">
+          <!-- External Link SVG -->
+          <svg class="svg-icon text-[#ba9578]" viewBox="0 0 24 24">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
           <span class="text-[#a1a1aa] font-mono">공개 주소:</span>
-          <a href="https://skt-aleph-gilt.vercel.app/" target="_blank" class="text-[#ba9578] hover:underline font-mono font-medium">
+          <a href="https://skt-aleph-gilt.vercel.app/" target="_blank" class="text-[#ba9578] hover:underline font-mono font-medium break-all">
             https://skt-aleph-gilt.vercel.app/
           </a>
         </div>
-        <span class="text-[#a1a1aa] font-mono text-[11px]">새 시크릿 창에서 계정 로그인 없이 열림 확인</span>
+        <span class="text-[#a1a1aa] font-mono text-[11px]">새 시크릿 창 무인증 열림 확인</span>
       </div>
     </section>
 
     <!-- 3. 핵심 역량 및 실증 사례 (RM.txt 기반 STAR 구조 + 인라인 토글 근거) -->
-    <section class="rounded-xl bg-[#141418] border border-zinc-800 p-6 sm:p-7 space-y-6">
-      <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
-        <h2 class="text-lg sm:text-xl font-bold text-[#ba9578] flex items-center gap-2">
+    <section class="card space-y-5">
+      <div class="flex items-center justify-between border-b border-[#27272a] pb-3">
+        <h2 class="text-base sm:text-lg font-bold text-[#ba9578] flex items-center gap-2">
           <span>핵심 역량과 실증 사례</span>
         </h2>
-        <span class="text-xs font-mono text-[#a1a1aa]">Core Strengths & Evidences</span>
+        <span class="text-[11px] font-mono text-[#a1a1aa]">Core Strengths</span>
       </div>
 
-      <div class="space-y-5">
+      <div class="space-y-4">
         <!-- 강점 1: 계획하고 정리할 때 (RM.txt 항목 1) -->
-        <div class="bg-[#09090b] border border-zinc-800 rounded-lg p-5 space-y-4">
+        <div class="bg-[#09090b] border border-[#27272a] rounded-lg p-4 sm:p-5 space-y-3.5">
           <h3 class="text-sm font-bold text-[#ba9578] flex items-center gap-2">
-            <span class="w-1.5 h-3 bg-[#ba9578] rounded-full"></span>
+            <span class="w-1.5 h-3 bg-[#ba9578] rounded-full inline-block"></span>
             <span>1. 계획하고 정리할 때 — 분석 기반의 목표 수립과 단계별 실행력</span>
           </h3>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-            <div class="bg-[#141418] p-3 rounded border border-zinc-800">
+            <div class="bg-[#141418] p-3 rounded border border-[#27272a]">
               <div class="font-mono text-[#ba9578] font-semibold mb-1">[상황 Situation]</div>
               <p class="text-zinc-300 leading-relaxed">전공 진입 초기, 방대한 보안 및 네트워크 분야 속에서 채용 시장이 실제로 요구하는 핵심 역량을 명확히 파악하고 학습 우선순위를 세워야 했습니다.</p>
             </div>
-            <div class="bg-[#141418] p-3 rounded border border-zinc-800">
+            <div class="bg-[#141418] p-3 rounded border border-[#27272a]">
               <div class="font-mono text-[#ba9578] font-semibold mb-1">[행동 Action]</div>
               <p class="text-zinc-300 leading-relaxed">최신 채용공고와 산업 뉴스를 수집·분석하여 직무에 필요한 자격과 역량을 매트릭스로 정리하고, 체계적인 실행 계획을 수립해 매일 실천했습니다.</p>
             </div>
-            <div class="bg-[#141418] p-3 rounded border border-zinc-800">
+            <div class="bg-[#141418] p-3 rounded border border-[#27272a]">
               <div class="font-mono text-[#ba9578] font-semibold mb-1">[결과 Result]</div>
               <p class="text-zinc-300 leading-relaxed"><strong class="text-white">정보보안산업기사, 네트워크관리사 2급, 리눅스마스터 2급</strong>을 차례로 취득하여 탄탄한 실무 지식 기반을 확립했으며, 지속적인 역량 확장을 이어가고 있습니다.</p>
             </div>
           </div>
 
           <!-- 강점 마지막: 근거 토글 -->
-          <div class="pt-2 border-t border-zinc-800/80">
+          <div class="pt-2 border-t border-[#27272a]">
             <button 
               type="button" 
               onclick="toggleEvidence('evidence1', this)" 
               class="flex items-center gap-1.5 text-xs font-mono text-[#ba9578] hover:text-white bg-[#141418] hover:bg-[#8c674b] px-3 py-1.5 rounded border border-zinc-700 hover:border-[#a27b5c] transition-colors"
               aria-expanded="false"
             >
-              <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform toggle-icon"></i>
+              <!-- Chevron SVG -->
+              <svg class="svg-icon toggle-icon transition-transform duration-200" viewBox="0 0 24 24">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
               <span>근거</span>
             </button>
 
             <!-- 펼쳐지는 근거 내용 -->
-            <div id="evidence1" class="hidden mt-3 p-4 bg-[#141418] border border-zinc-800 rounded-lg text-xs space-y-2 font-mono">
+            <div id="evidence1" class="hidden mt-3 p-3.5 bg-[#141418] border border-[#27272a] rounded-lg text-xs space-y-2 font-mono">
               <div class="text-[#ba9578] font-bold"># 공인 기술 자격 취득 내역 및 커리어 로드맵</div>
               <div class="text-white space-y-1">
                 <div>1. <strong>정보보안산업기사</strong> — 시스템 보안, 네트워크 보안, 애플리케이션 보안 이론 및 실무 자격 검증 완료</div>
                 <div>2. <strong>네트워크관리사 2급</strong> — TCP/IP 패킷 라우팅, 서브넷팅 계산, 스위치/라우터 환경 설정 실기 검증 완료</div>
                 <div>3. <strong>리눅스마스터 2급</strong> — 리눅스 OS 아키텍처, 쉘 스크립트, 파일 시스템 권한 체계 실무 검증 완료</div>
               </div>
-              <div class="text-[#a1a1aa] text-[11px] pt-1 border-t border-zinc-800">
+              <div class="text-[#a1a1aa] text-[11px] pt-1 border-t border-[#27272a]">
                 실행 결과: 채용공고와 산업 뉴스를 토대로 체계화한 역량 로드맵을 100% 기한 내 달성하였으며, 지속적인 상위 실무 역량 확장을 전개하고 있습니다.
               </div>
             </div>
@@ -300,41 +349,43 @@
         </div>
 
         <!-- 강점 2: 문제가 발생했을 때 (RM.txt 항목 2) -->
-        <div class="bg-[#09090b] border border-zinc-800 rounded-lg p-5 space-y-4">
+        <div class="bg-[#09090b] border border-[#27272a] rounded-lg p-4 sm:p-5 space-y-3.5">
           <h3 class="text-sm font-bold text-[#ba9578] flex items-center gap-2">
-            <span class="w-1.5 h-3 bg-[#ba9578] rounded-full"></span>
+            <span class="w-1.5 h-3 bg-[#ba9578] rounded-full inline-block"></span>
             <span>2. 문제가 발생했을 때 — 근본 원인을 끝까지 파고드는 집요함</span>
           </h3>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-            <div class="bg-[#141418] p-3 rounded border border-zinc-800">
+            <div class="bg-[#141418] p-3 rounded border border-[#27272a]">
               <div class="font-mono text-[#ba9578] font-semibold mb-1">[상황 Situation]</div>
               <p class="text-zinc-300 leading-relaxed">보안 자동탐지/대응 툴을 개발하던 중, 유입되는 공격 패킷을 IDS(침입 탐지 시스템) 엔진이 탐지하지 못하는 원인 미상의 오류에 직면했습니다.</p>
             </div>
-            <div class="bg-[#141418] p-3 rounded border border-zinc-800">
+            <div class="bg-[#141418] p-3 rounded border border-[#27272a]">
               <div class="font-mono text-[#ba9578] font-semibold mb-1">[행동 Action]</div>
               <p class="text-zinc-300 leading-relaxed">단순 프로그램 코드 디버깅에 그치지 않고, 가상 네트워크 환경 구축 단계부터 브리지 promiscuous 모드 설정 및 패킷 라우팅 경로를 하부 레이어부터 역추적했습니다.</p>
             </div>
-            <div class="bg-[#141418] p-3 rounded border border-zinc-800">
+            <div class="bg-[#141418] p-3 rounded border border-[#27272a]">
               <div class="font-mono text-[#ba9578] font-semibold mb-1">[결과 Result]</div>
               <p class="text-zinc-300 leading-relaxed">가상 브리지와 인터페이스 간 바인딩 결함을 정확히 찾아내어 해결함으로써 IDS 탐지 파이프라인을 정상 가동하고 프로젝트를 다음 단계로 완수했습니다.</p>
             </div>
           </div>
 
           <!-- 강점 마지막: 근거 토글 -->
-          <div class="pt-2 border-t border-zinc-800/80">
+          <div class="pt-2 border-t border-[#27272a]">
             <button 
               type="button" 
               onclick="toggleEvidence('evidence2', this)" 
               class="flex items-center gap-1.5 text-xs font-mono text-[#ba9578] hover:text-white bg-[#141418] hover:bg-[#8c674b] px-3 py-1.5 rounded border border-zinc-700 hover:border-[#a27b5c] transition-colors"
               aria-expanded="false"
             >
-              <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform toggle-icon"></i>
+              <svg class="svg-icon toggle-icon transition-transform duration-200" viewBox="0 0 24 24">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
               <span>근거</span>
             </button>
 
             <!-- 펼쳐지는 근거 내용 -->
-            <div id="evidence2" class="hidden mt-3 p-4 bg-[#141418] border border-zinc-800 rounded-lg text-xs space-y-2 font-mono">
+            <div id="evidence2" class="hidden mt-3 p-3.5 bg-[#141418] border border-[#27272a] rounded-lg text-xs space-y-2 font-mono">
               <div class="text-[#ba9578] font-bold"># IDS 미탐지 오류 원인 규명 및 트러블슈팅 로그</div>
               <div class="text-zinc-300 space-y-1">
                 <div><span class="text-[#a1a1aa]">[현상]</span> 공격 패킷 유입 시 IDS 엔진에서 탐지 로그 미발생</div>
@@ -348,41 +399,43 @@
         </div>
 
         <!-- 강점 3: 팀원과 상호작용할 때 (RM.txt 항목 3) -->
-        <div class="bg-[#09090b] border border-zinc-800 rounded-lg p-5 space-y-4">
+        <div class="bg-[#09090b] border border-[#27272a] rounded-lg p-4 sm:p-5 space-y-3.5">
           <h3 class="text-sm font-bold text-[#ba9578] flex items-center gap-2">
-            <span class="w-1.5 h-3 bg-[#ba9578] rounded-full"></span>
+            <span class="w-1.5 h-3 bg-[#ba9578] rounded-full inline-block"></span>
             <span>3. 팀원과 상호작용할 때 — 공감과 칭찬으로 이끌어내는 협업 시너지</span>
           </h3>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-            <div class="bg-[#141418] p-3 rounded border border-zinc-800">
+            <div class="bg-[#141418] p-3 rounded border border-[#27272a]">
               <div class="font-mono text-[#ba9578] font-semibold mb-1">[상황 Situation]</div>
               <p class="text-zinc-300 leading-relaxed">일정 압박과 복잡한 기술 요구사항으로 팀원들의 피로가 누적되고, 자칫 소통이 경직되기 쉬웠던 팀 프로젝트 환경이었습니다.</p>
             </div>
-            <div class="bg-[#141418] p-3 rounded border border-zinc-800">
+            <div class="bg-[#141418] p-3 rounded border border-[#27272a]">
               <div class="font-mono text-[#ba9578] font-semibold mb-1">[행동 Action]</div>
               <p class="text-zinc-300 leading-relaxed">팀원들의 작은 기여와 커밋에도 아낌없는 칭찬을 건넸으며, 막히는 지점을 겪는 동료에게 적극적인 공감과 함께 해결 아이디어를 나누어 심리적 안정감을 조성했습니다.</p>
             </div>
-            <div class="bg-[#141418] p-3 rounded border border-zinc-800">
+            <div class="bg-[#141418] p-3 rounded border border-[#27272a]">
               <div class="font-mono text-[#ba9578] font-semibold mb-1">[결과 Result]</div>
               <p class="text-zinc-300 leading-relaxed">팀 분위기가 눈에 띄게 활기를 띠며 마찰 없이 프로젝트를 완성하였고, 동료들로부터 "덕분에 큰 힘이 되었다"는 진심 어린 감사 인사를 받았습니다.</p>
             </div>
           </div>
 
           <!-- 강점 마지막: 근거 토글 -->
-          <div class="pt-2 border-t border-zinc-800/80">
+          <div class="pt-2 border-t border-[#27272a]">
             <button 
               type="button" 
               onclick="toggleEvidence('evidence3', this)" 
               class="flex items-center gap-1.5 text-xs font-mono text-[#ba9578] hover:text-white bg-[#141418] hover:bg-[#8c674b] px-3 py-1.5 rounded border border-zinc-700 hover:border-[#a27b5c] transition-colors"
               aria-expanded="false"
             >
-              <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform toggle-icon"></i>
+              <svg class="svg-icon toggle-icon transition-transform duration-200" viewBox="0 0 24 24">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
               <span>근거</span>
             </button>
 
             <!-- 펼쳐지는 근거 내용 -->
-            <div id="evidence3" class="hidden mt-3 p-4 bg-[#141418] border border-zinc-800 rounded-lg text-xs space-y-2 font-mono">
+            <div id="evidence3" class="hidden mt-3 p-3.5 bg-[#141418] border border-[#27272a] rounded-lg text-xs space-y-2 font-mono">
               <div class="text-[#ba9578] font-bold"># 팀 협업 프로세스 및 동료 피드백 기록</div>
               <div class="text-zinc-300 space-y-1">
                 <div>- <strong>소통 원칙:</strong> 팀원의 작은 코드 커밋과 조사 결과에도 적극적인 칭찬과 구체적인 피드백 전달</div>
@@ -396,28 +449,25 @@
     </section>
 
     <!-- 4. 실시간 피드백 컴포넌트 -->
-    <section class="rounded-xl bg-[#141418] border border-zinc-800 p-6 sm:p-7 space-y-6">
-      <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
-        <h2 class="text-lg sm:text-xl font-bold text-[#ba9578] flex items-center gap-2">
+    <section class="card space-y-5">
+      <div class="flex items-center justify-between border-b border-[#27272a] pb-3">
+        <h2 class="text-base sm:text-lg font-bold text-[#ba9578] flex items-center gap-2">
           <span>실시간 피드백 및 소통</span>
         </h2>
-        <span class="text-xs font-mono text-[#a1a1aa]">Interactive Guestbook</span>
+        <span class="text-[11px] font-mono text-[#a1a1aa]">Guestbook</span>
       </div>
 
       <!-- 방명록 입력 폼 & 피드 -->
-      <div class="bg-[#09090b] border border-zinc-800 rounded-lg p-5 space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-3">
-          <div>
-            <div class="text-xs font-mono text-[#ba9578] font-semibold">[실시간 상호작용]</div>
-            <h3 class="text-sm font-bold text-white mt-0.5">응원 및 피드백 남기기 (Supabase 실시간 DB 연동)</h3>
-          </div>
-          <span class="text-[11px] font-mono text-[#a1a1aa]">마우스 클릭 & 키보드 Enter 전송 지원</span>
+      <div class="bg-[#09090b] border border-[#27272a] rounded-lg p-4 sm:p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-[#27272a] pb-2.5">
+          <div class="text-xs text-white font-medium">응원 및 의견 남기기</div>
+          <span class="text-[10px] font-mono text-[#a1a1aa]">실시간 데이터베이스 연동</span>
         </div>
 
         <!-- 폼 -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <div class="sm:col-span-1">
-            <label for="guestAuthor" class="block text-xs text-[#a1a1aa] mb-1">작성자 명</label>
+            <label for="guestAuthor" class="block text-[11px] text-[#a1a1aa] mb-1">작성자 명</label>
             <input 
               type="text" 
               id="guestAuthor" 
@@ -426,7 +476,7 @@
             />
           </div>
           <div class="sm:col-span-2">
-            <label for="guestMessage" class="block text-xs text-[#a1a1aa] mb-1">메시지 내용</label>
+            <label for="guestMessage" class="block text-[11px] text-[#a1a1aa] mb-1">메시지 내용</label>
             <div class="flex gap-2">
               <input 
                 type="text" 
@@ -446,13 +496,13 @@
         </div>
 
         <!-- 피드 목록 -->
-        <div class="space-y-2 pt-2 border-t border-zinc-800/80">
+        <div class="space-y-2 pt-2 border-t border-[#27272a]">
           <div class="flex items-center justify-between text-xs text-[#a1a1aa] font-mono">
-            <span>남겨진 피드백 목록 (Supabase <code class="text-[#ba9578]">bankhar0328</code>)</span>
-            <span id="feedCountText">불러오는 중...</span>
+            <span>남겨진 피드백 목록</span>
+            <span id="feedCountText">조회 중...</span>
           </div>
-          <ul id="guestList" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs">
-            <li class="p-2.5 bg-[#141418] rounded border border-zinc-800 text-zinc-400 text-center">
+          <ul id="guestList" class="space-y-2 max-h-52 overflow-y-auto pr-1 text-xs">
+            <li class="p-2.5 bg-[#141418] rounded border border-[#27272a] text-zinc-400 text-center">
               데이터를 불러오는 중입니다...
             </li>
           </ul>
@@ -463,8 +513,8 @@
   </main>
 
   <!-- 푸터 -->
-  <footer class="border-t border-zinc-800/80 bg-[#09090b] py-6 text-[#a1a1aa] text-xs mt-12">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-[11px]">
+  <footer class="border-t border-[#27272a] bg-[#09090b] py-6 text-[#a1a1aa] text-xs mt-8">
+    <div class="container-box flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-[11px]">
       <div class="text-white font-medium">SHIN JAEWON — Portfolio Archive</div>
       <div class="flex items-center gap-3">
         <a href="https://github.com/User-shin0328/skt-aleph" target="_blank" class="hover:text-[#ba9578] transition-colors">GitHub</a>
@@ -476,9 +526,9 @@
     </div>
   </footer>
 
-  <!-- 자바스크립트 로직 -->
+  <!-- 자바스크립트 로직 (외부 의존성 제로 순수 브라우저 API) -->
   <script>
-    // Supabase 설정 및 REST API 클라이언트 (외부 CDN 의존성 없이 순수 fetch로 100% 안정적 동작)
+    // Supabase REST API 설정
     const SUPABASE_URL = 'https://nolhrriuxhuhgduekyae.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_YRJgWCiyxTxGvM81uZZu-w_66OxefD8';
     const TABLE_NAME = 'bankhar0328';
@@ -503,32 +553,31 @@
 
     // 움직임 제어 토글
     const motionToggleBtn = document.getElementById('motionToggleBtn');
-    const motionIcon = document.getElementById('motionIcon');
     const motionText = document.getElementById('motionText');
     let isReducedMotion = false;
 
-    motionToggleBtn.addEventListener('click', () => {
-      isReducedMotion = !isReducedMotion;
-      motionToggleBtn.setAttribute('aria-pressed', isReducedMotion.toString());
-      if (isReducedMotion) {
-        document.body.classList.add('reduced-motion');
-        motionText.textContent = '움직임 꺼짐';
-        motionIcon.setAttribute('data-lucide', 'eye-off');
-      } else {
-        document.body.classList.remove('reduced-motion');
-        motionText.textContent = '움직임 켜짐';
-        motionIcon.setAttribute('data-lucide', 'eye');
-      }
-      lucide.createIcons();
-    });
+    if (motionToggleBtn) {
+      motionToggleBtn.addEventListener('click', () => {
+        isReducedMotion = !isReducedMotion;
+        motionToggleBtn.setAttribute('aria-pressed', isReducedMotion.toString());
+        if (isReducedMotion) {
+          document.body.classList.add('reduced-motion');
+          if (motionText) motionText.textContent = '움직임 꺼짐';
+        } else {
+          document.body.classList.remove('reduced-motion');
+          if (motionText) motionText.textContent = '움직임';
+        }
+      });
+    }
 
-    // Supabase 방명록 REST API 통신
+    // 방명록 요소
     const guestAuthor = document.getElementById('guestAuthor');
     const guestMessage = document.getElementById('guestMessage');
     const guestSubmitBtn = document.getElementById('guestSubmitBtn');
     const guestList = document.getElementById('guestList');
     const feedCountText = document.getElementById('feedCountText');
 
+    // 방명록 불러오기 (fetch)
     async function loadGuestbook() {
       try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?select=*&order=id.desc`, {
@@ -541,16 +590,17 @@
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP 오류 ${response.status}: ${response.statusText}`);
+          throw new Error(`HTTP ${response.status}`);
         }
 
         const data = await response.json();
-        feedCountText.textContent = `총 ${data ? data.length : 0}건`;
+        if (feedCountText) feedCountText.textContent = `총 ${data ? data.length : 0}건`;
+        if (!guestList) return;
         guestList.innerHTML = '';
 
         if (!data || data.length === 0) {
           guestList.innerHTML = `
-            <li class="p-3 bg-[#141418] rounded border border-zinc-800 text-zinc-500 text-center">
+            <li class="p-3 bg-[#141418] rounded border border-[#27272a] text-zinc-500 text-center">
               남겨진 피드백이 없습니다. 첫 번째 피드백을 등록해보세요!
             </li>
           `;
@@ -568,30 +618,34 @@
           }
 
           const li = document.createElement('li');
-          li.className = 'p-2.5 bg-[#141418] rounded border border-zinc-800 flex items-start justify-between gap-2';
+          li.className = 'p-2.5 bg-[#141418] rounded border border-[#27272a] flex items-start justify-between gap-2';
           li.innerHTML = `
-            <div class="space-y-0.5">
+            <div class="space-y-0.5 min-w-0 flex-1">
               <span class="text-[#ba9578] font-mono font-semibold">[${escapeHtml(author)}]</span>
-              <span class="text-zinc-200 ml-1">${escapeHtml(message)}</span>
+              <span class="text-zinc-200 ml-1 break-words">${escapeHtml(message)}</span>
             </div>
-            <span class="text-[10px] text-zinc-500 font-mono shrink-0">#${item.id}</span>
+            <span class="text-[10px] text-zinc-500 font-mono shrink-0 ml-2">#${item.id}</span>
           `;
           guestList.appendChild(li);
         });
 
       } catch (err) {
-        console.error('피드백 조회 실패:', err);
-        feedCountText.textContent = '연결 확인';
-        guestList.innerHTML = `
-          <li class="p-2.5 bg-[#141418] rounded border border-zinc-800 text-zinc-500 text-center">
-            조회 중 오류가 발생했습니다. (${escapeHtml(err.message || '')})
-          </li>
-        `;
+        console.error('방명록 조회 실패:', err);
+        if (feedCountText) feedCountText.textContent = '연결 확인';
+        if (guestList) {
+          guestList.innerHTML = `
+            <li class="p-2.5 bg-[#141418] rounded border border-[#27272a] text-zinc-500 text-center">
+              조회 중 오류가 발생했습니다. (${escapeHtml(err.message || '')})
+            </li>
+          `;
+        }
       }
     }
 
+    // 방명록 등록하기 (fetch)
     async function submitGuestbook() {
-      const author = guestAuthor.value.trim() || '방문자';
+      if (!guestMessage) return;
+      const author = (guestAuthor && guestAuthor.value.trim()) || '방문자';
       const message = guestMessage.value.trim();
 
       if (!message) {
@@ -600,8 +654,10 @@
         return;
       }
 
-      guestSubmitBtn.disabled = true;
-      guestSubmitBtn.textContent = '등록 중...';
+      if (guestSubmitBtn) {
+        guestSubmitBtn.disabled = true;
+        guestSubmitBtn.textContent = '등록 중...';
+      }
 
       try {
         const payload = `${author} :: ${message}`;
@@ -627,8 +683,10 @@
         console.error('등록 실패:', err);
         alert('등록 실패: ' + err.message);
       } finally {
-        guestSubmitBtn.disabled = false;
-        guestSubmitBtn.textContent = '등록';
+        if (guestSubmitBtn) {
+          guestSubmitBtn.disabled = false;
+          guestSubmitBtn.textContent = '등록';
+        }
       }
     }
 
@@ -639,17 +697,22 @@
       );
     }
 
-    // 이벤트 리스너 바인딩
-    guestSubmitBtn.addEventListener('click', submitGuestbook);
-    guestMessage.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submitGuestbook();
-    });
+    // 이벤트 리스너
+    if (guestSubmitBtn) {
+      guestSubmitBtn.addEventListener('click', submitGuestbook);
+    }
+    if (guestMessage) {
+      guestMessage.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') submitGuestbook();
+      });
+    }
 
-    // 초기화
-    document.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
+    // 페이지 로드 즉시 실행
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadGuestbook);
+    } else {
       loadGuestbook();
-    });
+    }
   </script>
 </body>
 </html>
