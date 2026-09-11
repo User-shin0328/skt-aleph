@@ -267,7 +267,7 @@
 
       <!-- 시작 화면 오버레이 -->
       <div id="startOverlay" class="overlay">
-        <div class="overlay-card text-left" style="max-width: 500px; padding: 28px 24px;">
+        <div class="overlay-card text-left" style="max-width: 620px; padding: 28px 26px;">
           <!-- 상단 헤더: 타이틀(좌) + 바로 시작 버튼(우) -->
           <div class="flex items-center justify-between border-b border-zinc-800 pb-3.5 mb-4 gap-3">
             <div class="text-left">
@@ -289,41 +289,41 @@
             <span class="text-[#ba9578] font-bold" id="startBestRecord">등록된 1위 기록 없음 (-)</span>
           </div>
 
-          <!-- 쾌적한 줄간격과 핵심단어만 굵게 표시된 심플 게임 설명 -->
-          <div class="bg-[#141418] p-4 sm:p-5 rounded-xl border border-zinc-800/90 text-left">
-            <ul class="space-y-3.5 text-xs text-zinc-300 leading-relaxed list-none pl-0">
-              <li class="flex items-start gap-2">
-                <span class="text-[#ba9578] shrink-0 mt-0.5">•</span>
-                <span><strong class="text-white font-bold">Space</strong> 키 또는 <strong class="text-white font-bold">화면 터치</strong>로 점프하며, 공중에서 한 번 더 누르면 <strong class="text-[#ba9578] font-bold">2단 점프</strong>를 합니다.</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="text-[#ba9578] shrink-0 mt-0.5">•</span>
-                <span><strong class="text-amber-400 font-bold">거대 선인장</strong>은 1단 점프로 넘을 수 없으므로 반드시 <strong class="text-[#ba9578] font-bold">2단 점프</strong>로 넘어야 합니다.</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="text-[#ba9578] shrink-0 mt-0.5">•</span>
-                <span>30초 동안 시간이 흐를수록 속도가 <strong class="text-white font-bold">최대 3배</strong>까지 점차 빨라집니다.</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="text-[#ba9578] shrink-0 mt-0.5">•</span>
-                <span>점프 및 장애물 회피 시 <strong class="text-white font-bold">추가 점수</strong>를 획득하여 최고 점수를 기록해 보세요.</span>
-              </li>
-            </ul>
+          <!-- 넉넉한 줄간격, 글머리 기호 단일화, 한 줄 깔끔 표시 게임 설명 -->
+          <div class="bg-[#141418] p-5 rounded-xl border border-zinc-800/90 text-left">
+            <div class="space-y-4 text-xs text-zinc-300" style="line-height: 2.1;">
+              <div class="flex items-center gap-2.5 whitespace-nowrap overflow-hidden">
+                <span class="text-[#ba9578] text-sm shrink-0 leading-none">▪</span>
+                <span class="truncate"><strong class="text-white font-bold">Space</strong> 키 또는 <strong class="text-white font-bold">화면 터치</strong>로 점프하며, 공중에서 한 번 더 누르면 <strong class="text-[#ba9578] font-bold">2단 점프</strong>를 합니다.</span>
+              </div>
+              <div class="flex items-center gap-2.5 whitespace-nowrap overflow-hidden">
+                <span class="text-[#ba9578] text-sm shrink-0 leading-none">▪</span>
+                <span class="truncate"><strong class="text-amber-400 font-bold">거대 선인장</strong>은 1단 점프로 넘을 수 없으므로 반드시 <strong class="text-[#ba9578] font-bold">2단 점프</strong>로 넘어야 합니다.</span>
+              </div>
+              <div class="flex items-center gap-2.5 whitespace-nowrap overflow-hidden">
+                <span class="text-[#ba9578] text-sm shrink-0 leading-none">▪</span>
+                <span class="truncate">30초 동안 시간이 흐를수록 속도가 <strong class="text-white font-bold">최대 3배</strong>까지 점차 빨라집니다.</span>
+              </div>
+              <div class="flex items-center gap-2.5 whitespace-nowrap overflow-hidden">
+                <span class="text-[#ba9578] text-sm shrink-0 leading-none">▪</span>
+                <span class="truncate">점프 및 장애물 회피로 <strong class="text-white font-bold">추가 점수</strong>를 획득하여 최고 점수를 기록해 보세요.</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- 게임 오버 오버레이 -->
       <div id="gameOverOverlay" class="overlay hidden">
-        <div class="overlay-card text-left space-y-4" style="max-width: 440px; padding: 26px 24px;">
-          <div class="border-b border-zinc-800 pb-2.5">
+        <div class="overlay-card text-left space-y-4" style="max-width: 460px; padding: 28px 24px;">
+          <div class="border-b border-zinc-800 pb-3">
             <div class="text-[11px] font-mono text-zinc-500 uppercase tracking-widest">[ 현상수배 : 충돌 발생 ]</div>
-            <h2 class="text-2xl font-bold font-mono text-[#ba9578]">GAME OVER</h2>
-            <p class="text-xs text-zinc-400 mt-0.5" id="gameOverMsg">장애물에 걸려 쓰러졌습니다.</p>
+            <h2 class="text-2xl font-bold font-mono text-[#ba9578] mt-0.5">GAME OVER</h2>
+            <p class="text-xs text-zinc-400 mt-1" id="gameOverMsg">장애물에 걸려 쓰러졌습니다.</p>
           </div>
 
           <!-- 내 기록 요약 -->
-          <div class="bg-[#09090b] p-3.5 rounded-lg border border-zinc-800 font-mono text-xs space-y-2 text-left">
+          <div class="bg-[#09090b] p-4 rounded-lg border border-zinc-800 font-mono text-xs space-y-2.5 text-left">
             <div class="flex justify-between items-center">
               <span class="text-zinc-400">생존 시간:</span>
               <span class="text-white font-bold" id="finalTime">0.0s</span>
@@ -334,34 +334,34 @@
             </div>
           </div>
 
-          <!-- CASE 1: 1등 점수가 아닐 때 (1등 멘트 일체 없음, 오직 다시 도전 메시지만 단독 표시) -->
-          <div id="tryAgainBox" class="bg-[#141418] border border-zinc-800 p-4 rounded-xl text-left space-y-1.5">
-            <div class="text-[#ba9578] font-bold text-xs flex items-center gap-1.5">
+          <!-- CASE 1: 1등 점수가 아닐 때 (줄간격 넉넉한 순수 다시 도전 안내 메시지) -->
+          <div id="tryAgainBox" class="bg-[#141418] border border-zinc-800 p-5 rounded-xl text-left space-y-2.5" style="line-height: 2.0;">
+            <div class="text-[#ba9578] font-bold text-sm flex items-center gap-2">
               <span>🤠</span> <span>아쉽게 쓰러졌습니다!</span>
             </div>
-            <p class="text-zinc-300 text-xs leading-relaxed">
+            <p class="text-zinc-300 text-xs">
               장애물 타이밍을 잘 맞춰 점프해 보세요.<br>
-              컨트롤을 가다듬고 <strong class="text-white">다시 도전해 보세요!</strong>
+              컨트롤을 가다듬고 <strong class="text-white font-bold">다시 도전해 보세요!</strong>
             </p>
           </div>
 
-          <!-- CASE 2: 1등 신기록을 세웠을 때만 표시 (닉네임 입력란) -->
-          <div id="newRecordBox" class="hidden bg-[#09090b] p-4 rounded-xl border border-[#ba9578] text-xs font-mono space-y-2.5 text-left" style="display: none;">
-            <div id="recordInputRow">
-              <div class="text-[#ba9578] font-bold text-sm mb-1">🎉 축하합니다! 새로운 1위 신기록 달성!</div>
-              <p class="text-[11px] text-zinc-400 mb-2">1등의 닉네임을 입력하여 등록하세요.</p>
-              <div class="flex gap-2">
+          <!-- CASE 2: 1등 신기록을 세웠을 때만 표시 (줄간격 넉넉한 닉네임 입력란) -->
+          <div id="newRecordBox" class="hidden bg-[#09090b] p-5 rounded-xl border border-[#ba9578] text-xs font-mono space-y-3.5 text-left" style="display: none; line-height: 1.8;">
+            <div id="recordInputRow" class="space-y-2.5">
+              <div class="text-[#ba9578] font-bold text-sm">🎉 축하합니다! 새로운 1위 신기록 달성!</div>
+              <p class="text-[11px] text-zinc-400">새로운 1등의 닉네임을 입력하여 등록하세요.</p>
+              <div class="flex gap-2.5 pt-1">
                 <input type="text" id="recordNameInput" placeholder="닉네임 입력 (최대 10자)" maxlength="10" class="flex-1 px-3 py-2 bg-[#141418] text-white text-xs border border-zinc-700 rounded focus:border-[#ba9578] focus:outline-none">
-                <button type="button" id="saveRecordBtn" class="btn btn-primary px-3.5 py-2 text-xs font-bold">1위 등록</button>
+                <button type="button" id="saveRecordBtn" class="btn btn-primary px-4 py-2 text-xs font-bold shrink-0">1위 등록</button>
               </div>
             </div>
             <!-- 등록 완료 시에만 나타나는 메시지 -->
-            <div id="recordSuccessMsg" class="hidden text-[#ba9578] font-bold py-1.5 text-center" style="display: none;">
+            <div id="recordSuccessMsg" class="hidden text-[#ba9578] font-bold py-2 text-center text-sm" style="display: none;">
               ✓ 1위 기록으로 등록되었습니다!
             </div>
           </div>
 
-          <button id="restartBtn" class="btn btn-primary w-full py-2.5 text-sm justify-center font-bold shadow-lg" type="button">
+          <button id="restartBtn" class="btn btn-primary w-full py-2.5 text-sm justify-center font-bold shadow-lg mt-2" type="button">
             <span>다시 도전 (R)</span>
           </button>
         </div>
@@ -369,14 +369,14 @@
 
       <!-- 완주 성공 오버레이 -->
       <div id="successOverlay" class="overlay hidden">
-        <div class="overlay-card text-left space-y-4" style="max-width: 440px; padding: 26px 24px;">
-          <div class="border-b border-zinc-800 pb-2.5">
+        <div class="overlay-card text-left space-y-4" style="max-width: 460px; padding: 28px 24px;">
+          <div class="border-b border-zinc-800 pb-3">
             <div class="text-[11px] font-mono text-[#ba9578] uppercase tracking-widest">★ MISSION COMPLETE ★</div>
-            <h2 class="text-2xl font-bold font-mono text-[#ba9578]">30초 완주 성공!</h2>
-            <p class="text-xs text-zinc-400 mt-0.5">황야의 모든 장애물을 뛰어넘고 무사히 도착했습니다!</p>
+            <h2 class="text-2xl font-bold font-mono text-[#ba9578] mt-0.5">30초 완주 성공!</h2>
+            <p class="text-xs text-zinc-400 mt-1">황야의 모든 장애물을 뛰어넘고 무사히 도착했습니다!</p>
           </div>
 
-          <div class="bg-[#09090b] p-3.5 rounded-lg border border-zinc-800 font-mono text-xs space-y-2 text-left">
+          <div class="bg-[#09090b] p-4 rounded-lg border border-zinc-800 font-mono text-xs space-y-2.5 text-left">
             <div class="flex justify-between items-center">
               <span class="text-zinc-400">생존 시간:</span>
               <span class="text-white font-bold">30.0s (완주)</span>
@@ -387,32 +387,33 @@
             </div>
           </div>
 
-          <!-- 완주했으나 1등 점수가 아닐 때 (다시 도전 메시지) -->
-          <div id="successTryAgainBox" class="bg-[#141418] border border-zinc-800 p-4 rounded-xl text-left space-y-1.5">
-            <div class="text-[#ba9578] font-bold text-xs flex items-center gap-1.5">
+          <!-- 완주했으나 1등 점수가 아닐 때 (줄간격 넉넉한 다시 도전 메시지) -->
+          <div id="successTryAgainBox" class="bg-[#141418] border border-zinc-800 p-5 rounded-xl text-left space-y-2.5" style="line-height: 2.0;">
+            <div class="text-[#ba9578] font-bold text-sm flex items-center gap-2">
               <span>🎯</span> <span>30초 완주를 축하합니다!</span>
             </div>
-            <p class="text-zinc-300 text-xs leading-relaxed">
-              점프 보너스와 회피 점수를 더 모아 <strong class="text-white">최고 기록 경신에 다시 도전해 보세요!</strong>
+            <p class="text-zinc-300 text-xs">
+              점프 보너스와 회피 점수를 더 모아<br>
+              <strong class="text-white font-bold">최고 기록 경신에 다시 도전해 보세요!</strong>
             </p>
           </div>
 
-          <!-- 완주 후 1등 신기록까지 달성했을 때만 표시 (이름 등록창) -->
-          <div id="successRecordBox" class="hidden bg-[#09090b] p-4 rounded-xl border border-[#ba9578] text-xs font-mono space-y-2.5 text-left" style="display: none;">
-            <div id="successRecordInputRow">
-              <div class="text-[#ba9578] font-bold text-sm mb-1">🎉 완주 & 새로운 1위 신기록 달성!</div>
-              <p class="text-[11px] text-zinc-400 mb-2">1등의 닉네임을 입력하여 등록하세요.</p>
-              <div class="flex gap-2">
+          <!-- 완주 후 1등 신기록까지 달성했을 때만 표시 (줄간격 넉넉한 이름 등록창) -->
+          <div id="successRecordBox" class="hidden bg-[#09090b] p-5 rounded-xl border border-[#ba9578] text-xs font-mono space-y-3.5 text-left" style="display: none; line-height: 1.8;">
+            <div id="successRecordInputRow" class="space-y-2.5">
+              <div class="text-[#ba9578] font-bold text-sm">🎉 완주 & 새로운 1위 신기록 달성!</div>
+              <p class="text-[11px] text-zinc-400">새로운 1등의 닉네임을 입력하여 등록하세요.</p>
+              <div class="flex gap-2.5 pt-1">
                 <input type="text" id="successNameInput" placeholder="닉네임 입력 (최대 10자)" maxlength="10" class="flex-1 px-3 py-2 bg-[#141418] text-white text-xs border border-zinc-700 rounded focus:border-[#ba9578] focus:outline-none">
-                <button type="button" id="saveSuccessRecordBtn" class="btn btn-primary px-3.5 py-2 text-xs font-bold">1위 등록</button>
+                <button type="button" id="saveSuccessRecordBtn" class="btn btn-primary px-4 py-2 text-xs font-bold shrink-0">1위 등록</button>
               </div>
             </div>
-            <div id="successRecordSuccessMsg" class="hidden text-[#ba9578] font-bold py-1.5 text-center" style="display: none;">
+            <div id="successRecordSuccessMsg" class="hidden text-[#ba9578] font-bold py-1.5 text-center text-sm" style="display: none;">
               ✓ 1위 기록으로 등록되었습니다!
             </div>
           </div>
 
-          <button id="successRestartBtn" class="btn btn-primary w-full py-2.5 text-sm justify-center font-bold shadow-lg" type="button">
+          <button id="successRestartBtn" class="btn btn-primary w-full py-2.5 text-sm justify-center font-bold shadow-lg mt-2" type="button">
             <span>다시 도전 (R)</span>
           </button>
         </div>
