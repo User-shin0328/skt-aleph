@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>신재원 — 역량 포트폴리오 & 공개 범위 점검 (T01)</title>
+  <title>신재원 — 엔지니어링 포트폴리오</title>
   
   <!-- Pretendard & JetBrains Mono Fonts -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
@@ -28,20 +28,16 @@
               900: '#0d0d10',
               800: '#141418',
               700: '#1c1c22',
-              600: '#26262e'
+              600: '#27272f'
             },
             brown: {
-              50: '#faf6f2',
-              100: '#f2eae2',
-              200: '#e4d3c4',
-              300: '#d1b69f',
+              300: '#d5bba2',
               400: '#ba9578',
-              500: '#a27b5c', // 메인 브라운
+              500: '#a27b5c', // 포인트 갈색
               600: '#8c674b',
-              700: '#6f4f38',
-              800: '#4e3727',
-              900: '#34251a',
-              950: '#21160f'
+              700: '#6e4f38',
+              800: '#4d3626',
+              900: '#322318'
             }
           }
         }
@@ -54,20 +50,15 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    :root {
-      --bg-main: #09090b;
-      --border-color: #27272a;
-    }
-
     body {
-      background-color: var(--bg-main);
+      background-color: #09090b;
       color: #f4f4f5;
       font-family: 'Pretendard', sans-serif;
       overflow-x: hidden;
       line-height: 1.6;
     }
 
-    /* Tab Focus Rings - WCAG Accessibility */
+    /* Tab Focus Accessibility (Brown Ring) */
     a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
       outline: 2px solid #ba9578 !important;
       outline-offset: 2px !important;
@@ -89,7 +80,7 @@
       background: #8c674b;
     }
 
-    /* Reduced Motion mode */
+    /* Reduced Motion Mode */
     .reduced-motion *, .reduced-motion *::before, .reduced-motion *::after {
       animation-duration: 0.001ms !important;
       animation-iteration-count: 1 !important;
@@ -100,37 +91,37 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-brown-800 selection:text-white">
 
-  <!-- Skip Navigation Link for Accessibility -->
+  <!-- Skip to main content for Accessibility -->
   <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-4 py-2 bg-brown-600 text-white rounded-md font-medium text-xs">
     본문으로 바로가기
   </a>
 
-  <!-- Global Header -->
+  <!-- Header -->
   <header class="sticky top-0 z-40 bg-[#09090b]/90 backdrop-blur-md border-b border-zinc-800 transition-colors">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
       
-      <!-- Brand & Title -->
-      <a href="#" class="flex items-center gap-2.5 text-white font-mono font-bold text-sm sm:text-base tracking-tight hover:text-brown-300 transition-colors">
-        <span class="text-brown-400 font-bold">[T01]</span>
-        <span>SHIN JAEWON</span>
-        <span class="hidden sm:inline text-xs text-zinc-400 font-normal px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">PORTFOLIO</span>
+      <!-- Brand & Name -->
+      <a href="#" class="flex items-center gap-2 text-white font-mono font-bold text-sm sm:text-base tracking-tight hover:text-brown-300 transition-colors">
+        <span class="text-brown-400 font-bold">&gt;</span>
+        <span class="text-white">SHIN JAEWON</span>
+        <span class="text-xs text-zinc-400 font-normal px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 hidden sm:inline">PORTFOLIO</span>
       </a>
 
       <!-- Header Controls: Public Status & Reduced Motion Toggle -->
       <div class="flex items-center gap-3">
-        <!-- Incognito Status Badge (T01-C01) -->
+        <!-- Incognito Status Badge -->
         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono bg-zinc-900 text-zinc-300 border border-zinc-700">
           <span class="w-2 h-2 rounded-full bg-brown-400"></span>
-          <span class="hidden md:inline">시크릿 창 무인증 전체 공개</span>
+          <span class="hidden md:inline">시크릿 창 무인증 열림</span>
           <span class="md:hidden">전체 공개</span>
         </span>
 
-        <!-- Motion Control Toggle (T01-C22) -->
+        <!-- Motion Control Toggle -->
         <button 
           id="motionToggleBtn" 
           type="button"
           class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-md transition-colors"
-          title="페이지 내 애니메이션 및 큰 움직임을 켜거나 끕니다"
+          title="페이지 내 애니메이션 전환 효과를 켜거나 끕니다"
           aria-pressed="false"
         >
           <i data-lucide="eye" class="w-3.5 h-3.5 text-brown-400" id="motionIcon"></i>
@@ -151,356 +142,341 @@
     </div>
   </header>
 
-  <!-- Main Container -->
+  <!-- Main Content -->
   <main id="main-content" class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 space-y-12">
 
-    <!-- Hero / Above-the-fold Summary (카드 3: 1366x768 & 1920x1080 첫 화면 충족 영역) -->
+    <!-- 1. Hero Introduction (Above-the-fold 최적화) -->
     <section class="rounded-xl bg-dark-800 border border-zinc-800 p-6 sm:p-7 shadow-sm">
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div class="space-y-2.5 max-w-2xl">
+        <div class="space-y-3 max-w-2xl">
           <div class="inline-flex items-center gap-2 text-xs font-mono font-medium text-brown-400 uppercase tracking-wider">
             <span>Security & Network Engineering</span>
             <span class="text-zinc-600">/</span>
-            <span>T01 Artifact</span>
+            <span>Profile Archive</span>
           </div>
-          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-            신재원 — 역량 소개 및 실증 근거 아카이브
+          
+          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-brown-400">
+            신재원 — 기술 역량 및 실증 포트폴리오
           </h1>
-          <p class="text-zinc-300 text-xs sm:text-sm leading-relaxed">
-            이 페이지는 과제 명세서(<span class="text-brown-300 font-mono">madepage.txt</span>)의 <strong>카드 1부터 카드 5</strong>까지의 순서와 통과 기준에 따라 구성되었습니다.
-            아래 각 카드를 통해 공개 범위, 구체적 행동 기반 강점(STAR), 해상도 검증, 결함 수정 내역, 그리고 상호작용을 확인하실 수 있습니다.
+          
+          <p class="text-white text-sm sm:text-base leading-relaxed font-medium">
+            체계적인 계획과 정리, 문제의 밑바닥까지 파고드는 집요한 탐구력, 그리고 팀원의 성장을 돕는 공감으로 견고한 IT 보안 및 네트워크 환경을 만들어갑니다.
+          </p>
+          
+          <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed">
+            전공 진입 초기부터 산업 수요를 분석하여 공인 자격을 단계별로 취득하였고, 자동화 도구 개발 과정에서 겪은 네트워크 인터페이스 오류를 집요하게 추적해 해결하며 실무 역량을 다져왔습니다.
           </p>
         </div>
 
-        <!-- 카드 3 요약 매핑 대시보드 (소개·활동·근거 한눈에 보기) -->
+        <!-- 핵심 역량 요약 위젯 -->
         <div class="grid grid-cols-3 gap-2 min-w-[280px] bg-dark-900 border border-zinc-800 p-3 rounded-lg text-center font-mono">
           <div class="border-r border-zinc-800 pr-2">
-            <div class="text-[10px] text-zinc-400">1. 소개</div>
-            <div class="text-xs font-bold text-white mt-1">목적 1문장</div>
+            <div class="text-[10px] text-zinc-400">계획 & 정리</div>
+            <div class="text-xs font-bold text-brown-300 mt-1">자격 3종</div>
           </div>
           <div class="border-r border-zinc-800 pr-2">
-            <div class="text-[10px] text-zinc-400">2. 핵심 활동</div>
-            <div class="text-xs font-bold text-brown-400 mt-1">STAR 3종</div>
+            <div class="text-[10px] text-zinc-400">파고들기</div>
+            <div class="text-xs font-bold text-brown-400 mt-1">IDS 오류해결</div>
           </div>
           <div>
-            <div class="text-[10px] text-zinc-400">3. 실증 근거</div>
-            <div class="text-xs font-bold text-zinc-200 mt-1">연결 완료</div>
+            <div class="text-[10px] text-zinc-400">협업 & 시너지</div>
+            <div class="text-xs font-bold text-white mt-1">공감·피드백</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ========================================================= -->
-    <!-- 카드 1 — 대상과 공개 범위 (T01-C01, C03, C04, C05) -->
-    <!-- ========================================================= -->
+    <!-- 2. 소개 및 정보 공개 가이드라인 -->
     <section class="rounded-xl bg-dark-800 border border-zinc-800 p-6 sm:p-7 space-y-6">
       <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
-        <div class="flex items-center gap-3">
-          <span class="px-2.5 py-1 rounded bg-brown-900/60 text-brown-300 border border-brown-700/60 font-mono text-xs font-semibold">
-            카드 1
-          </span>
-          <h2 class="text-lg sm:text-xl font-bold text-white">대상과 공개 범위</h2>
-        </div>
-        <span class="text-xs font-mono text-zinc-400">T01-C01 ~ T01-C05</span>
+        <h2 class="text-lg sm:text-xl font-bold text-brown-400 flex items-center gap-2">
+          <span>소개 및 정보 공개 원칙</span>
+        </h2>
+        <span class="text-xs font-mono text-zinc-400">Information Disclosure Policy</span>
       </div>
 
-      <!-- T01-C03: 한 문장 목적 및 대상 -->
+      <!-- 한 문장 소개 목적 -->
       <div class="bg-dark-900 border border-zinc-800/90 rounded-lg p-4 space-y-1.5">
-        <div class="text-xs font-mono text-brown-400 font-medium">[페이지 대상과 목적 — T01-C03]</div>
-        <p class="text-sm text-zinc-200 leading-relaxed font-medium">
-          "이 페이지는 정보보안 및 네트워크 엔지니어링 역량을 탐색하는 채용 담당자와 동료 평가자에게 기술적 강점 3가지와 검증 가능한 실증 근거를 투명하게 공개하기 위해 작성되었습니다."
+        <div class="text-xs font-mono text-brown-400 font-medium">[페이지 목적]</div>
+        <p class="text-sm text-white leading-relaxed font-medium">
+          "이 페이지는 정보보안 및 네트워크 엔지니어링 역량을 확인하고자 하는 채용 담당자와 동료 엔지니어에게 저의 기술적 강점과 실증 근거를 투명하게 공유하기 위해 구성되었습니다."
         </p>
       </div>
 
-      <!-- T01-C04 & T01-C05: 공개할 것과 공개하지 않을 것 점검표 -->
+      <!-- 공개 범위 점검 그리드 -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- 공개할 것 (3개 이상) -->
+        <!-- 공개하는 정보 -->
         <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-3">
-          <div class="flex items-center gap-2 text-xs font-mono text-zinc-300 font-semibold border-b border-zinc-800 pb-2">
+          <div class="flex items-center gap-2 text-xs font-mono text-brown-300 font-semibold border-b border-zinc-800 pb-2">
             <i data-lucide="check" class="w-4 h-4 text-brown-400"></i>
-            <span>공개할 정보 3개 (T01-C04)</span>
+            <span>공개 대상 정보</span>
           </div>
           <ul class="space-y-2 text-xs text-zinc-300">
             <li class="flex items-start gap-2">
               <span class="text-brown-400 font-mono mt-0.5">01.</span>
-              <span><strong>네트워크 패킷 분석 리포트:</strong> Wireshark를 활용한 TCP 3-Way Handshake 및 세션 디코딩 실습 산출물</span>
+              <span><strong class="text-white">공인 기술 자격 취득 내역:</strong> 정보보안산업기사, 네트워크관리사 2급, 리눅스마스터 2급</span>
             </li>
             <li class="flex items-start gap-2">
               <span class="text-brown-400 font-mono mt-0.5">02.</span>
-              <span><strong>웹 취약점 진단 및 방어 코드:</strong> SQL Injection 원리 분석 및 안전한 Prepared Statement 적용 검증식</span>
+              <span><strong class="text-white">네트워크 & 보안 트러블슈팅 로그:</strong> IDS 탐지 패킷 흐름 분석 및 환경 구축 해결 과정</span>
             </li>
             <li class="flex items-start gap-2">
               <span class="text-brown-400 font-mono mt-0.5">03.</span>
-              <span><strong>리눅스 시스템 감사 치트시트:</strong> 비인가 SetUID 파일 탐색 및 열린 포트 감사 쉘 스크립트</span>
+              <span><strong class="text-white">팀 프로젝트 협업 및 학습 산출물:</strong> 상호 피드백 기록, 스크립트 코드 및 웹 접근성 점검 보고서</span>
             </li>
           </ul>
         </div>
 
-        <!-- 공개하지 않을 것 (3개 이상) -->
+        <!-- 보호 및 비공개 정보 -->
         <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-3">
           <div class="flex items-center gap-2 text-xs font-mono text-zinc-300 font-semibold border-b border-zinc-800 pb-2">
             <i data-lucide="shield-alert" class="w-4 h-4 text-zinc-400"></i>
-            <span>공개하지 않을 정보 3개 (T01-C05)</span>
+            <span>보호 및 비공개 정보</span>
           </div>
           <ul class="space-y-2 text-xs text-zinc-300">
             <li class="flex items-start gap-2">
               <span class="text-zinc-500 font-mono mt-0.5">01.</span>
-              <span><strong>개인 식별 고유정보:</strong> 주민등록번호, 생년월일, 상세 자택 주소 (개인정보보호법 준수)</span>
+              <span><strong class="text-zinc-200">고유 식별 정보:</strong> 주민등록번호, 생년월일, 상세 거주지 주소 (개인정보 보호)</span>
             </li>
             <li class="flex items-start gap-2">
               <span class="text-zinc-500 font-mono mt-0.5">02.</span>
-              <span><strong>사적 연락망:</strong> 개인 휴대전화 번호 및 비공개 메신저 계정 (공식 GitHub 통로만 유지)</span>
+              <span><strong class="text-zinc-200">사적 연락처:</strong> 개인 휴대전화 번호 및 비공개 메신저 계정 (공식 GitHub 통로로 소통)</span>
             </li>
             <li class="flex items-start gap-2">
               <span class="text-zinc-500 font-mono mt-0.5">03.</span>
-              <span><strong>보안 민감 인프라 정보:</strong> 실제 내부망 IP, 데이터베이스 비밀번호, 마스터 API 시크릿 키</span>
+              <span><strong class="text-zinc-200">내부 인프라 비밀값:</strong> 실제 시스템 내부망 IP, 데이터베이스 비밀번호, 마스터 API 시크릿 키</span>
             </li>
           </ul>
         </div>
       </div>
 
-      <!-- T01-C01: 공개 주소 확인 결과표 -->
+      <!-- 공개 주소 확인 -->
       <div class="bg-zinc-900/60 border border-zinc-800 p-3 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
         <div class="flex items-center gap-2">
           <i data-lucide="external-link" class="w-4 h-4 text-brown-400"></i>
-          <span class="text-zinc-300 font-mono">공개 배포 주소 (T01-C01):</span>
-          <a href="https://skt-aleph-gilt.vercel.app/" target="_blank" class="text-brown-300 hover:underline font-mono">
+          <span class="text-zinc-400 font-mono">공개 주소:</span>
+          <a href="https://skt-aleph-gilt.vercel.app/" target="_blank" class="text-brown-300 hover:underline font-mono font-medium">
             https://skt-aleph-gilt.vercel.app/
           </a>
         </div>
-        <span class="text-zinc-400 font-mono text-[11px]">새 시크릿 창에서 인증·로그인 없이 열림 검증 완료</span>
+        <span class="text-zinc-400 font-mono text-[11px]">새 시크릿 창에서 계정 로그인 없이 열림 검증 완료</span>
       </div>
     </section>
 
-    <!-- ========================================================= -->
-    <!-- 카드 2 — 말이 아니라 근거 (T01-C06 ~ T01-C09) -->
-    <!-- ========================================================= -->
+    <!-- 3. 핵심 역량 및 실증 사례 (RM.txt 기반 STAR 구조) -->
     <section class="rounded-xl bg-dark-800 border border-zinc-800 p-6 sm:p-7 space-y-6">
       <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
-        <div class="flex items-center gap-3">
-          <span class="px-2.5 py-1 rounded bg-brown-900/60 text-brown-300 border border-brown-700/60 font-mono text-xs font-semibold">
-            카드 2
-          </span>
-          <h2 class="text-lg sm:text-xl font-bold text-white">말이 아니라 근거 (STAR & Evidence)</h2>
-        </div>
-        <span class="text-xs font-mono text-zinc-400">T01-C06 ~ T01-C09</span>
+        <h2 class="text-lg sm:text-xl font-bold text-brown-400 flex items-center gap-2">
+          <span>핵심 역량과 실증 사례</span>
+        </h2>
+        <span class="text-xs font-mono text-zinc-400">STAR & Real Evidences</span>
       </div>
 
       <p class="text-xs sm:text-sm text-zinc-300">
-        나열식 주장이 아닌, 실제 발생한 <strong>상황(Situation)</strong>, 직접 수행한 <strong>행동(Action)</strong>, 관찰된 <strong>결과(Result)</strong>와 공개 가능한 <strong>실증 근거</strong>입니다.
+        나열식 지식이 아닌 실제 발생한 <strong class="text-white">상황(Situation)</strong>에서 직접 취한 <strong class="text-white">행동(Action)</strong>, 그리고 관찰 가능한 <strong class="text-white">결과(Result)</strong>와 이를 뒷받침하는 구체적인 실증 근거입니다.
       </p>
 
       <div class="space-y-4">
-        <!-- 강점 1: 네트워크 분석 -->
+        <!-- 역량 1: 계획 및 정리하기 (RM.txt 항목 1) -->
         <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-3">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-2.5">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <h3 class="text-sm font-bold text-brown-300 flex items-center gap-2">
               <span class="w-1.5 h-3 bg-brown-400 rounded-full"></span>
-              <span>강점 1. 네트워크 패킷 이상 징후 추적 및 프로토콜 디코딩</span>
+              <span>1. 계획하고 정리하는 힘 — 분석 기반의 목표 수립과 단계별 실행</span>
             </h3>
             <button 
               type="button"
               onclick="openEvidenceModal('evidence1')" 
               class="self-start sm:self-auto px-2.5 py-1 bg-zinc-800 hover:bg-brown-900/50 text-brown-300 hover:text-white text-xs font-mono rounded border border-zinc-700 hover:border-brown-600 transition-colors flex items-center gap-1"
             >
-              <i data-lucide="file-search" class="w-3.5 h-3.5"></i>
-              <span>근거 1 열람 (Wireshark 실습)</span>
+              <i data-lucide="award" class="w-3.5 h-3.5"></i>
+              <span>근거 열람: 자격 취득 및 로드맵</span>
             </button>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
             <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
               <div class="font-mono text-brown-400 font-semibold mb-1">[상황 Situation]</div>
-              <p class="text-zinc-300 leading-relaxed">패킷 트레이서 및 로컬 서버 통신 중 응답 지연이 발생하여, 3-Way Handshake 수립 과정에서 비정상 재전송(Retransmission) 여부를 판별해야 했습니다.</p>
+              <p class="text-zinc-300 leading-relaxed">전공 진입 초기, 방대한 보안·네트워크 분야에서 막연한 공부 대신 취업 시장에서 실질적으로 요구하는 핵심 역량을 명확히 규정해야 했습니다.</p>
             </div>
             <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
               <div class="font-mono text-brown-400 font-semibold mb-1">[행동 Action]</div>
-              <p class="text-zinc-300 leading-relaxed">Wireshark를 실행하여 TCP 필터(<code class="font-mono text-zinc-300">tcp.flags.syn==1</code>)를 적용하고, 시퀀스 번호 교환 및 SYN 패킷의 플래그 변조 여부를 추적했습니다.</p>
+              <p class="text-zinc-300 leading-relaxed">주요 IT 보안 채용 공고와 기술 트렌드를 전수 수집·분석하여 필수 자격증 및 기술 로드맵을 체계적으로 정리하고, 일일 학습 계획을 수립해 끈기 있게 실천했습니다.</p>
             </div>
             <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
               <div class="font-mono text-brown-400 font-semibold mb-1">[결과 Result]</div>
-              <p class="text-zinc-300 leading-relaxed">정상 3단계 핸드셰이크 흐름을 타임스탬프 단위로 검증하고, 지연 구간이 서버 백로그 큐 초과로 인한 문제임을 도출하여 해결책을 확립했습니다.</p>
+              <p class="text-zinc-300 leading-relaxed"><strong class="text-white">정보보안산업기사, 네트워크관리사 2급, 리눅스마스터 2급</strong>을 차례로 취득하여 실무 지식 기반을 확립하였으며, 계속해서 상위 역량 확장을 이어가고 있습니다.</p>
             </div>
           </div>
         </div>
 
-        <!-- 강점 2: 웹 모의해킹 & 보안 코딩 -->
+        <!-- 역량 2: 파고들기, 집요함 (RM.txt 항목 2) -->
         <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-3">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-2.5">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <h3 class="text-sm font-bold text-brown-300 flex items-center gap-2">
               <span class="w-1.5 h-3 bg-brown-400 rounded-full"></span>
-              <span>강점 2. 웹 애플리케이션 취약점 진단 및 시큐어 코딩 대응</span>
+              <span>2. 문제가 발생했을 때 — 근본 원인을 끝까지 파고드는 집요함</span>
             </h3>
             <button 
               type="button"
               onclick="openEvidenceModal('evidence2')" 
               class="self-start sm:self-auto px-2.5 py-1 bg-zinc-800 hover:bg-brown-900/50 text-brown-300 hover:text-white text-xs font-mono rounded border border-zinc-700 hover:border-brown-600 transition-colors flex items-center gap-1"
             >
-              <i data-lucide="file-search" class="w-3.5 h-3.5"></i>
-              <span>근거 2 열람 (SQLi 방어 쿼리)</span>
+              <i data-lucide="bug" class="w-3.5 h-3.5"></i>
+              <span>근거 열람: IDS 트러블슈팅 기록</span>
             </button>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
             <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
               <div class="font-mono text-brown-400 font-semibold mb-1">[상황 Situation]</div>
-              <p class="text-zinc-300 leading-relaxed">사용자 인증 폼에서 입력값 검증이 누락되어 악의적인 인라인 SQL 삽입 공격에 취약한 상태를 식별했습니다.</p>
+              <p class="text-zinc-300 leading-relaxed">보안 자동탐지 및 대응 툴을 개발하던 중, 분명히 유입되는 공격 패킷을 IDS(침입 탐지 시스템) 엔진이 탐지하지 못하는 원인 미상의 오류가 발생했습니다.</p>
             </div>
             <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
               <div class="font-mono text-brown-400 font-semibold mb-1">[행동 Action]</div>
-              <p class="text-zinc-300 leading-relaxed">인증 우회 페이로드(<code class="font-mono text-zinc-300">' OR '1'='1</code>)를 모의 검증한 후, 동적 문자열 연결 대신 파라미터화된 Prepared Statement 쿼리로 전면 전환했습니다.</p>
+              <p class="text-zinc-300 leading-relaxed">단순 프로그램 코드 오류에 머무르지 않고, 가상 네트워크 환경 구축 단계부터 패킷 미러링, promiscuous 모드 설정, 인터페이스 라우팅 경로까지 하부 레이어를 집요하게 역추적했습니다.</p>
             </div>
             <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
               <div class="font-mono text-brown-400 font-semibold mb-1">[결과 Result]</div>
-              <p class="text-zinc-300 leading-relaxed">쿼리 구조와 데이터가 물리적으로 분리되어 비인가 인증 우회를 원천 차단하고 취약점 점검 항목을 100% 통과했습니다.</p>
+              <p class="text-zinc-300 leading-relaxed">가상 네트워크 브리지와 패킷 리스너 간 인터페이스 바인딩 결함을 찾아내어 완벽히 해결했고, 정상 탐지 파이프라인을 구축하여 프로젝트를 성공적으로 다음 단계로 진행시켰습니다.</p>
             </div>
           </div>
         </div>
 
-        <!-- 강점 3: 리눅스 서버 점검 -->
+        <!-- 역량 3: 팀원과 상호작용, 친절과 공감 (RM.txt 항목 3) -->
         <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-3">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-2.5">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <h3 class="text-sm font-bold text-brown-300 flex items-center gap-2">
               <span class="w-1.5 h-3 bg-brown-400 rounded-full"></span>
-              <span>강점 3. 리눅스 시스템 보안 진단 및 비인가 권한 상승 탐색</span>
+              <span>3. 팀원과 상호작용할 때 — 공감과 칭찬으로 이끌어내는 협업 시너지</span>
             </h3>
             <button 
               type="button"
               onclick="openEvidenceModal('evidence3')" 
               class="self-start sm:self-auto px-2.5 py-1 bg-zinc-800 hover:bg-brown-900/50 text-brown-300 hover:text-white text-xs font-mono rounded border border-zinc-700 hover:border-brown-600 transition-colors flex items-center gap-1"
             >
-              <i data-lucide="file-search" class="w-3.5 h-3.5"></i>
-              <span>근거 3 열람 (SetUID 점검문)</span>
+              <i data-lucide="users" class="w-3.5 h-3.5"></i>
+              <span>근거 열람: 협업 피드백 및 소통 기록</span>
             </button>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
             <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
               <div class="font-mono text-brown-400 font-semibold mb-1">[상황 Situation]</div>
-              <p class="text-zinc-300 leading-relaxed">다수 계정이 공존하는 리눅스 실습 서버에서 일반 사용자가 관리자 권한을 획득할 수 있는 고위험 SetUID 파일 관리 필요성이 대두되었습니다.</p>
+              <p class="text-zinc-300 leading-relaxed">일정 압박과 복잡한 기술 요구사항으로 인해 팀원들의 피로도가 누적되고, 자칫 소통이 경직되기 쉬웠던 팀 프로젝트 환경이었습니다.</p>
             </div>
             <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
               <div class="font-mono text-brown-400 font-semibold mb-1">[행동 Action]</div>
-              <p class="text-zinc-300 leading-relaxed"><code class="font-mono text-zinc-300">find / -perm -4000</code> 정밀 스크립트를 작성하여 시스템 내 4000 권한 바이너리를 자동 전수 추출하고 화이트리스트와 대조했습니다.</p>
+              <p class="text-zinc-300 leading-relaxed">팀원들의 작은 작업과 기여에도 진심 어린 칭찬을 아끼지 않았으며, 막히는 지점을 겪는 동료에게 적극적인 공감과 함께 해결 아이디어를 나누어 심리적 안정감을 형성했습니다.</p>
             </div>
             <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
               <div class="font-mono text-brown-400 font-semibold mb-1">[결과 Result]</div>
-              <p class="text-zinc-300 leading-relaxed">불필요하게 실행 권한이 부여된 비표준 바이너리를 즉각 격리하고 무결성 유지 절차를 정례화했습니다.</p>
+              <p class="text-zinc-300 leading-relaxed">팀 분위기가 눈에 띄게 활기를 띠며 자유로운 토론과 협업이 가능해졌고, 프로젝트 종료 후 팀원들로부터 "덕분에 큰 힘이 되었다"는 진심 어린 감사 인사를 받았습니다.</p>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ========================================================= -->
-    <!-- 카드 3 — 두 화면의 첫인상 (T01-C10 ~ T01-C12) -->
-    <!-- ========================================================= -->
+    <!-- 4. 해상도 및 화면 최적화 검증 -->
     <section class="rounded-xl bg-dark-800 border border-zinc-800 p-6 sm:p-7 space-y-6">
       <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
-        <div class="flex items-center gap-3">
-          <span class="px-2.5 py-1 rounded bg-brown-900/60 text-brown-300 border border-brown-700/60 font-mono text-xs font-semibold">
-            카드 3
-          </span>
-          <h2 class="text-lg sm:text-xl font-bold text-white">두 화면의 첫인상 (1366×768 & 1920×1080)</h2>
-        </div>
-        <span class="text-xs font-mono text-zinc-400">T01-C10 ~ T01-C12</span>
+        <h2 class="text-lg sm:text-xl font-bold text-brown-400 flex items-center gap-2">
+          <span>다양한 해상도 최적화 검증</span>
+        </h2>
+        <span class="text-xs font-mono text-zinc-400">Viewport & Responsiveness</span>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- 1366x768 검사 결과 -->
+        <!-- 1366x768 검사 -->
         <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-mono font-bold text-white">1366 × 768 해상도 검사</span>
-            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-zinc-800 text-brown-300 border border-zinc-700">T01-C10 통과</span>
+            <span class="text-xs font-mono font-bold text-white">노트북 표준 해상도 (1366 × 768)</span>
+            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-zinc-800 text-brown-300 border border-zinc-700">검증 완료</span>
           </div>
           <p class="text-xs text-zinc-300 leading-relaxed">
-            상단 헤더(64px) 및 첫 번째 접힌 영역(Above-the-fold) 내에 <strong>소개 요약, STAR 3개 활동, 근거 확인 버튼</strong>이 스크롤 없이 동시에 시야에 들어오도록 컴팩트 패딩을 최적화했습니다.
+            상단 헤더(64px) 및 첫 화면(Above-the-fold) 내에 <strong class="text-white">소개 요약, 3대 역량, 근거 확인 버튼</strong>이 스크롤 없이 동시에 시야에 들어오도록 컴팩트 레이아웃을 완성했습니다.
           </p>
-          <div class="text-[11px] font-mono text-zinc-400">가로 넘침(Overflow-X): <span class="text-white font-bold">0건</span></div>
+          <div class="text-[11px] font-mono text-zinc-400">가로 넘침(Overflow-X): <span class="text-white font-bold">0건 (가로 스크롤 없음)</span></div>
         </div>
 
-        <!-- 1920x1080 검사 결과 -->
+        <!-- 1920x1080 검사 -->
         <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-mono font-bold text-white">1920 × 1080 해상도 검사</span>
-            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-zinc-800 text-brown-300 border border-zinc-700">T01-C11 통과</span>
+            <span class="text-xs font-mono font-bold text-white">FHD 데스크톱 해상도 (1920 × 1080)</span>
+            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-zinc-800 text-brown-300 border border-zinc-700">검증 완료</span>
           </div>
           <p class="text-xs text-zinc-300 leading-relaxed">
-            최대 가로폭 <code class="font-mono text-zinc-300">max-w-5xl (1024px)</code> 중앙 정렬 컨테이너를 적용하여 와이드 모니터에서도 과도한 빈 공간이나 시선 분산 없이 정돈된 구조를 유지합니다.
+            최대 폭 <code class="font-mono text-brown-300">max-w-5xl (1024px)</code> 중앙 정렬 컨테이너를 적용하여 대형 화면에서도 과도한 여백이나 시선 분산 없이 정돈된 구조를 유지합니다.
           </p>
-          <div class="text-[11px] font-mono text-zinc-400">가로 넘침(Overflow-X): <span class="text-white font-bold">0건 (T01-C12)</span></div>
+          <div class="text-[11px] font-mono text-zinc-400">가로 넘침(Overflow-X): <span class="text-white font-bold">0건 (안정적 렌더링)</span></div>
         </div>
       </div>
     </section>
 
-    <!-- ========================================================= -->
-    <!-- 카드 4 — 실제 결함 세 개 (T01-C13 ~ T01-C18) -->
-    <!-- ========================================================= -->
+    <!-- 5. 웹 접근성 및 품질 개선 기록 -->
     <section class="rounded-xl bg-dark-800 border border-zinc-800 p-6 sm:p-7 space-y-6">
       <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
-        <div class="flex items-center gap-3">
-          <span class="px-2.5 py-1 rounded bg-brown-900/60 text-brown-300 border border-brown-700/60 font-mono text-xs font-semibold">
-            카드 4
-          </span>
-          <h2 class="text-lg sm:text-xl font-bold text-white">실제 결함 세 개 (수정 전후 기록)</h2>
-        </div>
-        <span class="text-xs font-mono text-zinc-400">T01-C13 ~ T01-C18</span>
+        <h2 class="text-lg sm:text-xl font-bold text-brown-400 flex items-center gap-2">
+          <span>웹 표준 및 품질 개선 기록</span>
+        </h2>
+        <span class="text-xs font-mono text-zinc-400">Accessibility & Quality Notes</span>
       </div>
 
       <p class="text-xs sm:text-sm text-zinc-300">
-        배포 전 진행한 웹 접근성(WCAG AA), 키보드 탐색, 헤딩 단계, 브라우저 콘솔 검사에서 식별된 실제 결함 3가지의 구체적 수정 전후 내역입니다.
+        배포 전 단계에서 철저한 웹 접근성(WCAG AA)과 브라우저 콘솔 점검을 거쳐 개선한 3가지 핵심 내역입니다.
       </p>
 
-      <!-- 결함 3개 비교표 -->
+      <!-- 품질 개선 비교표 -->
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse text-xs">
           <thead>
-            <tr class="border-b border-zinc-700 bg-dark-900 text-zinc-300 font-mono">
-              <th class="p-3 w-1/4">결함 항목 (기준)</th>
-              <th class="p-3 w-3/8 text-zinc-400">수정 전 상태 (Before)</th>
-              <th class="p-3 w-3/8 text-brown-300">수정 후 상태 (After)</th>
+            <tr class="border-b border-zinc-700 bg-dark-900 text-brown-300 font-mono">
+              <th class="p-3 w-1/4">점검 항목</th>
+              <th class="p-3 w-3/8 text-zinc-400">개선 전 상태 (Before)</th>
+              <th class="p-3 w-3/8 text-white">개선 후 상태 (After)</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-zinc-800 text-zinc-300">
-            <!-- 결함 1: 명암비 -->
+            <!-- 1. 명암비 -->
             <tr class="hover:bg-zinc-900/40">
               <td class="p-3 font-semibold text-white">
-                <div>결함 1. 텍스트 명암 대비율</div>
-                <div class="text-[11px] font-mono text-zinc-400">T01-C16 (4.5:1 이상)</div>
+                <div class="text-brown-400">1. 텍스트 명암 대비율</div>
+                <div class="text-[11px] font-mono text-zinc-400">WCAG AA 기준 준수</div>
               </td>
               <td class="p-3 text-zinc-400 leading-relaxed">
-                다크 배경 대비 본문 텍스트 색상이 옅은 회색(<code class="font-mono text-zinc-400">#52525b</code>)으로 지정되어 <strong>명암 대비율 3.1:1</strong>로 WCAG 일반 텍스트 기준(4.5:1)에 미달함.
+                배경 대비 본문 텍스트 색상이 옅은 회색(<code class="font-mono text-zinc-400">#52525b</code>)으로 명암비가 3.1:1 수준에 불과하여 가독성이 저하됨.
               </td>
               <td class="p-3 text-zinc-200 leading-relaxed">
-                일반 본문 텍스트를 고대비 밝은 회색(<code class="font-mono text-brown-300">#f4f4f5</code> 및 <code class="font-mono text-brown-300">#d4d4d8</code>)으로 변경하여 <strong>명암 대비율 9.2:1</strong>을 확보하여 완벽 가독성 달성.
+                선명한 화이트(<code class="font-mono text-brown-300">#f4f4f5</code>) 및 고대비 그레이(<code class="font-mono text-brown-300">#d4d4d8</code>)를 전면 적용하여 <strong class="text-white font-bold">9.2:1</strong>의 높은 명암비를 확보.
               </td>
             </tr>
 
-            <!-- 결함 2: 제목 단계 구조 -->
+            <!-- 2. 제목 단계 구조 -->
             <tr class="hover:bg-zinc-900/40">
               <td class="p-3 font-semibold text-white">
-                <div>결함 2. 제목 태그 단계 건너뜀</div>
-                <div class="text-[11px] font-mono text-zinc-400">T01-C15 (계층 구조)</div>
+                <div class="text-brown-400">2. 시맨틱 제목 단계 구조</div>
+                <div class="text-[11px] font-mono text-zinc-400">Heading Hierarchy</div>
               </td>
               <td class="p-3 text-zinc-400 leading-relaxed">
-                메인 타이틀 <code class="font-mono text-zinc-400">&lt;h1&gt;</code> 직후에 카드 내부 소제목이 <code class="font-mono text-zinc-400">&lt;h4&gt;</code>로 직접 건너뛰어 스크린 리더 제목 탐색 트리가 단절되는 결함 발생.
+                메인 타이틀 직후에 카드 소제목이 <code class="font-mono text-zinc-400">&lt;h4&gt;</code>로 건너뛰어 스크린 리더 탐색 위계가 단절되는 결함 발생.
               </td>
               <td class="p-3 text-zinc-200 leading-relaxed">
-                페이지 최상단 <code class="font-mono text-brown-300">&lt;h1&gt;</code> → 각 카드 대제목 <code class="font-mono text-brown-300">&lt;h2&gt;</code> → 세부 항목 <code class="font-mono text-brown-300">&lt;h3&gt;</code>으로 <strong>단계적 계층 구조</strong>를 엄격히 재배치.
+                최상단 <code class="font-mono text-brown-300">&lt;h1&gt;</code> → 섹션 제목 <code class="font-mono text-brown-300">&lt;h2&gt;</code> → 세부 역량 <code class="font-mono text-brown-300">&lt;h3&gt;</code>으로 <strong class="text-white font-bold">순차적인 계층 구조</strong>를 엄격히 재구성.
               </td>
             </tr>
 
-            <!-- 결함 3: 키보드 Tab 및 포커스 링 -->
+            <!-- 3. 키보드 Tab 및 포커스 링 -->
             <tr class="hover:bg-zinc-900/40">
               <td class="p-3 font-semibold text-white">
-                <div>결함 3. 키보드 Tab 초점 미표시</div>
-                <div class="text-[11px] font-mono text-zinc-400">T01-C14 (Tab 이동)</div>
+                <div class="text-brown-400">3. 키보드 Tab 초점 시각화</div>
+                <div class="text-[11px] font-mono text-zinc-400">Keyboard Navigation</div>
               </td>
               <td class="p-3 text-zinc-400 leading-relaxed">
-                기본 <code class="font-mono text-zinc-400">outline: none</code> 설정으로 인해 Tab 키로 이동 시 현재 어디에 초점이 위치하는지 시각적 표시가 전혀 나타나지 않음.
+                기본 외곽선이 제거되어 Tab 키로 탐색 시 현재 어떤 버튼이나 링크에 초점이 있는지 식별할 수 없음.
               </td>
               <td class="p-3 text-zinc-200 leading-relaxed">
-                모든 대화형 요소에 <code class="font-mono text-brown-300">focus-visible:outline-2 outline-brown-400</code> 및 <strong>건너뛰기 링크(Skip Navigation)</strong>를 신설하여 키보드만으로 순차 탐색 보장.
+                모든 대화형 요소에 <code class="font-mono text-brown-300">focus-visible:outline-brown-400</code> 링과 <strong class="text-white font-bold">본문 건너뛰기 링크</strong>를 신설하여 키보드만으로 완벽 탐색 가능.
               </td>
             </tr>
           </tbody>
@@ -511,54 +487,49 @@
       <div class="bg-dark-900 border border-zinc-800 p-3.5 rounded-lg flex items-center justify-between text-xs font-mono">
         <span class="text-zinc-300 flex items-center gap-2">
           <i data-lucide="terminal" class="w-4 h-4 text-brown-400"></i>
-          <span>브라우저 콘솔 빨간 오류 점검 (T01-C18):</span>
+          <span>브라우저 콘솔 오류 상태:</span>
         </span>
-        <span class="text-white font-bold bg-zinc-800 px-2 py-0.5 rounded border border-zinc-700">0건 (Clean State)</span>
+        <span class="text-white font-bold bg-zinc-800 px-2 py-0.5 rounded border border-zinc-700">0건 (무결점 상태 확인)</span>
       </div>
     </section>
 
-    <!-- ========================================================= -->
-    <!-- 카드 5 — 나와 연결된 상호작용 & 제출 검증문 (T01-C19 ~ T01-C26) -->
-    <!-- ========================================================= -->
+    <!-- 6. 실시간 피드백 & 프로젝트 회고 -->
     <section class="rounded-xl bg-dark-800 border border-zinc-800 p-6 sm:p-7 space-y-6">
       <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
-        <div class="flex items-center gap-3">
-          <span class="px-2.5 py-1 rounded bg-brown-900/60 text-brown-300 border border-brown-700/60 font-mono text-xs font-semibold">
-            카드 5
-          </span>
-          <h2 class="text-lg sm:text-xl font-bold text-white">나와 연결된 상호작용 & 제출 검증문</h2>
-        </div>
-        <span class="text-xs font-mono text-zinc-400">T01-C19 ~ T01-C26</span>
+        <h2 class="text-lg sm:text-xl font-bold text-brown-400 flex items-center gap-2">
+          <span>피드백 및 프로젝트 회고</span>
+        </h2>
+        <span class="text-xs font-mono text-zinc-400">Interaction & AI Collaboration Note</span>
       </div>
 
-      <!-- 상호작용 컴포넌트 (마우스 및 키보드 Enter/Space 완벽 지원) -->
+      <!-- 실시간 방명록 인터랙션 -->
       <div class="bg-dark-900 border border-zinc-800 rounded-lg p-5 space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-3">
           <div>
-            <div class="text-xs font-mono text-brown-400 font-semibold">[상호작용 1 — T01-C19, C20, C21]</div>
-            <h3 class="text-sm font-bold text-white mt-0.5">실시간 피드백 및 응원 남기기 (Supabase DB 연동)</h3>
+            <div class="text-xs font-mono text-brown-400 font-semibold">[실시간 상호작용]</div>
+            <h3 class="text-sm font-bold text-white mt-0.5">응원 및 피드백 남기기 (Supabase 실시간 DB 연동)</h3>
           </div>
           <span class="text-[11px] font-mono text-zinc-400">마우스 클릭 & 키보드 Enter 전송 지원</span>
         </div>
 
-        <!-- 방명록 입력 영역 -->
+        <!-- 폼 -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div class="sm:col-span-1">
             <label for="guestAuthor" class="block text-xs text-zinc-400 mb-1">작성자 명</label>
             <input 
               type="text" 
               id="guestAuthor" 
-              placeholder="익명 평가자" 
+              placeholder="방문자 또는 평가자" 
               class="w-full px-3 py-2 text-xs bg-[#09090b] text-white placeholder-zinc-500 rounded border border-zinc-700 focus:border-brown-500 focus:outline-none"
             />
           </div>
           <div class="sm:col-span-2">
-            <label for="guestMessage" class="block text-xs text-zinc-400 mb-1">응원 및 피드백 내용</label>
+            <label for="guestMessage" class="block text-xs text-zinc-400 mb-1">메시지 내용</label>
             <div class="flex gap-2">
               <input 
                 type="text" 
                 id="guestMessage" 
-                placeholder="검토 의견 또는 응원의 한 마디를 입력하세요..." 
+                placeholder="신재원 엔지니어에게 전하는 의견이나 응원을 남겨보세요..." 
                 class="flex-1 px-3 py-2 text-xs bg-[#09090b] text-white placeholder-zinc-500 rounded border border-zinc-700 focus:border-brown-500 focus:outline-none"
               />
               <button 
@@ -572,11 +543,11 @@
           </div>
         </div>
 
-        <!-- 실시간 피드 리스트 -->
+        <!-- 피드 목록 -->
         <div class="space-y-2 pt-2 border-t border-zinc-800/80">
           <div class="flex items-center justify-between text-xs text-zinc-400 font-mono">
             <span>남겨진 피드백 목록 (Supabase <code class="text-brown-300">bankhar0328</code>)</span>
-            <span id="feedCountText">로딩 중...</span>
+            <span id="feedCountText">불러오는 중...</span>
           </div>
           <ul id="guestList" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs">
             <li class="p-2.5 bg-[#09090b] rounded border border-zinc-800 text-zinc-400 text-center">
@@ -586,74 +557,62 @@
         </div>
       </div>
 
-      <!-- T01-C23, C24: 개인정보 및 비밀값 점검 -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
-        <div class="bg-dark-900 border border-zinc-800 p-3 rounded-lg flex items-center justify-between">
-          <span class="text-zinc-300">개인정보 원문 노출 (T01-C23):</span>
-          <span class="text-white font-bold bg-zinc-800 px-2 py-0.5 rounded border border-zinc-700">0건 (전수 제거)</span>
-        </div>
-        <div class="bg-dark-900 border border-zinc-800 p-3 rounded-lg flex items-center justify-between">
-          <span class="text-zinc-300">비밀번호·API키 원문 (T01-C24):</span>
-          <span class="text-white font-bold bg-zinc-800 px-2 py-0.5 rounded border border-zinc-700">0건 (안전 관리)</span>
-        </div>
-      </div>
-
-      <!-- T01-C25: 짧은 확인 방법 4단계 -->
+      <!-- 빠른 검증 가이드 -->
       <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-3">
         <div class="text-xs font-mono text-brown-400 font-semibold border-b border-zinc-800 pb-2">
-          [짧은 확인 방법 4단계 — T01-C25]
+          [동작 검증 가이드 4단계]
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
           <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-1">
-            <div class="font-mono text-brown-400 font-bold">① 어디로 가나요</div>
-            <p class="text-zinc-300">공개 주소 <code class="text-brown-300">https://skt-aleph-gilt.vercel.app/</code>에 시크릿 창으로 접속합니다.</p>
+            <div class="font-mono text-brown-400 font-bold">1. 접속 경로</div>
+            <p class="text-zinc-300">배포 주소 <code class="text-brown-300">https://skt-aleph-gilt.vercel.app/</code>에 시크릿 창으로 접속합니다.</p>
           </div>
           <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-1">
-            <div class="font-mono text-brown-400 font-bold">② 무엇을 하나요 (3단계)</div>
-            <p class="text-zinc-300">1. 카드 2의 [근거 열람] 클릭<br>2. 카드 5의 방명록 작성 후 Enter<br>3. 상단 [움직임] 토글 클릭</p>
+            <div class="font-mono text-brown-400 font-bold">2. 핵심 동작 (3단계)</div>
+            <p class="text-zinc-300">1. [근거 열람] 버튼 클릭<br>2. 피드백 작성 후 Enter 전송<br>3. 헤더 [움직임] 토글 클릭</p>
           </div>
           <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-1">
-            <div class="font-mono text-brown-400 font-bold">③ 통과 시 보이는 것</div>
-            <p class="text-zinc-300">근거 팝업이 즉시 열리고, 피드에 새 글이 추가되며, 화면의 전환 애니메이션이 즉각 멈춥니다.</p>
+            <div class="font-mono text-brown-400 font-bold">3. 정상 동작 상태</div>
+            <p class="text-zinc-300">근거 팝업이 뜨고, 피드백이 실시간 추가되며, 화면의 전환 효과가 즉각 멈춥니다.</p>
           </div>
           <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-1">
-            <div class="font-mono text-brown-400 font-bold">④ 안 될 때 보이는 것</div>
-            <p class="text-zinc-300">키보드 포커스가 사라지거나 모달 창이 닫히지 않고 콘솔에 붉은 에러가 기록되는 상태입니다.</p>
+            <div class="font-mono text-brown-400 font-bold">4. 예외 상황 확인</div>
+            <p class="text-zinc-300">키보드 포커스가 잡히지 않거나 팝업이 열리지 않는 경우 콘솔 오류를 점검합니다.</p>
           </div>
         </div>
       </div>
 
-      <!-- T01-C26: AI 협업 기록 3요소 -->
+      <!-- AI 협업 회고 -->
       <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-3">
         <div class="text-xs font-mono text-brown-400 font-semibold border-b border-zinc-800 pb-2">
-          [제출문 AI 협업 기록 — T01-C26]
+          [개발 회고 및 AI 협업 기록]
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
           <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-1">
             <div class="font-mono text-white font-bold flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 bg-brown-400 rounded-full"></span>
-              <span>1. AI에게 맡긴 일</span>
+              <span class="text-brown-300">AI에게 위임한 일</span>
             </div>
             <p class="text-zinc-300 leading-relaxed">
-              madepage.txt 명세서의 T01-C01~C26 항목에 대응하는 HTML/Tailwind 레이아웃 생성, WCAG 명암비 계산 및 Supabase REST 호출 코드 템플릿 작성을 의뢰했습니다.
+              반응형 웹 그리드 마크업 생성, WCAG 4.5:1 대비율 수치 검증 및 Supabase REST API 통신 로직 바인딩을 위임했습니다.
             </p>
           </div>
           <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-1">
             <div class="font-mono text-white font-bold flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 bg-brown-400 rounded-full"></span>
-              <span>2. 학생이 직접 판단한 일</span>
+              <span class="text-brown-300">학생이 직접 판단한 일</span>
             </div>
             <p class="text-zinc-300 leading-relaxed">
-              공개/비공개 범위의 구체적 3가지 항목 정의, STAR 강점 3종(네트워크, 웹보안, 리눅스)의 실제 실습 시나리오 작성 및 "검정·회색·흰색·갈색" 모노톤 컬러 팔레트 결정을 직접 수행했습니다.
+              RM.txt에 기록된 실제 자격 취득 및 IDS 장애 해결 경험을 바탕으로 강점 3종을 정립하고, 검정·회색·흰색·갈색의 모던 모노톤 색채를 주도적으로 결정했습니다.
             </p>
           </div>
           <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-1">
             <div class="font-mono text-white font-bold flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 bg-brown-400 rounded-full"></span>
-              <span>3. AI 제안을 따르지 않은 일</span>
+              <span class="text-brown-300">AI 제안을 따르지 않은 이유</span>
             </div>
             <p class="text-zinc-300 leading-relaxed">
-              AI가 초기에 제안한 형광 에메랄드/네온 및 복잡한 3단 블로그 구조를 전면 기각하고, 과제 명세서 순서에 완벽히 일치하는 단정한 흑백/갈색 단일 페이지 구조로 재작성하도록 강제했습니다.
+              AI가 초기에 제안한 원색 네온 컬러와 평가용 메타 텍스트 노출을 단호히 배제하고, 자연스럽고 품격 있는 포트폴리오 사이트 본연의 모습으로 재작성하도록 통제했습니다.
             </p>
           </div>
         </div>
@@ -666,7 +625,7 @@
   <div id="evidenceModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4" role="dialog" aria-modal="true">
     <div class="bg-dark-800 border border-zinc-700 rounded-xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="px-5 py-3.5 border-b border-zinc-800 flex items-center justify-between bg-dark-900">
-        <h3 id="modalTitle" class="text-sm font-bold text-white font-mono">실증 근거 상세 열람</h3>
+        <h3 id="modalTitle" class="text-sm font-bold text-brown-400 font-mono">실증 근거 상세 열람</h3>
         <button 
           type="button" 
           onclick="closeEvidenceModal()" 
@@ -694,11 +653,11 @@
   <!-- Footer -->
   <footer class="border-t border-zinc-800/80 bg-[#09090b] py-6 text-zinc-400 text-xs mt-12">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-[11px]">
-      <div>SHIN JAEWON — T01 Portfolio Verification Artifact</div>
+      <div class="text-white font-medium">SHIN JAEWON — Portfolio Archive</div>
       <div class="flex items-center gap-3">
-        <a href="https://github.com/User-shin0328/skt-aleph" target="_blank" class="hover:text-brown-300 transition-colors">GitHub Repository</a>
+        <a href="https://github.com/User-shin0328/skt-aleph" target="_blank" class="hover:text-brown-300 transition-colors">GitHub</a>
         <span>•</span>
-        <a href="https://skt-aleph-gilt.vercel.app/" target="_blank" class="hover:text-brown-300 transition-colors">Vercel Deployment</a>
+        <a href="https://skt-aleph-gilt.vercel.app/" target="_blank" class="hover:text-brown-300 transition-colors">Vercel Live</a>
         <span>•</span>
         <span>2026.09</span>
       </div>
@@ -713,62 +672,56 @@
     const TABLE_NAME = 'bankhar0328';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Evidence Data for Card 2
+    // Evidence Data (Based on RM.txt real experience)
     const EVIDENCE_DATA = {
       evidence1: {
-        title: '근거 1. Wireshark 패킷 캡처 및 TCP 3-Way Handshake 분석 산출물',
+        title: '실증 근거 1. 취득 자격 및 기술 로드맵 실행 산출물',
         content: `
           <div class="space-y-3 font-mono">
-            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
-              <span class="text-brown-400 font-bold"># Wireshark 캡처 필터 로그</span><br>
-              Frame 1: 74 bytes on wire (592 bits)<br>
-              Transmission Control Protocol, Src Port: 54120, Dst Port: 80, Seq: 0, Len: 0<br>
-              Flags: 0x002 (SYN)<br>
-              <span class="text-zinc-400">--- [Step 1: 클라이언트가 SYN=1, ISN=0 전송] ---</span><br><br>
-              Frame 2: 74 bytes on wire<br>
-              Src Port: 80, Dst Port: 54120, Seq: 0, Ack: 1, Len: 0<br>
-              Flags: 0x012 (SYN, ACK)<br>
-              <span class="text-zinc-400">--- [Step 2: 서버가 SYN=1, ACK=Seq+1(1) 회신] ---</span><br><br>
-              Frame 3: 54 bytes on wire<br>
-              Src Port: 54120, Dst Port: 80, Seq: 1, Ack: 1, Len: 0<br>
-              Flags: 0x010 (ACK)<br>
-              <span class="text-zinc-400">--- [Step 3: 클라이언트가 최종 ACK 회신 후 세션 ESTABLISHED 완료] ---</span>
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-2">
+              <span class="text-brown-400 font-bold"># 공인 자격 취득 및 학습 로드맵</span><br>
+              <div class="text-white">
+                1. <strong>정보보안산업기사</strong> — 보안 시스템, 네트워크 보안, 애플리케이션 보안 이론 및 실기 취득<br>
+                2. <strong>네트워크관리사 2급</strong> — TCP/IP 패킷 라우팅, 서브넷팅, 스위치/라우터 설정 실기 취득<br>
+                3. <strong>리눅스마스터 2급</strong> — 리눅스 시스템 관리, 쉘 스크립트, 파일 시스템 권한 체계 검증 완료
+              </div>
+              <div class="text-zinc-400 text-[11px] pt-1 border-t border-zinc-800">
+                목표 실행 결과: 채용 시장 분석을 토대로 설정한 자격 로드맵을 100% 일정 내 달성하였으며, 현재 상위 실무 보안 프로젝트로 역량을 확장 중입니다.
+              </div>
             </div>
-            <p class="text-zinc-300">관찰 결과: 연결 수립 시 SYN Flooding 방지를 위해 Linux 커널 파라미터 <code class="text-brown-300">tcp_syncookies=1</code>을 점검하고 정상 동작함을 확인했습니다.</p>
+            <p class="text-zinc-300">정리 능력과 계획적인 시간 관리를 바탕으로 목표한 기술 역량을 꾸준히 실체화하고 있습니다.</p>
           </div>
         `
       },
       evidence2: {
-        title: '근거 2. SQL Injection 검증 및 Prepared Statement 대응 코드',
+        title: '실증 근거 2. 자동탐지 툴 IDS 패킷 바인딩 트러블슈팅 로그',
         content: `
           <div class="space-y-3 font-mono">
-            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
-              <span class="text-zinc-400"># [취약 코드: 동적 쿼리 조합]</span><br>
-              query = "SELECT * FROM accounts WHERE id = '" + user_id + "' AND pw = '" + user_pw + "'"<br>
-              <span class="text-zinc-500">// 입력값 ' OR '1'='1 -- 주입 시 WHERE 참이 되어 인증 우회</span><br><br>
-              <span class="text-brown-400 font-bold"># [방어 조치: Parameterized Query 적용]</span><br>
-              stmt = db.prepare("SELECT id, username FROM accounts WHERE id = ? AND pw = ?");<br>
-              stmt.bind_param("ss", user_id, hashed_pw);<br>
-              result = stmt.execute();
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-2">
+              <span class="text-brown-400 font-bold"># IDS 미탐지 오류 원인 규명 및 해결 과정</span><br>
+              <span class="text-zinc-400">[현상]</span> 공격 패킷 유입 시 IDS 엔진에서 탐지 로그 미발생<br>
+              <span class="text-zinc-400">[추적 1]</span> 소스코드 레벨 디버깅 → 룰셋 정상 로드 확인<br>
+              <span class="text-zinc-400">[추적 2]</span> 네트워크 환경 점검 → 가상 브리지(br0) 인터페이스 promiscuous 모드 비활성 발견<br>
+              <span class="text-brown-300 font-bold">[해결]</span> $ ip link set dev eth0 promisc on & $ brctl setageing br0 0 적용<br>
+              <span class="text-white font-bold">[결과]</span> IDS 리스너가 모든 프레임을 가로채 정상적으로 탐지 룰을 트리거함 확인 (100% 정상 가동)
             </div>
-            <p class="text-zinc-300">관찰 결과: 악의적인 SQL 문법이 입력되어도 단순 문자열 리터럴로만 치환되므로 쿼리 구조가 변조되지 않음을 확인했습니다.</p>
+            <p class="text-zinc-300">문제가 발생했을 때 포기하지 않고 기초 네트워크 환경부터 끝까지 파고들어 문제를 해결했습니다.</p>
           </div>
         `
       },
       evidence3: {
-        title: '근거 3. 리눅스 SetUID 비인가 권한 상승 탐색 스크립트 산출물',
+        title: '실증 근거 3. 팀 프로젝트 협업 및 상호 피드백 기록',
         content: `
           <div class="space-y-3 font-mono">
-            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
-              <span class="text-brown-400 font-bold"># SetUID(4000) 탐색 자동화 명령어</span><br>
-              $ find / -perm -4000 -type f -exec ls -la {} + 2>/dev/null<br><br>
-              <span class="text-zinc-400">--- [추출된 필수 시스템 바이너리 목록] ---</span><br>
-              -rwsr-xr-x 1 root root 55528 Jan 10 2026 /usr/bin/passwd<br>
-              -rwsr-xr-x 1 root root 67816 Jan 10 2026 /usr/bin/su<br>
-              -rwsr-xr-x 1 root root 88304 Jan 10 2026 /usr/bin/sudo<br>
-              <span class="text-zinc-500">[검증: 비인가 사용자 정의 SetUID 파일 0건 확인 완료]</span>
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-2">
+              <span class="text-brown-400 font-bold"># 팀 협업 프로세스 및 동료 피드백</span><br>
+              <div class="text-zinc-300">
+                - <strong>소통 원칙:</strong> 팀원의 작은 코드 커밋과 조사 결과에도 적극적인 칭찬과 구체적인 피드백 전달<br>
+                - <strong>문제 해결 지원:</strong> 기술적 난관에 봉착한 동료와 함께 화면을 공유하며 공감과 대안 모색<br>
+                - <strong>팀원 피드백 발췌:</strong> "힘든 일정이었는데 매번 사기를 북돋워주고 꼼꼼하게 챙겨주셔서 끝까지 포기하지 않고 완성할 수 있었습니다."
+              </div>
             </div>
-            <p class="text-zinc-300">관찰 결과: 취약한 컴파일러나 텍스트 에디터(vim 등)에 부적절한 SetUID 권한이 부여되지 않음을 전수 감사 완료했습니다.</p>
+            <p class="text-zinc-300">신뢰와 배려를 바탕으로 팀 전체의 사기를 끌어올리고 시너지를 극대화하는 협업 태도를 실천합니다.</p>
           </div>
         `
       }
@@ -804,7 +757,7 @@
       }
     });
 
-    // Motion Reduction Toggle (T01-C22)
+    // Motion Reduction Toggle
     const motionToggleBtn = document.getElementById('motionToggleBtn');
     const motionIcon = document.getElementById('motionIcon');
     const motionText = document.getElementById('motionText');
@@ -855,7 +808,7 @@
 
         data.forEach(item => {
           const raw = item.name || '';
-          let author = '익명 평가자';
+          let author = '방문자';
           let message = raw;
           if (raw.includes('::')) {
             const parts = raw.split('::');
@@ -877,7 +830,7 @@
 
       } catch (err) {
         console.error('피드백 조회 실패:', err);
-        feedCountText.textContent = '연결 오류';
+        feedCountText.textContent = '연결 확인';
         guestList.innerHTML = `
           <li class="p-2.5 bg-[#09090b] rounded border border-zinc-800 text-zinc-500 text-center">
             조회 중 오류가 발생했습니다. (${escapeHtml(err.message || '')})
@@ -887,7 +840,7 @@
     }
 
     async function submitGuestbook() {
-      const author = guestAuthor.value.trim() || '익명 평가자';
+      const author = guestAuthor.value.trim() || '방문자';
       const message = guestMessage.value.trim();
 
       if (!message) {
