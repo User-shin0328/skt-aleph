@@ -448,6 +448,15 @@
           gain.gain.linearRampToValueAtTime(0.01, now + 0.16);
           osc.start(now);
           osc.stop(now + 0.16);
+        } else if (type === 'dodge') {
+          // 장애물 회피 성공 경쾌한 보너스음
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.linearRampToValueAtTime(0.005, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
         } else if (type === 'hit') {
           // 충돌 쾅 소리
           osc.type = 'sawtooth';
@@ -590,7 +599,7 @@
       velocityY: 0,
       gravity: 0.85,
       jumpStrength1: -14.2,  // 1단 점프
-      jumpStrength2: -12.0,  // 2단 점프
+      jumpStrength2: -13.8,  // 2단 점프 (거대 92px 장애물 통과를 위한 초고도 도약)
       jumpCount: 0,          // 현재 점프 횟수 (최대 2)
       maxJumps: 2,           // 2단 점프 허용
       isGrounded: true,
@@ -604,6 +613,7 @@
     let obstacles = [];
     let nextObstacleTimer = 0;
     let bgOffset = 0;
+    let floatingScores = []; // 회피 성공 시 떠오르는 점수 이펙트
 
     // ==========================================
     // 4. 게임 리셋 및 점프 로직 (2단 점프 핵심)
@@ -621,6 +631,7 @@
       player.lastJumpTime = 0;
       player.doubleJumpEffect = 0;
       obstacles = [];
+      floatingScores = [];
       nextObstacleTimer = 0.8;
       bgOffset = 0;
 
@@ -689,7 +700,7 @@
 
       survivalTime = GAME_DURATION - remainingTime;
       finalTime.textContent = survivalTime.toFixed(1) + 's';
-      finalScore.textContent = currentScore + ' PTS';
+      finalScore.textContent = Math.floor(currentScore) + ' PTS';
 
       // 가장 오래 버틴 사람 기록 확인 및 갱신 표시
       bestRecord = getBestSurvivorRecord();
@@ -713,7 +724,7 @@
       playSound('win');
 
       survivalTime = 30.0;
-      currentScore += 300;
+      currentScore = Math.floor(currentScore) + 300;
       scoreVal.textContent = currentScore;
       successScore.textContent = currentScore + ' PTS';
 
@@ -770,9 +781,9 @@
         speedVal.textContent = speedMultiplier.toFixed(1) + 'x';
       }
 
-      // 점수 가산 (후반부 고속일수록 점수 가산율 상승)
-      currentScore += Math.floor(dt * 10 * speedMultiplier);
-      scoreVal.textContent = currentScore;
+      // 시간에 따른 점수 상승 (속도가 빨라질수록 초당 점수가 더욱 가파르게 상승)
+      currentScore += dt * 30 * speedMultiplier;
+      scoreVal.textContent = Math.floor(currentScore);
 
       // 3) 플레이어 물리 (점프 & 중력)
       player.velocityY += player.gravity;
@@ -793,7 +804,6 @@
       bgOffset += currentSpeed * 60 * dt * 0.5;
 
       // 4) 장애물 고빈도 랜덤 스폰
-      // 회전초, 일반 선인장, 쌍둥이 선인장, 2단 점프 거대 선인장이 쉴 틈 없이 랜덤하게 쏟아짐
       nextObstacleTimer -= dt;
       if (nextObstacleTimer <= 0) {
         const rand = Math.random();
@@ -802,10 +812,10 @@
         let height = 44;
 
         if (rand < 0.28) {
-          // ★ 2단 점프로만 피할 수 있는 거대 3단 선인장 (높이 74px)
+          // ★ 2단 점프로만 피할 수 있는 거대 3단 선인장 (높이를 74px -> 92px로 대폭 상향!)
           type = 'tall_cactus';
-          width = 30;
-          height = 74;
+          width = 32;
+          height = 92;
         } else if (rand < 0.52) {
           // 회전초 (Tumbleweed)
           type = 'tumbleweed';
@@ -829,25 +839,52 @@
           width: width,
           height: height,
           type: type,
-          rotation: 0
+          rotation: 0,
+          passed: false
         });
 
-        // 장애물 생성 간격: 속도가 빨라질수록 더욱 빈번하게 등장 (기존 대비 2배 이상 빈도)
+        // 장애물 생성 간격
         if (type === 'tall_cactus') {
-          // 2단 점프 후 착지 텀을 보장하면서도 자주 등장 (~1.0s - 1.4s)
-          nextObstacleTimer = (1.15 + Math.random() * 0.45) / Math.sqrt(speedMultiplier);
+          nextObstacleTimer = (1.2 + Math.random() * 0.45) / Math.sqrt(speedMultiplier);
         } else {
-          // 일반/쌍둥이/회전초는 0.55s ~ 0.95s로 매우 긴장감 있게 쏟아짐
           nextObstacleTimer = (0.62 + Math.random() * 0.45) / speedMultiplier;
         }
       }
 
-      // 5) 장애물 이동 및 충돌 검사 (현재 속도 연동)
+      // 5) 장애물 이동, 회피 점수 판정, 충돌 검사
       for (let i = obstacles.length - 1; i >= 0; i--) {
         const obs = obstacles[i];
         obs.x -= currentSpeed * 60 * dt;
         if (obs.type === 'tumbleweed') {
           obs.rotation += 0.14 * speedMultiplier;
+        }
+
+        // ★ 피한 장애물마다 점수 상승 (회피 성공 보너스)
+        if (!obs.passed && (obs.x + obs.width < player.x)) {
+          obs.passed = true;
+          let bonus = 50;
+          if (obs.type === 'tall_cactus') {
+            bonus = 150; // 초고도 2단 점프 극복 특급 보너스!
+          } else if (obs.type === 'double_cactus') {
+            bonus = 80;
+          } else if (obs.type === 'tumbleweed') {
+            bonus = 40;
+          } else {
+            bonus = 50;
+          }
+          currentScore += bonus;
+          scoreVal.textContent = Math.floor(currentScore);
+
+          playSound('dodge');
+
+          floatingScores.push({
+            x: player.x + 8,
+            y: player.y - 12,
+            text: `+${bonus}`,
+            color: (obs.type === 'tall_cactus') ? '#ffd700' : '#ba9578',
+            alpha: 1.0,
+            velocityY: -1.6
+          });
         }
 
         // 충돌 판정 박스
@@ -923,25 +960,26 @@
       // 4. 장애물 그리기
       obstacles.forEach(obs => {
         if (obs.type === 'tall_cactus') {
-          // ★ 2단 점프로만 넘을 수 있는 거대 2단 선인장 (Double Cactus)
-          ctx.fillStyle = '#3d2b1a';
-          // 줄기 본체
-          ctx.fillRect(obs.x + 10, obs.y, 10, obs.height);
-          // 아랫단 가지
-          ctx.fillRect(obs.x, obs.y + 40, 10, 8);
-          ctx.fillRect(obs.x, obs.y + 26, 8, 16);
-          ctx.fillRect(obs.x + 20, obs.y + 48, 10, 8);
-          ctx.fillRect(obs.x + 22, obs.y + 34, 8, 16);
-          // 윗단 가지
-          ctx.fillRect(obs.x + 2, obs.y + 14, 8, 6);
-          ctx.fillRect(obs.x + 2, obs.y + 6, 6, 10);
-          ctx.fillRect(obs.x + 20, obs.y + 20, 8, 6);
-          ctx.fillRect(obs.x + 22, obs.y + 10, 6, 12);
+          // ★ 2단 점프로만 넘을 수 있는 거대 3단 선인장 (높이 92px 대폭 상향!)
+          ctx.fillStyle = '#382515';
+          // 중앙 메인 줄기
+          ctx.fillRect(obs.x + 11, obs.y, 10, obs.height);
+          // 1단 (하단) 양쪽 가지
+          ctx.fillRect(obs.x + 1, obs.y + 56, 10, 8);
+          ctx.fillRect(obs.x + 1, obs.y + 40, 8, 20);
+          ctx.fillRect(obs.x + 21, obs.y + 64, 10, 8);
+          ctx.fillRect(obs.x + 23, obs.y + 48, 8, 20);
+          // 2단 (중단) 가지
+          ctx.fillRect(obs.x + 3, obs.y + 26, 8, 7);
+          ctx.fillRect(obs.x + 3, obs.y + 16, 7, 14);
+          // 3단 (상단) 가지
+          ctx.fillRect(obs.x + 21, obs.y + 22, 9, 7);
+          ctx.fillRect(obs.x + 23, obs.y + 10, 7, 16);
           
-          // 상단 경고 표식 (2단 점프 요구 표시)
-          ctx.fillStyle = '#ba9578';
+          // 상단 경고 표식 (2단 점프 필수 표시 - 시인성 강화)
+          ctx.fillStyle = '#ffd700';
           ctx.font = 'bold 10px JetBrains Mono';
-          ctx.fillText('2단점프!', obs.x - 6, obs.y - 8);
+          ctx.fillText('▲2단점프!', obs.x - 8, obs.y - 8);
         } else if (obs.type === 'cactus') {
           // 일반 선인장
           ctx.fillStyle = '#5c4028';
@@ -1021,6 +1059,23 @@
           ctx.fillRect(player.x + 2, player.y + 36, 8, 8);
           ctx.fillRect(player.x + 16, player.y + 34, 10, 6);
         }
+      }
+
+      // 7. 회피 성공 부유 점수 이펙트 렌더링
+      for (let i = floatingScores.length - 1; i >= 0; i--) {
+        const f = floatingScores[i];
+        f.y += f.velocityY;
+        f.alpha -= 0.024;
+        if (f.alpha <= 0) {
+          floatingScores.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = Math.max(f.alpha, 0);
+        ctx.fillStyle = f.color;
+        ctx.font = 'bold 13px "JetBrains Mono", monospace';
+        ctx.fillText(f.text, f.x, f.y);
+        ctx.restore();
       }
     }
 
