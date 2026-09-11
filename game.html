@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>WESTERN RUNNER — 서부의 총잡이 러너 게임 (과제 2)</title>
+  
+  <!-- Pretendard & JetBrains Mono Fonts -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-black: #09090b;
+      --card-bg: #141418;
+      --border-zinc: #27272a;
+      --brown-main: #ba9578;
+      --brown-btn: #8c674b;
+      --text-white: #f4f4f5;
+      --text-gray: #a1a1aa;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-white);
+      font-family: 'Pretendard', sans-serif;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Tab 포커스 링 */
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--brown-main) !important;
+      outline-offset: 2px !important;
+    }
+
+    .container-box {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 캔버스 컨테이너 */
+    .game-wrapper {
+      position: relative;
+      width: 100%;
+      background: #0d0d10;
+      border: 1px solid var(--border-zinc);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.8);
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 800 / 400;
+      background: #110d0a;
+    }
+
+    /* HUD 컨트롤 바 */
+    .hud-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-zinc);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    .hud-stat {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hud-val {
+      font-weight: bold;
+      color: var(--brown-main);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--text-white);
+      background: #1e1e24;
+      border: 1px solid var(--border-zinc);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: var(--brown-btn);
+      border-color: var(--brown-main);
+    }
+
+    .btn-primary {
+      background: var(--brown-btn);
+      border-color: var(--brown-main);
+    }
+    .btn-primary:hover {
+      background: #a27b5c;
+    }
+
+    /* 오버레이 팝업 (시작 / 게임오버 / 성공) */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+      z-index: 20;
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    .overlay-card {
+      background: #18181e;
+      border: 2px solid var(--brown-main);
+      border-radius: 12px;
+      padding: 24px 32px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.9);
+    }
+
+    /* 화면 흔들림 효과 */
+    .screen-shake {
+      animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-2px, 0, 0); }
+      20%, 80% { transform: translate3d(3px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+      40%, 60% { transform: translate3d(5px, 0, 0); }
+    }
+
+    /* 조작 안내 */
+    .controls-guide {
+      margin-top: 16px;
+      padding: 14px 18px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-zinc);
+      border-radius: 10px;
+      font-size: 12px;
+      color: var(--text-gray);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    kbd {
+      display: inline-block;
+      padding: 2px 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      background: #09090b;
+      border: 1px solid var(--border-zinc);
+      border-radius: 4px;
+      color: var(--brown-main);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-box">
+    
+    <!-- 상단 네비 및 HUD 바 -->
+    <div class="hud-bar">
+      <div class="flex items-center gap-4">
+        <a href="/" class="btn" title="메인 포트폴리오로 돌아가기">
+          <span>&larr; 포트폴리오</span>
+        </a>
+        <div class="hud-stat">
+          <span class="text-zinc-500">시간:</span>
+          <span id="timeVal" class="hud-val">30.0s</span>
+        </div>
+        <div class="hud-stat">
+          <span class="text-zinc-500">점수:</span>
+          <span id="scoreVal" class="hud-val">0</span>
+        </div>
+        <div class="hud-stat">
+          <span class="text-zinc-500">최고:</span>
+          <span id="highScoreVal" class="hud-val">0</span>
+        </div>
+      </div>
+
+      <!-- 효과 제어 버튼 (카드 5) -->
+      <div class="flex items-center gap-2">
+        <button id="muteBtn" class="btn" type="button" aria-pressed="false" title="효과음 켜기/끄기">
+          <span id="muteIcon">🔊</span>
+          <span id="muteText">소리 켜짐</span>
+        </button>
+        <button id="motionBtn" class="btn" type="button" aria-pressed="false" title="화면 흔들림 줄이기">
+          <span id="motionText">흔들림 켜짐</span>
+        </button>
+        <button id="pauseBtn" class="btn" type="button" title="일시정지 (P)">
+          <span id="pauseText">일시정지 (P)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 게임 캔버스 래퍼 -->
+    <div class="game-wrapper" id="gameWrapper">
+      <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+      <!-- 시작 화면 오버레이 -->
+      <div id="startOverlay" class="overlay">
+        <div class="overlay-card space-y-4">
+          <div class="text-xs font-mono text-[#ba9578] uppercase tracking-widest">[ 과제 2 : 서부 총잡이 러너 ]</div>
+          <h1 class="text-xl sm:text-2xl font-bold text-white font-mono">WESTERN RUNNER</h1>
+          <p class="text-xs text-[#a1a1aa] leading-relaxed">
+            황야의 총잡이가 되어 30초 동안 굴러오는 회전초와 날카로운 선인장을 피해 달리세요!<br>
+            30초 동안 생존하여 보안관 배지를 획득하면 완주 성공입니다.
+          </p>
+          <div class="pt-2">
+            <button id="startBtn" class="btn btn-primary w-full py-2.5 text-sm justify-center" type="button">
+              <span>게임 시작 (Space)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 게임 오버 오버레이 -->
+      <div id="gameOverOverlay" class="overlay hidden">
+        <div class="overlay-card space-y-3">
+          <div class="text-xs font-mono text-zinc-500 uppercase tracking-widest">[ 현상수배 : 충돌 발생 ]</div>
+          <h2 class="text-2xl font-bold text-white font-mono text-[#ba9578]">GAME OVER</h2>
+          <p class="text-xs text-zinc-300" id="gameOverMsg">장애물에 걸려 쓰러졌습니다.</p>
+          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 font-mono text-xs space-y-1">
+            <div class="flex justify-between">
+              <span class="text-zinc-500">생존 시간:</span>
+              <span class="text-white" id="finalTime">0s</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-zinc-500">획득 점수:</span>
+              <span class="text-[#ba9578] font-bold" id="finalScore">0</span>
+            </div>
+          </div>
+          <button id="restartBtn" class="btn btn-primary w-full py-2 text-sm justify-center mt-2" type="button">
+            <span>다시 도전 (R)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 완주 성공 오버레이 -->
+      <div id="successOverlay" class="overlay hidden">
+        <div class="overlay-card space-y-3">
+          <div class="text-xs font-mono text-[#ba9578] uppercase tracking-widest">★ MISSION COMPLETE ★</div>
+          <h2 class="text-2xl font-bold text-white font-mono text-[#ba9578]">30초 완주 성공!</h2>
+          <p class="text-xs text-zinc-300">황야를 가로질러 무사히 마을에 도착하여 보안관 배지를 수여받았습니다!</p>
+          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 font-mono text-xs space-y-1">
+            <div class="flex justify-between">
+              <span class="text-zinc-500">완주 보너스 점수:</span>
+              <span class="text-[#ba9578] font-bold">+300 PTS</span>
+            </div>
+          </div>
+          <button id="successRestartBtn" class="btn btn-primary w-full py-2 text-sm justify-center mt-2" type="button">
+            <span>새 게임 시작 (R)</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 하단 조작 가이드 -->
+    <div class="controls-guide">
+      <div class="flex items-center gap-4 flex-wrap">
+        <span><kbd>Space</kbd> 또는 <kbd>&uarr;</kbd> 점프</span>
+        <span><kbd>P</kbd> 일시정지</span>
+        <span><kbd>R</kbd> 재시작</span>
+        <span class="text-zinc-500">|</span>
+        <span class="text-zinc-400">모바일: 화면 터치로 점프</span>
+      </div>
+      <div class="text-zinc-500 font-mono text-[11px]">
+        30초 루프 · Web Audio 효과 · 무손실 복구
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 게임 로직 스크립트 -->
+  <script>
+    // ==========================================
+    // 1. Web Audio API 오디오 합성기 (카드 5)
+    // ==========================================
+    let audioCtx = null;
+    let isMuted = false;
+    let isReduceMotion = false;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+    }
+
+    function playSound(type) {
+      if (isMuted || !audioCtx) return;
+      try {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'jump') {
+          // 점프 슉 소리 (주파수 상승)
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(150, now);
+          osc.frequency.exponentialRampToValueAtTime(450, now + 0.15);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'hit') {
+          // 충돌 쾅 소리 (낮은 둔탁한 소리)
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(120, now);
+          osc.frequency.linearRampToValueAtTime(40, now + 0.25);
+          gain.gain.setValueAtTime(0.35, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (type === 'win') {
+          // 30초 완주 팡파르
+          const notes = [261.63, 329.63, 392.00, 523.25];
+          notes.forEach((freq, idx) => {
+            const nOsc = audioCtx.createOscillator();
+            const nGain = audioCtx.createGain();
+            nOsc.connect(nGain);
+            nGain.connect(audioCtx.destination);
+            nOsc.type = 'sine';
+            nOsc.frequency.setValueAtTime(freq, now + idx * 0.12);
+            nGain.gain.setValueAtTime(0.2, now + idx * 0.12);
+            nGain.gain.linearRampToValueAtTime(0.01, now + (idx + 1) * 0.12);
+            nOsc.start(now + idx * 0.12);
+            nOsc.stop(now + (idx + 1) * 0.12);
+          });
+        }
+      } catch (e) {
+        console.warn('Audio play error:', e);
+      }
+    }
+
+    // ==========================================
+    // 2. 스토리지 저장 및 손상 복구 (카드 4)
+    // ==========================================
+    const STORAGE_KEY = 'western_runner_highscore';
+
+    function getSafeHighScore() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw === null || raw === '') return 0;
+        const parsed = parseInt(raw, 10);
+        return isNaN(parsed) ? 0 : Math.max(0, parsed);
+      } catch (e) {
+        // 손상되거나 차단된 경우 안전 기본값 0 반환
+        return 0;
+      }
+    }
+
+    function saveHighScore(score) {
+      try {
+        const current = getSafeHighScore();
+        if (score > current) {
+          localStorage.setItem(STORAGE_KEY, score.toString());
+          return score;
+        }
+        return current;
+      } catch (e) {
+        return score;
+      }
+    }
+
+    // ==========================================
+    // 3. 게임 엔진 & 상태 관리 (카드 1, 2, 3)
+    // ==========================================
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const gameWrapper = document.getElementById('gameWrapper');
+
+    // DOM UI
+    const timeVal = document.getElementById('timeVal');
+    const scoreVal = document.getElementById('scoreVal');
+    const highScoreVal = document.getElementById('highScoreVal');
+    const muteBtn = document.getElementById('muteBtn');
+    const muteIcon = document.getElementById('muteIcon');
+    const muteText = document.getElementById('muteText');
+    const motionBtn = document.getElementById('motionBtn');
+    const motionText = document.getElementById('motionText');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const pauseText = document.getElementById('pauseText');
+
+    // 오버레이 UI
+    const startOverlay = document.getElementById('startOverlay');
+    const gameOverOverlay = document.getElementById('gameOverOverlay');
+    const successOverlay = document.getElementById('successOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const successRestartBtn = document.getElementById('successRestartBtn');
+    const finalTime = document.getElementById('finalTime');
+    const finalScore = document.getElementById('finalScore');
+
+    // 게임 상태 (State)
+    const GAME_DURATION = 30.0; // 30초 루프
+    const BASE_SPEED = 7.0;     // 카드 3 최종 채택 난이도 (Speed 7)
+    let gameState = 'IDLE';     // IDLE, PLAYING, PAUSED, GAMEOVER, SUCCESS
+    let lastTime = 0;
+    let remainingTime = GAME_DURATION;
+    let currentScore = 0;
+    let highScore = getSafeHighScore();
+
+    highScoreVal.textContent = highScore;
+
+    // 플레이어 객체 (서부 총잡이)
+    const player = {
+      x: 80,
+      y: 300,
+      width: 32,
+      height: 48,
+      velocityY: 0,
+      gravity: 0.85,
+      jumpStrength: -15,
+      isGrounded: true,
+      lastJumpTime: 0
+    };
+
+    const GROUND_Y = 348;
+
+    // 장애물 (회전초 & 선인장)
+    let obstacles = [];
+    let nextObstacleTimer = 0;
+
+    // 배경 스크롤 오프셋
+    let bgOffset = 0;
+
+    // ==========================================
+    // 4. 게임 리셋 및 루프 함수
+    // ==========================================
+    function resetGame() {
+      gameState = 'PLAYING';
+      remainingTime = GAME_DURATION;
+      currentScore = 0;
+      player.y = GROUND_Y - player.height;
+      player.velocityY = 0;
+      player.isGrounded = true;
+      player.lastJumpTime = 0;
+      obstacles = [];
+      nextObstacleTimer = 1.0;
+      bgOffset = 0;
+
+      startOverlay.classList.add('hidden');
+      gameOverOverlay.classList.add('hidden');
+      successOverlay.classList.add('hidden');
+
+      timeVal.textContent = remainingTime.toFixed(1) + 's';
+      scoreVal.textContent = '0';
+      lastTime = performance.now();
+      requestAnimationFrame(gameLoop);
+    }
+
+    function jump() {
+      if (gameState === 'IDLE') {
+        initAudio();
+        resetGame();
+        return;
+      }
+      if (gameState !== 'PLAYING') return;
+
+      // 연속 입력 중복 방지 (카드 2 — 지면에 있을 때만 1회 점프 정확히 반영)
+      const now = performance.now();
+      if (player.isGrounded && now - player.lastJumpTime > 200) {
+        player.velocityY = player.jumpStrength;
+        player.isGrounded = false;
+        player.lastJumpTime = now;
+        playSound('jump');
+      }
+    }
+
+    function togglePause() {
+      if (gameState === 'PLAYING') {
+        gameState = 'PAUSED';
+        pauseText.textContent = '재개 (P)';
+      } else if (gameState === 'PAUSED') {
+        gameState = 'PLAYING';
+        pauseText.textContent = '일시정지 (P)';
+        lastTime = performance.now();
+        requestAnimationFrame(gameLoop);
+      }
+    }
+
+    function gameOver() {
+      gameState = 'GAMEOVER';
+      playSound('hit');
+
+      if (!isReduceMotion) {
+        gameWrapper.classList.add('screen-shake');
+        setTimeout(() => gameWrapper.classList.remove('screen-shake'), 300);
+      }
+
+      highScore = saveHighScore(currentScore);
+      highScoreVal.textContent = highScore;
+
+      finalTime.textContent = (GAME_DURATION - remainingTime).toFixed(1) + 's';
+      finalScore.textContent = currentScore;
+      gameOverOverlay.classList.remove('hidden');
+    }
+
+    function gameSuccess() {
+      gameState = 'SUCCESS';
+      playSound('win');
+
+      currentScore += 300;
+      scoreVal.textContent = currentScore;
+      highScore = saveHighScore(currentScore);
+      highScoreVal.textContent = highScore;
+
+      successOverlay.classList.remove('hidden');
+    }
+
+    // ==========================================
+    // 5. 프레임 업데이트 & 렌더링
+    // ==========================================
+    function gameLoop(currentTime) {
+      if (gameState !== 'PLAYING') return;
+
+      const dt = Math.min((currentTime - lastTime) / 1000, 0.1);
+      lastTime = currentTime;
+
+      // 시간 및 점수 업데이트
+      remainingTime -= dt;
+      currentScore += Math.floor(dt * 10);
+      scoreVal.textContent = currentScore;
+
+      if (remainingTime <= 0) {
+        remainingTime = 0;
+        timeVal.textContent = '0.0s';
+        gameSuccess();
+        return;
+      }
+      timeVal.textContent = remainingTime.toFixed(1) + 's';
+
+      // 물리 업데이트 (플레이어)
+      player.velocityY += player.gravity;
+      player.y += player.velocityY;
+
+      if (player.y >= GROUND_Y - player.height) {
+        player.y = GROUND_Y - player.height;
+        player.velocityY = 0;
+        player.isGrounded = true;
+      }
+
+      // 배경 오프셋
+      bgOffset += BASE_SPEED * 60 * dt * 0.5;
+
+      // 장애물 스폰
+      nextObstacleTimer -= dt;
+      if (nextObstacleTimer <= 0) {
+        const type = Math.random() > 0.4 ? 'cactus' : 'tumbleweed';
+        const width = type === 'cactus' ? 24 : 26;
+        const height = type === 'cactus' ? 44 : 26;
+        obstacles.push({
+          x: canvas.width + 20,
+          y: GROUND_Y - height,
+          width: width,
+          height: height,
+          type: type,
+          rotation: 0
+        });
+        // 1.2초 ~ 2.4초 간격 스폰
+        nextObstacleTimer = 1.2 + Math.random() * 1.2;
+      }
+
+      // 장애물 이동 및 충돌 판정
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obs = obstacles[i];
+        obs.x -= BASE_SPEED * 60 * dt;
+        if (obs.type === 'tumbleweed') {
+          obs.rotation += 0.1;
+        }
+
+        // AABB 충돌 검사 (피격 판정 살짝 여유)
+        const pad = 6;
+        if (
+          player.x + pad < obs.x + obs.width - pad &&
+          player.x + player.width - pad > obs.x + pad &&
+          player.y + pad < obs.y + obs.height - pad &&
+          player.y + player.height - pad > obs.y + pad
+        ) {
+          gameOver();
+          return;
+        }
+
+        // 화면 밖 제거
+        if (obs.x + obs.width < -50) {
+          obstacles.splice(i, 1);
+        }
+      }
+
+      // 그리기
+      render();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 1. 서부 황야 하늘 그라데이션
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
+      skyGrad.addColorStop(0, '#1c120c');
+      skyGrad.addColorStop(0.6, '#3a2012');
+      skyGrad.addColorStop(1, '#5a341b');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, canvas.width, GROUND_Y);
+
+      // 붉은 서부 석양 태양
+      ctx.fillStyle = '#ba6838';
+      ctx.beginPath();
+      ctx.arc(680, 100, 42, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. 원경 사막 협곡 산맥 실루엣
+      ctx.fillStyle = '#22140e';
+      ctx.beginPath();
+      ctx.moveTo(0, GROUND_Y);
+      ctx.lineTo(0, 220);
+      ctx.lineTo(120, 180);
+      ctx.lineTo(240, 240);
+      ctx.lineTo(400, 170);
+      ctx.lineTo(560, 230);
+      ctx.lineTo(700, 190);
+      ctx.lineTo(800, 210);
+      ctx.lineTo(800, GROUND_Y);
+      ctx.closePath();
+      ctx.fill();
+
+      // 3. 지면 (모래 대지)
+      ctx.fillStyle = '#141418';
+      ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
+      ctx.strokeStyle = '#a27b5c';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(0, GROUND_Y);
+      ctx.lineTo(canvas.width, GROUND_Y);
+      ctx.stroke();
+
+      // 4. 장애물 그리기
+      obstacles.forEach(obs => {
+        if (obs.type === 'cactus') {
+          // 선인장
+          ctx.fillStyle = '#5c4028';
+          ctx.fillRect(obs.x + 8, obs.y, 8, obs.height);
+          // 선인장 좌우 가지
+          ctx.fillRect(obs.x, obs.y + 12, 8, 6);
+          ctx.fillRect(obs.x, obs.y + 6, 6, 12);
+          ctx.fillRect(obs.x + 16, obs.y + 18, 8, 6);
+          ctx.fillRect(obs.x + 18, obs.y + 12, 6, 12);
+        } else {
+          // 회전초 (Tumbleweed)
+          ctx.save();
+          ctx.translate(obs.x + obs.width / 2, obs.y + obs.height / 2);
+          ctx.rotate(obs.rotation);
+          ctx.strokeStyle = '#ba9578';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(0, 0, obs.width / 2 - 2, 0, Math.PI * 2);
+          ctx.moveTo(-8, -4); ctx.lineTo(8, 4);
+          ctx.moveTo(4, -8); ctx.lineTo(-4, 8);
+          ctx.stroke();
+          ctx.restore();
+        }
+      });
+
+      // 5. 총잡이 플레이어 (서부 건슬링어 실루엣)
+      ctx.fillStyle = '#ba9578';
+      // 중절모 챙
+      ctx.fillRect(player.x - 4, player.y + 4, player.width + 8, 4);
+      // 모자 윗부분
+      ctx.fillRect(player.x + 4, player.y, player.width - 8, 6);
+      // 얼굴/스카프
+      ctx.fillStyle = '#e4d3c4';
+      ctx.fillRect(player.x + 6, player.y + 8, player.width - 12, 10);
+      // 펄럭이는 판초 코트
+      ctx.fillStyle = '#8c674b';
+      ctx.fillRect(player.x + 2, player.y + 18, player.width - 4, 18);
+      // 다리/부츠
+      ctx.fillStyle = '#34251a';
+      if (player.isGrounded) {
+        const runFrame = Math.floor((bgOffset / 10) % 2);
+        if (runFrame === 0) {
+          ctx.fillRect(player.x + 4, player.y + 36, 8, 12);
+          ctx.fillRect(player.x + 18, player.y + 36, 8, 8);
+        } else {
+          ctx.fillRect(player.x + 4, player.y + 36, 8, 8);
+          ctx.fillRect(player.x + 18, player.y + 36, 8, 12);
+        }
+      } else {
+        // 점프 공중 자세
+        ctx.fillRect(player.x + 2, player.y + 36, 8, 8);
+        ctx.fillRect(player.x + 16, player.y + 34, 10, 6);
+      }
+    }
+
+    // ==========================================
+    // 6. 이벤트 리스너 바인딩 (키보드, 마우스, 터치)
+    // ==========================================
+    // 키보드 조작
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' || e.code === 'ArrowUp') {
+        e.preventDefault();
+        jump();
+      } else if (e.code === 'KeyP') {
+        togglePause();
+      } else if (e.code === 'KeyR') {
+        if (gameState === 'GAMEOVER' || gameState === 'SUCCESS') {
+          resetGame();
+        }
+      }
+    });
+
+    // 캔버스 클릭/터치 조작 (모바일/PC 지원)
+    canvas.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      jump();
+    });
+
+    // 버튼 이벤트
+    startBtn.addEventListener('click', () => {
+      initAudio();
+      resetGame();
+    });
+    restartBtn.addEventListener('click', resetGame);
+    successRestartBtn.addEventListener('click', resetGame);
+    pauseBtn.addEventListener('click', togglePause);
+
+    // 음소거 토글 (카드 5)
+    muteBtn.addEventListener('click', () => {
+      initAudio();
+      isMuted = !isMuted;
+      muteBtn.setAttribute('aria-pressed', isMuted.toString());
+      if (isMuted) {
+        muteIcon.textContent = '🔇';
+        muteText.textContent = '음소거';
+      } else {
+        muteIcon.textContent = '🔊';
+        muteText.textContent = '소리 켜짐';
+      }
+    });
+
+    // 움직임 줄이기 토글 (카드 5)
+    motionBtn.addEventListener('click', () => {
+      isReduceMotion = !isReduceMotion;
+      motionBtn.setAttribute('aria-pressed', isReduceMotion.toString());
+      motionText.textContent = isReduceMotion ? '흔들림 꺼짐' : '흔들림 켜짐';
+    });
+
+    // 창 포커스 이탈 시 자동 일시정지 (카드 2)
+    window.addEventListener('blur', () => {
+      if (gameState === 'PLAYING') {
+        togglePause();
+      }
+    });
+
+    // 초기 화면 1회 렌더
+    render();
+  </script>
+</body>
+</html>
