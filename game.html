@@ -238,7 +238,7 @@
         </div>
         <div class="hud-stat" title="역대 최고 점수 기록">
           <span class="text-zinc-500">🏆최고점수:</span>
-          <span id="bestScoreVal" class="hud-val text-[#ba9578]">1,200</span>
+          <span id="bestScoreVal" class="hud-val text-[#ba9578]">-</span>
         </div>
       </div>
 
@@ -263,116 +263,101 @@
 
       <!-- 시작 화면 오버레이 -->
       <div id="startOverlay" class="overlay">
-        <div class="overlay-card text-left space-y-4" style="max-width: 520px; padding: 24px;">
+        <div class="overlay-card text-left" style="max-width: 500px; padding: 28px 24px;">
           <!-- 상단 헤더: 타이틀(좌) + 바로 시작 버튼(우) -->
-          <div class="flex items-center justify-between border-b border-zinc-800 pb-3 gap-3">
+          <div class="flex items-center justify-between border-b border-zinc-800 pb-3.5 mb-4 gap-3">
             <div class="text-left">
-              <div class="text-[11px] font-mono font-bold text-[#ba9578] uppercase tracking-wider mb-0.5">WESTERN RUNNER</div>
+              <div class="text-[11px] font-mono font-bold text-[#ba9578] uppercase tracking-wider mb-1">WESTERN RUNNER</div>
               <h1 class="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight flex items-center gap-2">
                 <span class="text-[#ba9578]">미니게임</span>
                 <span class="text-xs font-normal text-zinc-400 font-sans">총잡이 러너</span>
               </h1>
             </div>
-            <!-- 설명을 다 읽지 않아도 즉시 시작 가능한 버튼 -->
-            <button id="startBtn" class="btn btn-primary px-4 py-2 text-xs sm:text-sm font-bold shadow-lg shrink-0" type="button">
+            <!-- 바로 시작 버튼 (우측 상단) -->
+            <button id="startBtn" class="btn btn-primary px-4 py-2.5 text-xs sm:text-sm font-bold shadow-lg shrink-0" type="button">
               <span>⚡ 게임 시작 (Space)</span>
             </button>
           </div>
 
-          <!-- 현재 1위 기록 안내 (왼쪽 정렬) -->
-          <div class="bg-[#09090b] px-3.5 py-2.5 rounded-lg border border-zinc-800 text-xs font-mono flex items-center justify-between text-left">
-            <span class="text-zinc-400">🏆 현재 1위 기록:</span>
-            <span class="text-[#ba9578] font-bold" id="startBestRecord">2,000 PTS (보안관 신재원)</span>
+          <!-- 역대 1위 안내 (기록이 있을 때만 표시, 없으면 '없음' 처리) -->
+          <div class="bg-[#09090b] px-3.5 py-2.5 rounded-lg border border-zinc-800 text-xs font-mono flex items-center justify-between text-left mb-4">
+            <span class="text-zinc-400">🏆 최고 기록 1위:</span>
+            <span class="text-[#ba9578] font-bold" id="startBestRecord">등록된 1위 기록 없음 (-)</span>
           </div>
 
-          <!-- 심플하고 깔끔한 왼쪽 정렬 게임 설명 -->
-          <div class="space-y-2 text-left">
-            <div class="bg-[#141418] p-3 rounded-lg border border-zinc-800 text-xs text-left leading-relaxed">
-              <div class="text-[#ba9578] font-bold mb-1 flex items-center gap-1.5">
-                <span>1.</span> <span>기본 조작 & 2단 점프</span>
-              </div>
-              <div class="text-zinc-300 text-[11px]">
-                • <kbd>Space</kbd> 키 또는 <strong class="text-white">화면 터치</strong>로 점프합니다.<br>
-                • 공중에서 한 번 더 누르면 <strong class="text-[#ba9578]">360도 덤블링 2단 점프</strong>가 발동합니다.
-              </div>
-            </div>
-
-            <div class="bg-[#141418] p-3 rounded-lg border border-zinc-800 text-xs text-left leading-relaxed">
-              <div class="text-[#ba9578] font-bold mb-1 flex items-center gap-1.5">
-                <span>2.</span> <span>3배 가속 & 거대 장애물</span>
-              </div>
-              <div class="text-zinc-300 text-[11px]">
-                • 30초 동안 속도가 <strong class="text-white">최대 3배(3.0x)</strong>까지 점차 빨라집니다.<br>
-                • 거대 4단 선인장(<strong class="text-amber-400">▲2단점프 필수</strong>)은 반드시 2단 점프로만 넘을 수 있습니다.
-              </div>
-            </div>
-
-            <div class="bg-[#141418] p-3 rounded-lg border border-zinc-800 text-xs text-left leading-relaxed">
-              <div class="text-[#ba9578] font-bold mb-1 flex items-center gap-1.5">
-                <span>3.</span> <span>점수 획득 팁</span>
-              </div>
-              <div class="text-zinc-300 text-[11px]">
-                • 1단 점프 시 <strong class="text-white">+10점</strong>, 2단 덤블링 점프 시 <strong class="text-white">+25점</strong> 즉시 획득<br>
-                • 장애물 뛰어넘을 때마다 <strong class="text-white">+40 ~ 150점</strong> 회피 보너스 지급
-              </div>
-            </div>
+          <!-- 쾌적한 줄간격과 핵심단어만 굵게 표시된 심플 게임 설명 -->
+          <div class="bg-[#141418] p-4 sm:p-5 rounded-xl border border-zinc-800/90 text-left">
+            <ul class="space-y-3.5 text-xs text-zinc-300 leading-relaxed list-none pl-0">
+              <li class="flex items-start gap-2">
+                <span class="text-[#ba9578] shrink-0 mt-0.5">•</span>
+                <span><strong class="text-white font-bold">Space</strong> 키 또는 <strong class="text-white font-bold">화면 터치</strong>로 점프하며, 공중에서 한 번 더 누르면 <strong class="text-[#ba9578] font-bold">2단 점프</strong>를 합니다.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-[#ba9578] shrink-0 mt-0.5">•</span>
+                <span><strong class="text-amber-400 font-bold">거대 선인장</strong>은 1단 점프로 넘을 수 없으므로 반드시 <strong class="text-[#ba9578] font-bold">2단 점프</strong>로 넘어야 합니다.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-[#ba9578] shrink-0 mt-0.5">•</span>
+                <span>30초 동안 시간이 흐를수록 속도가 <strong class="text-white font-bold">최대 3배</strong>까지 점차 빨라집니다.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-[#ba9578] shrink-0 mt-0.5">•</span>
+                <span>점프 및 장애물 회피 시 <strong class="text-white font-bold">추가 점수</strong>를 획득하여 최고 점수를 기록해 보세요.</span>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
 
       <!-- 게임 오버 오버레이 -->
       <div id="gameOverOverlay" class="overlay hidden">
-        <div class="overlay-card text-left space-y-3.5" style="max-width: 440px; padding: 24px;">
-          <div class="border-b border-zinc-800 pb-2">
+        <div class="overlay-card text-left space-y-4" style="max-width: 440px; padding: 26px 24px;">
+          <div class="border-b border-zinc-800 pb-2.5">
             <div class="text-[11px] font-mono text-zinc-500 uppercase tracking-widest">[ 현상수배 : 충돌 발생 ]</div>
             <h2 class="text-2xl font-bold font-mono text-[#ba9578]">GAME OVER</h2>
             <p class="text-xs text-zinc-400 mt-0.5" id="gameOverMsg">장애물에 걸려 쓰러졌습니다.</p>
           </div>
 
           <!-- 내 기록 요약 -->
-          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 font-mono text-xs space-y-1.5 text-left">
-            <div class="flex justify-between">
+          <div class="bg-[#09090b] p-3.5 rounded-lg border border-zinc-800 font-mono text-xs space-y-2 text-left">
+            <div class="flex justify-between items-center">
               <span class="text-zinc-400">생존 시간:</span>
-              <span class="text-white font-bold" id="finalTime">0s</span>
+              <span class="text-white font-bold" id="finalTime">0.0s</span>
             </div>
-            <div class="flex justify-between">
-              <span class="text-zinc-400">획득 점수:</span>
-              <span class="text-[#ba9578] font-bold text-sm" id="finalScore">0 PTS</span>
-            </div>
-            <div class="flex justify-between pt-1 border-t border-zinc-800/80 text-[11px]">
-              <span class="text-zinc-500">목표 1위 기록:</span>
-              <span class="text-zinc-300 font-semibold" id="bestRecordScore">2,000 PTS</span>
+            <div class="flex justify-between items-center">
+              <span class="text-zinc-400">최종 획득 점수:</span>
+              <span class="text-[#ba9578] font-bold text-base" id="finalScore">0 PTS</span>
             </div>
           </div>
 
-          <!-- CASE 1: 1등을 하지 못했을 때만 표시 (1등 멘트 일체 없음, 다시 도전 메시지 단독 표시) -->
-          <div id="tryAgainBox" class="bg-[#141418] border border-zinc-800 p-3.5 rounded-lg text-left space-y-1.5">
+          <!-- CASE 1: 1등 점수가 아닐 때 (1등 멘트 일체 없음, 오직 다시 도전 메시지만 단독 표시) -->
+          <div id="tryAgainBox" class="bg-[#141418] border border-zinc-800 p-4 rounded-xl text-left space-y-1.5">
             <div class="text-[#ba9578] font-bold text-xs flex items-center gap-1.5">
-              <span>🎯</span> <span>1위 기록 경신에 실패했습니다!</span>
+              <span>🤠</span> <span>아쉽게 쓰러졌습니다!</span>
             </div>
             <p class="text-zinc-300 text-xs leading-relaxed">
-              현재 1위 기록은 <strong class="text-white" id="targetRecordScore">2,000</strong> PTS 입니다.<br>
-              2단 덤블링 점프와 장애물 연속 회피를 활용해 <strong class="text-[#ba9578]">다시 도전해 보세요!</strong>
+              장애물 타이밍을 잘 맞춰 점프해 보세요.<br>
+              컨트롤을 가다듬고 <strong class="text-white">다시 도전해 보세요!</strong>
             </p>
           </div>
 
-          <!-- CASE 2: 1등을 달성했을 때만 표시 (닉네임 입력란) -->
-          <div id="newRecordBox" class="hidden bg-[#09090b] p-3 rounded-lg border border-[#ba9578] text-xs font-mono space-y-2 text-left">
+          <!-- CASE 2: 1등 신기록을 세웠을 때만 표시 (닉네임 입력란) -->
+          <div id="newRecordBox" class="hidden bg-[#09090b] p-4 rounded-xl border border-[#ba9578] text-xs font-mono space-y-2.5 text-left">
             <div id="recordInputRow">
-              <div class="text-[#ba9578] font-bold mb-1">🎉 축하합니다! 새로운 1위 신기록 달성!</div>
-              <p class="text-[11px] text-zinc-400 mb-2">새로운 1등의 이름을 명예의 전당에 새기세요.</p>
+              <div class="text-[#ba9578] font-bold text-sm mb-1">🎉 축하합니다! 새로운 1위 신기록 달성!</div>
+              <p class="text-[11px] text-zinc-400 mb-2">1등의 닉네임을 입력하여 등록하세요.</p>
               <div class="flex gap-2">
-                <input type="text" id="recordNameInput" placeholder="닉네임 입력 (최대 10자)" maxlength="10" class="flex-1 px-2.5 py-1.5 bg-[#141418] text-white text-xs border border-zinc-700 rounded focus:border-[#ba9578] focus:outline-none">
-                <button type="button" id="saveRecordBtn" class="btn btn-primary px-3 py-1.5 text-xs">1위 등록</button>
+                <input type="text" id="recordNameInput" placeholder="닉네임 입력 (최대 10자)" maxlength="10" class="flex-1 px-3 py-2 bg-[#141418] text-white text-xs border border-zinc-700 rounded focus:border-[#ba9578] focus:outline-none">
+                <button type="button" id="saveRecordBtn" class="btn btn-primary px-3.5 py-2 text-xs font-bold">1위 등록</button>
               </div>
             </div>
-            <!-- 등록 버튼을 눌렀을 때만 나타나는 메시지 -->
-            <div id="recordSuccessMsg" class="hidden text-[#ba9578] font-bold py-1 text-center">
-              ✓ 새로운 1위로 등록되었습니다!
+            <!-- 등록 완료 시에만 나타나는 메시지 -->
+            <div id="recordSuccessMsg" class="hidden text-[#ba9578] font-bold py-1.5 text-center">
+              ✓ 1위 기록으로 등록되었습니다!
             </div>
           </div>
 
-          <button id="restartBtn" class="btn btn-primary w-full py-2.5 text-sm justify-center mt-2 font-bold" type="button">
+          <button id="restartBtn" class="btn btn-primary w-full py-2.5 text-sm justify-center font-bold shadow-lg" type="button">
             <span>다시 도전 (R)</span>
           </button>
         </div>
@@ -380,55 +365,50 @@
 
       <!-- 완주 성공 오버레이 -->
       <div id="successOverlay" class="overlay hidden">
-        <div class="overlay-card text-left space-y-3.5" style="max-width: 440px; padding: 24px;">
-          <div class="border-b border-zinc-800 pb-2">
+        <div class="overlay-card text-left space-y-4" style="max-width: 440px; padding: 26px 24px;">
+          <div class="border-b border-zinc-800 pb-2.5">
             <div class="text-[11px] font-mono text-[#ba9578] uppercase tracking-widest">★ MISSION COMPLETE ★</div>
             <h2 class="text-2xl font-bold font-mono text-[#ba9578]">30초 완주 성공!</h2>
-            <p class="text-xs text-zinc-400 mt-0.5">황야의 모든 장애물을 뛰어넘고 무사히 완주했습니다!</p>
+            <p class="text-xs text-zinc-400 mt-0.5">황야의 모든 장애물을 뛰어넘고 무사히 도착했습니다!</p>
           </div>
 
-          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 font-mono text-xs space-y-1.5 text-left">
-            <div class="flex justify-between">
+          <div class="bg-[#09090b] p-3.5 rounded-lg border border-zinc-800 font-mono text-xs space-y-2 text-left">
+            <div class="flex justify-between items-center">
               <span class="text-zinc-400">생존 시간:</span>
               <span class="text-white font-bold">30.0s (완주)</span>
             </div>
-            <div class="flex justify-between">
+            <div class="flex justify-between items-center">
               <span class="text-zinc-400">최종 점수:</span>
-              <span class="text-[#ba9578] font-bold text-sm" id="successScore">0 PTS</span>
-            </div>
-            <div class="flex justify-between pt-1 border-t border-zinc-800/80 text-[11px]">
-              <span class="text-zinc-500">목표 1위 기록:</span>
-              <span class="text-zinc-300 font-semibold" id="successRecordScore">2,000 PTS</span>
+              <span class="text-[#ba9578] font-bold text-base" id="successScore">0 PTS</span>
             </div>
           </div>
 
-          <!-- 완주했으나 1등을 못했을 때만 표시 (다시 도전 메시지) -->
-          <div id="successTryAgainBox" class="bg-[#141418] border border-zinc-800 p-3.5 rounded-lg text-left space-y-1.5">
+          <!-- 완주했으나 1등 점수가 아닐 때 (다시 도전 메시지) -->
+          <div id="successTryAgainBox" class="bg-[#141418] border border-zinc-800 p-4 rounded-xl text-left space-y-1.5">
             <div class="text-[#ba9578] font-bold text-xs flex items-center gap-1.5">
-              <span>🎯</span> <span>완주 성공! 그러나 1위 경신은 실패했습니다.</span>
+              <span>🎯</span> <span>30초 완주를 축하합니다!</span>
             </div>
             <p class="text-zinc-300 text-xs leading-relaxed">
-              현재 1위 기록은 <strong class="text-white" id="successTargetScore">2,000</strong> PTS 입니다.<br>
-              점프 보너스와 장애물 회피를 극대화해 <strong class="text-[#ba9578]">1위 경신에 다시 도전해 보세요!</strong>
+              점프 보너스와 회피 점수를 더 모아 <strong class="text-white">최고 기록 경신에 다시 도전해 보세요!</strong>
             </p>
           </div>
 
-          <!-- 완주하고 1등까지 달성했을 때만 표시 (이름 등록창) -->
-          <div id="successRecordBox" class="hidden bg-[#09090b] p-3 rounded-lg border border-[#ba9578] text-xs font-mono space-y-2 text-left">
+          <!-- 완주 후 1등 신기록까지 달성했을 때만 표시 (이름 등록창) -->
+          <div id="successRecordBox" class="hidden bg-[#09090b] p-4 rounded-xl border border-[#ba9578] text-xs font-mono space-y-2.5 text-left">
             <div id="successRecordInputRow">
-              <div class="text-[#ba9578] font-bold mb-1">🎉 완주 & 새로운 1위 신기록 달성!</div>
-              <p class="text-[11px] text-zinc-400 mb-2">새로운 1등의 이름을 명예의 전당에 새기세요.</p>
+              <div class="text-[#ba9578] font-bold text-sm mb-1">🎉 완주 & 새로운 1위 신기록 달성!</div>
+              <p class="text-[11px] text-zinc-400 mb-2">1등의 닉네임을 입력하여 등록하세요.</p>
               <div class="flex gap-2">
-                <input type="text" id="successNameInput" placeholder="보안관 닉네임 (최대 10자)" maxlength="10" class="flex-1 px-2.5 py-1.5 bg-[#141418] text-white text-xs border border-zinc-700 rounded focus:border-[#ba9578] focus:outline-none">
-                <button type="button" id="saveSuccessRecordBtn" class="btn btn-primary px-3 py-1.5 text-xs">1위 등록</button>
+                <input type="text" id="successNameInput" placeholder="닉네임 입력 (최대 10자)" maxlength="10" class="flex-1 px-3 py-2 bg-[#141418] text-white text-xs border border-zinc-700 rounded focus:border-[#ba9578] focus:outline-none">
+                <button type="button" id="saveSuccessRecordBtn" class="btn btn-primary px-3.5 py-2 text-xs font-bold">1위 등록</button>
               </div>
             </div>
-            <div id="successRecordSuccessMsg" class="hidden text-[#ba9578] font-bold py-1 text-center">
-              ✓ 새로운 1위로 등록되었습니다!
+            <div id="successRecordSuccessMsg" class="hidden text-[#ba9578] font-bold py-1.5 text-center">
+              ✓ 1위 기록으로 등록되었습니다!
             </div>
           </div>
 
-          <button id="successRestartBtn" class="btn btn-primary w-full py-2.5 text-sm justify-center mt-2 font-bold" type="button">
+          <button id="successRestartBtn" class="btn btn-primary w-full py-2.5 text-sm justify-center font-bold shadow-lg" type="button">
             <span>다시 도전 (R)</span>
           </button>
         </div>
@@ -538,36 +518,29 @@
     }
 
     // ==========================================
-    // 2. 가장 높은 점수를 획득한 사람 기록 저장 & 손상 복구
+    // 2. 1위 최고 기록 관리 (처음에는 등록된 1위 기록 없음)
     // ==========================================
-    const HIGH_SCORE_RECORD_KEY = 'western_runner_highest_score_v7';
-
-    // 기본 초기 최고 점수 명예 기록 (보안관 신재원, 2,000 PTS)
-    const DEFAULT_RECORD = {
-      score: 2000,
-      name: '보안관 신재원',
-      time: 30.0
-    };
+    const HIGH_SCORE_RECORD_KEY = 'western_runner_best_player_v9';
 
     function getHighestScoreRecord() {
       try {
         const raw = localStorage.getItem(HIGH_SCORE_RECORD_KEY);
-        if (!raw) return DEFAULT_RECORD;
+        if (!raw) return null;
         const parsed = JSON.parse(raw);
-        if (typeof parsed.score === 'number' && parsed.name && parsed.score >= 2000) {
+        if (typeof parsed.score === 'number' && parsed.score > 0 && parsed.name) {
           return parsed;
         }
-        return DEFAULT_RECORD;
+        return null;
       } catch (e) {
-        return DEFAULT_RECORD;
+        return null;
       }
     }
 
     function saveHighestScoreRecord(score, name, time) {
       try {
         const current = getHighestScoreRecord();
-        // 기존 최고 점수보다 높을 때만 저장 허용
-        if (score > current.score) {
+        // 등록된 기록이 없거나, 기존 1위 점수보다 높을 때만 저장 허용
+        if (!current || score > current.score) {
           const newRecord = {
             score: Math.floor(score),
             name: name.trim() || '익명의 총잡이',
@@ -578,7 +551,7 @@
         }
         return current;
       } catch (e) {
-        return current;
+        return null;
       }
     }
 
@@ -612,10 +585,6 @@
     const successRestartBtn = document.getElementById('successRestartBtn');
     const finalTime = document.getElementById('finalTime');
     const finalScore = document.getElementById('finalScore');
-    const bestRecordHolderName = document.getElementById('bestRecordHolderName');
-    const bestRecordScore = document.getElementById('bestRecordScore');
-    const successRecordHolderName = document.getElementById('successRecordHolderName');
-    const successRecordScore = document.getElementById('successRecordScore');
     const successScore = document.getElementById('successScore');
 
     // 신기록 및 메시지 UI
@@ -625,7 +594,6 @@
     const saveRecordBtn = document.getElementById('saveRecordBtn');
     const recordSuccessMsg = document.getElementById('recordSuccessMsg');
     const tryAgainBox = document.getElementById('tryAgainBox');
-    const targetRecordScore = document.getElementById('targetRecordScore');
 
     const successRecordBox = document.getElementById('successRecordBox');
     const successRecordInputRow = document.getElementById('successRecordInputRow');
@@ -633,25 +601,20 @@
     const saveSuccessRecordBtn = document.getElementById('saveSuccessRecordBtn');
     const successRecordSuccessMsg = document.getElementById('successRecordSuccessMsg');
     const successTryAgainBox = document.getElementById('successTryAgainBox');
-    const successTargetScore = document.getElementById('successTargetScore');
 
     // 모든 화면의 최고 점수 기록 표시 동기화 함수
     function updateAllRecordDisplays(rec) {
-      if (bestScoreVal) bestScoreVal.textContent = rec.score.toLocaleString();
-      if (startBestRecord) startBestRecord.textContent = `${rec.score.toLocaleString()} PTS (${rec.name})`;
-      if (bestRecordHolderName) bestRecordHolderName.textContent = rec.name;
-      if (bestRecordScore) bestRecordScore.textContent = `${rec.score.toLocaleString()} PTS`;
-      if (successRecordHolderName) successRecordHolderName.textContent = rec.name;
-      if (successRecordScore) successRecordScore.textContent = `${rec.score.toLocaleString()} PTS`;
-      if (targetRecordScore) targetRecordScore.textContent = rec.score.toLocaleString();
-      if (successTargetScore) successTargetScore.textContent = rec.score.toLocaleString();
+      if (rec && rec.score > 0) {
+        if (bestScoreVal) bestScoreVal.textContent = rec.score.toLocaleString();
+        if (startBestRecord) startBestRecord.textContent = `${rec.score.toLocaleString()} PTS (${rec.name})`;
+      } else {
+        if (bestScoreVal) bestScoreVal.textContent = '-';
+        if (startBestRecord) startBestRecord.textContent = '등록된 1위 기록 없음 (-)';
+      }
     }
 
-    // 기록 초기 표시 (최소 2,000점 방어)
+    // 기록 초기 표시 (처음에는 등록된 기록이 없음)
     let bestRecord = getHighestScoreRecord();
-    if (bestRecord.score < 2000) {
-      bestRecord = DEFAULT_RECORD;
-    }
     updateAllRecordDisplays(bestRecord);
 
     // 게임 상태 (State)
@@ -825,11 +788,10 @@
 
       // 현재 최고 점수 획득자 정보 갱신 표시
       bestRecord = getHighestScoreRecord();
-      if (bestRecord.score < 2000) bestRecord = DEFAULT_RECORD;
       updateAllRecordDisplays(bestRecord);
 
-      // ★ 최고 점수 갱신 여부 판정
-      const isNewRecord = finalScoreVal > bestRecord.score;
+      // ★ 최고 점수 갱신 여부 판정 (기록이 없거나, 기존 1위 점수보다 높을 때만 1등!)
+      const isNewRecord = finalScoreVal > 0 && (!bestRecord || finalScoreVal > bestRecord.score);
       if (isNewRecord) {
         // [1등 달성 시]: 입력란 노출, 다시도전 박스 숨김
         newRecordBox.classList.remove('hidden');
@@ -861,11 +823,10 @@
       successScore.textContent = finalScoreVal.toLocaleString() + ' PTS';
 
       bestRecord = getHighestScoreRecord();
-      if (bestRecord.score < 2000) bestRecord = DEFAULT_RECORD;
       updateAllRecordDisplays(bestRecord);
 
       // 완주 시에도 최고 점수를 넘었을 때만 1등 등록창 노출
-      const isNewRecord = finalScoreVal > bestRecord.score;
+      const isNewRecord = finalScoreVal > 0 && (!bestRecord || finalScoreVal > bestRecord.score);
       if (isNewRecord) {
         successRecordBox.classList.remove('hidden');
         if (successRecordInputRow) successRecordInputRow.classList.remove('hidden');
@@ -894,7 +855,7 @@
       // 입력창 숨기고 성공 멘트만 단독 표시
       if (recordInputRow) recordInputRow.classList.add('hidden');
       if (recordSuccessMsg) {
-        recordSuccessMsg.textContent = `✓ 새로운 1위로 등록되었습니다! (${bestRecord.name} - ${bestRecord.score.toLocaleString()} PTS)`;
+        recordSuccessMsg.textContent = `✓ 1위로 등록되었습니다! (${bestRecord.name} - ${bestRecord.score.toLocaleString()} PTS)`;
         recordSuccessMsg.classList.remove('hidden');
       }
     });
@@ -908,7 +869,7 @@
       // 입력창 숨기고 성공 멘트만 단독 표시
       if (successRecordInputRow) successRecordInputRow.classList.add('hidden');
       if (successRecordSuccessMsg) {
-        successRecordSuccessMsg.textContent = `✓ 새로운 1위로 등록되었습니다! (${bestRecord.name} - ${bestRecord.score.toLocaleString()} PTS)`;
+        successRecordSuccessMsg.textContent = `✓ 1위로 등록되었습니다! (${bestRecord.name} - ${bestRecord.score.toLocaleString()} PTS)`;
         successRecordSuccessMsg.classList.remove('hidden');
       }
     });
