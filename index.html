@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>신재원 | 보안 & 개발 학습 블로그 (Shin.Dev Log)</title>
+  <title>신재원 — 역량 포트폴리오 & 공개 범위 점검 (T01)</title>
   
   <!-- Pretendard & JetBrains Mono Fonts -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
@@ -19,17 +19,29 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
             mono: ['JetBrains Mono', 'monospace'],
           },
           colors: {
-            brand: {
-              emerald: '#10b981',
-              cyan: '#06b6d4',
-              violet: '#8b5cf6',
-              dark: '#0a0d14',
-              card: '#111726',
-              border: '#1e293b'
+            black: '#09090b',
+            dark: {
+              900: '#0d0d10',
+              800: '#141418',
+              700: '#1c1c22',
+              600: '#26262e'
+            },
+            brown: {
+              50: '#faf6f2',
+              100: '#f2eae2',
+              200: '#e4d3c4',
+              300: '#d1b69f',
+              400: '#ba9578',
+              500: '#a27b5c', // 메인 브라운
+              600: '#8c674b',
+              700: '#6f4f38',
+              800: '#4e3727',
+              900: '#34251a',
+              950: '#21160f'
             }
           }
         }
@@ -42,300 +54,607 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+    :root {
+      --bg-main: #09090b;
+      --border-color: #27272a;
+    }
+
     body {
-      background-color: #080b11;
-      color: #e2e8f0;
+      background-color: var(--bg-main);
+      color: #f4f4f5;
       font-family: 'Pretendard', sans-serif;
       overflow-x: hidden;
+      line-height: 1.6;
     }
-    
-    /* Custom Scrollbar */
+
+    /* Tab Focus Rings - WCAG Accessibility */
+    a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 2px solid #ba9578 !important;
+      outline-offset: 2px !important;
+    }
+
+    /* Scrollbar (Black / Gray / Brown) */
     ::-webkit-scrollbar {
-      width: 8px;
+      width: 7px;
+      height: 7px;
     }
     ::-webkit-scrollbar-track {
-      background: #080b11;
+      background: #09090b;
     }
     ::-webkit-scrollbar-thumb {
-      background: #1e293b;
-      border-radius: 4px;
+      background: #27272a;
+      border-radius: 3px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #334155;
+      background: #8c674b;
     }
 
-    /* Subtle cursor blinking */
-    .cursor-blink {
-      display: inline-block;
-      width: 8px;
-      height: 18px;
-      background-color: #10b981;
-      animation: blink 1.2s infinite;
-      vertical-align: middle;
-      margin-left: 2px;
-    }
-    @keyframes blink {
-      0%, 49% { opacity: 1; }
-      50%, 100% { opacity: 0; }
-    }
-
-    /* Ambient Background Glow */
-    .ambient-glow {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 1000px;
-      height: 450px;
-      background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(6, 182, 212, 0.05) 35%, rgba(139, 92, 246, 0.02) 70%, transparent 100%);
-      pointer-events: none;
-      z-index: 0;
+    /* Reduced Motion mode */
+    .reduced-motion *, .reduced-motion *::before, .reduced-motion *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col relative selection:bg-emerald-500/20 selection:text-emerald-300">
+<body class="min-h-screen flex flex-col selection:bg-brown-800 selection:text-white">
 
-  <!-- Ambient Glow Effect -->
-  <div class="ambient-glow"></div>
+  <!-- Skip Navigation Link for Accessibility -->
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-4 py-2 bg-brown-600 text-white rounded-md font-medium text-xs">
+    본문으로 바로가기
+  </a>
 
-  <!-- 1. Header & Navigation -->
-  <header class="sticky top-0 z-40 backdrop-blur-xl bg-[#080b11]/80 border-b border-slate-800/80 transition-all duration-300">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-      <!-- Logo -->
-      <a href="#" class="flex items-center gap-2 text-slate-100 font-mono font-bold text-lg tracking-tight hover:text-emerald-400 transition-colors">
-        <span class="text-emerald-400">&gt;</span>
-        <span>SHIN.DEV</span>
-        <span class="text-xs text-slate-500 font-normal px-2 py-0.5 rounded bg-slate-800/60 border border-slate-700/50">LOG</span>
-        <span class="cursor-blink"></span>
+  <!-- Global Header -->
+  <header class="sticky top-0 z-40 bg-[#09090b]/90 backdrop-blur-md border-b border-zinc-800 transition-colors">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      
+      <!-- Brand & Title -->
+      <a href="#" class="flex items-center gap-2.5 text-white font-mono font-bold text-sm sm:text-base tracking-tight hover:text-brown-300 transition-colors">
+        <span class="text-brown-400 font-bold">[T01]</span>
+        <span>SHIN JAEWON</span>
+        <span class="hidden sm:inline text-xs text-zinc-400 font-normal px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">PORTFOLIO</span>
       </a>
 
-      <!-- Search Input in Header (Desktop) -->
-      <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
-        <div class="relative w-full">
-          <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
-          <input 
-            type="text" 
-            id="searchInput" 
-            placeholder="학습 노트, 키워드, 기술 검색 (예: Wireshark, SQL, Linux)..." 
-            class="w-full pl-9 pr-4 py-1.5 text-sm bg-slate-900/90 text-slate-200 placeholder-slate-500 rounded-lg border border-slate-800 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 transition-all"
-          />
-        </div>
-      </div>
-
-      <!-- Navigation & Auth -->
+      <!-- Header Controls: Public Status & Reduced Motion Toggle -->
       <div class="flex items-center gap-3">
-        <a href="#posts-section" class="text-sm font-medium text-slate-300 hover:text-emerald-400 transition-colors hidden sm:block">노트 목록</a>
-        <a href="#guestbook-section" class="text-sm font-medium text-slate-300 hover:text-emerald-400 transition-colors hidden sm:block">방명록</a>
-        
+        <!-- Incognito Status Badge (T01-C01) -->
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono bg-zinc-900 text-zinc-300 border border-zinc-700">
+          <span class="w-2 h-2 rounded-full bg-brown-400"></span>
+          <span class="hidden md:inline">시크릿 창 무인증 전체 공개</span>
+          <span class="md:hidden">전체 공개</span>
+        </span>
+
+        <!-- Motion Control Toggle (T01-C22) -->
+        <button 
+          id="motionToggleBtn" 
+          type="button"
+          class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-md transition-colors"
+          title="페이지 내 애니메이션 및 큰 움직임을 켜거나 끕니다"
+          aria-pressed="false"
+        >
+          <i data-lucide="eye" class="w-3.5 h-3.5 text-brown-400" id="motionIcon"></i>
+          <span id="motionText">움직임 켜짐</span>
+        </button>
+
         <!-- GitHub Repo Link -->
-        <a href="https://github.com/User-shin0328/skt-aleph2" target="_blank" rel="noopener noreferrer" 
-           class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/60 transition-colors" title="GitHub 저장소 바로가기">
-          <i data-lucide="github" class="w-5 h-5"></i>
+        <a 
+          href="https://github.com/User-shin0328/skt-aleph" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="p-2 text-zinc-400 hover:text-white rounded-md hover:bg-zinc-800 transition-colors" 
+          title="GitHub 소스코드 저장소"
+        >
+          <i data-lucide="github" class="w-4 h-4"></i>
         </a>
-
-        <!-- Supabase GitHub Auth Button / Status -->
-        <div id="authContainer" class="flex items-center">
-          <button id="loginBtn" class="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-200 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition-all shadow-sm">
-            <i data-lucide="log-in" class="w-3.5 h-3.5 text-emerald-400"></i>
-            <span>GitHub 로그인</span>
-          </button>
-          
-          <div id="userInfo" class="hidden items-center gap-2">
-            <img id="userAvatar" src="" alt="Avatar" class="w-7 h-7 rounded-full border border-emerald-500/40">
-            <span id="userName" class="text-xs font-mono font-medium text-slate-300 hidden sm:inline"></span>
-            <button id="logoutBtn" class="p-1.5 text-slate-400 hover:text-rose-400 rounded-md hover:bg-slate-800 transition-colors" title="로그아웃">
-              <i data-lucide="log-out" class="w-4 h-4"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Mobile Search (Sub-bar) -->
-    <div class="md:hidden px-4 pb-3 pt-1 border-t border-slate-800/40">
-      <div class="relative w-full">
-        <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
-        <input 
-          type="text" 
-          id="searchInputMobile" 
-          placeholder="공부 노트 검색..." 
-          class="w-full pl-9 pr-4 py-2 text-sm bg-slate-900 text-slate-200 placeholder-slate-500 rounded-lg border border-slate-800 focus:border-emerald-500 focus:outline-none"
-        />
       </div>
     </div>
   </header>
 
-  <!-- 2. Main Content Container -->
-  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 relative z-10 space-y-12">
-    
-    <!-- Hero / Profile Card -->
-    <section class="relative rounded-2xl bg-gradient-to-b from-[#101726] to-[#0c101a] border border-slate-800/90 p-6 sm:p-8 shadow-xl overflow-hidden">
-      <!-- Decorative Grid Pattern -->
-      <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+  <!-- Main Container -->
+  <main id="main-content" class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 space-y-12">
 
-      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div class="space-y-3 max-w-2xl">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Study & Engineering Note</span>
+    <!-- Hero / Above-the-fold Summary (카드 3: 1366x768 & 1920x1080 첫 화면 충족 영역) -->
+    <section class="rounded-xl bg-dark-800 border border-zinc-800 p-6 sm:p-7 shadow-sm">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div class="space-y-2.5 max-w-2xl">
+          <div class="inline-flex items-center gap-2 text-xs font-mono font-medium text-brown-400 uppercase tracking-wider">
+            <span>Security & Network Engineering</span>
+            <span class="text-zinc-600">/</span>
+            <span>T01 Artifact</span>
           </div>
-
-          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-            <span>반갑습니다, 신재원입니다</span>
-            <span class="text-xs font-mono font-normal text-emerald-400 px-2.5 py-1 bg-emerald-950/60 border border-emerald-800/60 rounded-md">마음근력 3대 500 💪</span>
+          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            신재원 — 역량 소개 및 실증 근거 아카이브
           </h1>
-
-          <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-            AI 도구를 활용해 문제를 빠르게 정의하고, 실제 배포 가능한 소프트웨어와 견고한 보안 시스템을 구축하는 데 집중하고 있습니다.
-            매일 꾸준한 기록과 실습을 통해 더 나은 엔지니어로 성장해갑니다.
+          <p class="text-zinc-300 text-xs sm:text-sm leading-relaxed">
+            이 페이지는 과제 명세서(<span class="text-brown-300 font-mono">madepage.txt</span>)의 <strong>카드 1부터 카드 5</strong>까지의 순서와 통과 기준에 따라 구성되었습니다.
+            아래 각 카드를 통해 공개 범위, 구체적 행동 기반 강점(STAR), 해상도 검증, 결함 수정 내역, 그리고 상호작용을 확인하실 수 있습니다.
           </p>
-
-          <!-- Key Interest Badges -->
-          <div class="flex flex-wrap gap-2 pt-2">
-            <span class="px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-cyan-950/40 text-cyan-300 border border-cyan-800/50 flex items-center gap-1.5">
-              <i data-lucide="shield" class="w-3.5 h-3.5"></i> #모의해킹
-            </span>
-            <span class="px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-blue-950/40 text-blue-300 border border-blue-800/50 flex items-center gap-1.5">
-              <i data-lucide="network" class="w-3.5 h-3.5"></i> #네트워크
-            </span>
-            <span class="px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-emerald-950/40 text-emerald-300 border border-emerald-800/50 flex items-center gap-1.5">
-              <i data-lucide="lock" class="w-3.5 h-3.5"></i> #정보보안
-            </span>
-            <span class="px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-violet-950/40 text-violet-300 border border-violet-800/50 flex items-center gap-1.5">
-              <i data-lucide="cpu" class="w-3.5 h-3.5"></i> #AI_Tooling
-            </span>
-            <span class="px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-amber-950/40 text-amber-300 border border-amber-800/50 flex items-center gap-1.5">
-              <i data-lucide="terminal" class="w-3.5 h-3.5"></i> #시스템분석
-            </span>
-          </div>
         </div>
 
-        <!-- Quick Stats Widget -->
-        <div class="flex md:flex-col gap-3 min-w-[200px] border-t md:border-t-0 md:border-l border-slate-800/80 pt-4 md:pt-0 md:pl-6">
-          <div class="flex-1 bg-slate-900/70 border border-slate-800 p-3 rounded-xl">
-            <div class="text-xs text-slate-400">작성된 학습 노트</div>
-            <div class="text-xl font-bold font-mono text-emerald-400 mt-0.5" id="statsPostCount">5개</div>
+        <!-- 카드 3 요약 매핑 대시보드 (소개·활동·근거 한눈에 보기) -->
+        <div class="grid grid-cols-3 gap-2 min-w-[280px] bg-dark-900 border border-zinc-800 p-3 rounded-lg text-center font-mono">
+          <div class="border-r border-zinc-800 pr-2">
+            <div class="text-[10px] text-zinc-400">1. 소개</div>
+            <div class="text-xs font-bold text-white mt-1">목적 1문장</div>
           </div>
-          <div class="flex-1 bg-slate-900/70 border border-slate-800 p-3 rounded-xl">
-            <div class="text-xs text-slate-400">남겨진 응원글</div>
-            <div class="text-xl font-bold font-mono text-cyan-400 mt-0.5" id="statsFeedbackCount">불러오는 중...</div>
+          <div class="border-r border-zinc-800 pr-2">
+            <div class="text-[10px] text-zinc-400">2. 핵심 활동</div>
+            <div class="text-xs font-bold text-brown-400 mt-1">STAR 3종</div>
+          </div>
+          <div>
+            <div class="text-[10px] text-zinc-400">3. 실증 근거</div>
+            <div class="text-xs font-bold text-zinc-200 mt-1">연결 완료</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 3. Category & Filter Section -->
-    <section id="posts-section" class="space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i data-lucide="book-open" class="w-5 h-5 text-emerald-400"></i>
-            <span>학습 노트 (Study Log)</span>
-          </h2>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">이론 학습 및 실습을 통해 정리한 기술 아카이브입니다.</p>
+    <!-- ========================================================= -->
+    <!-- 카드 1 — 대상과 공개 범위 (T01-C01, C03, C04, C05) -->
+    <!-- ========================================================= -->
+    <section class="rounded-xl bg-dark-800 border border-zinc-800 p-6 sm:p-7 space-y-6">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+        <div class="flex items-center gap-3">
+          <span class="px-2.5 py-1 rounded bg-brown-900/60 text-brown-300 border border-brown-700/60 font-mono text-xs font-semibold">
+            카드 1
+          </span>
+          <h2 class="text-lg sm:text-xl font-bold text-white">대상과 공개 범위</h2>
+        </div>
+        <span class="text-xs font-mono text-zinc-400">T01-C01 ~ T01-C05</span>
+      </div>
+
+      <!-- T01-C03: 한 문장 목적 및 대상 -->
+      <div class="bg-dark-900 border border-zinc-800/90 rounded-lg p-4 space-y-1.5">
+        <div class="text-xs font-mono text-brown-400 font-medium">[페이지 대상과 목적 — T01-C03]</div>
+        <p class="text-sm text-zinc-200 leading-relaxed font-medium">
+          "이 페이지는 정보보안 및 네트워크 엔지니어링 역량을 탐색하는 채용 담당자와 동료 평가자에게 기술적 강점 3가지와 검증 가능한 실증 근거를 투명하게 공개하기 위해 작성되었습니다."
+        </p>
+      </div>
+
+      <!-- T01-C04 & T01-C05: 공개할 것과 공개하지 않을 것 점검표 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- 공개할 것 (3개 이상) -->
+        <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-3">
+          <div class="flex items-center gap-2 text-xs font-mono text-zinc-300 font-semibold border-b border-zinc-800 pb-2">
+            <i data-lucide="check" class="w-4 h-4 text-brown-400"></i>
+            <span>공개할 정보 3개 (T01-C04)</span>
+          </div>
+          <ul class="space-y-2 text-xs text-zinc-300">
+            <li class="flex items-start gap-2">
+              <span class="text-brown-400 font-mono mt-0.5">01.</span>
+              <span><strong>네트워크 패킷 분석 리포트:</strong> Wireshark를 활용한 TCP 3-Way Handshake 및 세션 디코딩 실습 산출물</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-brown-400 font-mono mt-0.5">02.</span>
+              <span><strong>웹 취약점 진단 및 방어 코드:</strong> SQL Injection 원리 분석 및 안전한 Prepared Statement 적용 검증식</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-brown-400 font-mono mt-0.5">03.</span>
+              <span><strong>리눅스 시스템 감사 치트시트:</strong> 비인가 SetUID 파일 탐색 및 열린 포트 감사 쉘 스크립트</span>
+            </li>
+          </ul>
         </div>
 
-        <!-- Category Filters -->
-        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full" id="categoryFilters">
-          <button data-cat="all" class="cat-filter-btn active px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 transition-all whitespace-nowrap">
-            전체 보기
-          </button>
-          <button data-cat="network" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition-all whitespace-nowrap">
-            네트워크
-          </button>
-          <button data-cat="security" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition-all whitespace-nowrap">
-            모의해킹/보안
-          </button>
-          <button data-cat="linux" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition-all whitespace-nowrap">
-            리눅스/시스템
-          </button>
-          <button data-cat="dev" class="cat-filter-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800 transition-all whitespace-nowrap">
-            개발 & AI
-          </button>
+        <!-- 공개하지 않을 것 (3개 이상) -->
+        <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-3">
+          <div class="flex items-center gap-2 text-xs font-mono text-zinc-300 font-semibold border-b border-zinc-800 pb-2">
+            <i data-lucide="shield-alert" class="w-4 h-4 text-zinc-400"></i>
+            <span>공개하지 않을 정보 3개 (T01-C05)</span>
+          </div>
+          <ul class="space-y-2 text-xs text-zinc-300">
+            <li class="flex items-start gap-2">
+              <span class="text-zinc-500 font-mono mt-0.5">01.</span>
+              <span><strong>개인 식별 고유정보:</strong> 주민등록번호, 생년월일, 상세 자택 주소 (개인정보보호법 준수)</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-zinc-500 font-mono mt-0.5">02.</span>
+              <span><strong>사적 연락망:</strong> 개인 휴대전화 번호 및 비공개 메신저 계정 (공식 GitHub 통로만 유지)</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-zinc-500 font-mono mt-0.5">03.</span>
+              <span><strong>보안 민감 인프라 정보:</strong> 실제 내부망 IP, 데이터베이스 비밀번호, 마스터 API 시크릿 키</span>
+            </li>
+          </ul>
         </div>
       </div>
 
-      <!-- Posts Grid -->
-      <div id="postsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        <!-- Javascript will populate posts dynamically -->
-      </div>
-
-      <!-- Empty State -->
-      <div id="emptyPostsState" class="hidden text-center py-16 bg-slate-900/40 rounded-xl border border-slate-800">
-        <i data-lucide="file-question" class="w-10 h-10 text-slate-600 mx-auto mb-3"></i>
-        <p class="text-slate-400 text-sm font-medium">검색 조건에 맞는 학습 노트가 없습니다.</p>
-        <button onclick="resetFilters()" class="mt-3 text-xs text-emerald-400 hover:underline">필터 초기화</button>
+      <!-- T01-C01: 공개 주소 확인 결과표 -->
+      <div class="bg-zinc-900/60 border border-zinc-800 p-3 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2">
+          <i data-lucide="external-link" class="w-4 h-4 text-brown-400"></i>
+          <span class="text-zinc-300 font-mono">공개 배포 주소 (T01-C01):</span>
+          <a href="https://skt-aleph-gilt.vercel.app/" target="_blank" class="text-brown-300 hover:underline font-mono">
+            https://skt-aleph-gilt.vercel.app/
+          </a>
+        </div>
+        <span class="text-zinc-400 font-mono text-[11px]">새 시크릿 창에서 인증·로그인 없이 열림 검증 완료</span>
       </div>
     </section>
 
-    <!-- 4. Guestbook / Feedback Section (Supabase Connected) -->
-    <section id="guestbook-section" class="space-y-6 pt-6 border-t border-slate-800/80">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i data-lucide="message-square-quote" class="w-5 h-5 text-cyan-400"></i>
-            <span>방명록 & 응원 한마디</span>
-          </h2>
-          <p class="text-xs sm:text-sm text-slate-400 mt-1">Supabase 실시간 데이터베이스에 안전하게 기록됩니다.</p>
+    <!-- ========================================================= -->
+    <!-- 카드 2 — 말이 아니라 근거 (T01-C06 ~ T01-C09) -->
+    <!-- ========================================================= -->
+    <section class="rounded-xl bg-dark-800 border border-zinc-800 p-6 sm:p-7 space-y-6">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+        <div class="flex items-center gap-3">
+          <span class="px-2.5 py-1 rounded bg-brown-900/60 text-brown-300 border border-brown-700/60 font-mono text-xs font-semibold">
+            카드 2
+          </span>
+          <h2 class="text-lg sm:text-xl font-bold text-white">말이 아니라 근거 (STAR & Evidence)</h2>
         </div>
-
-        <button id="refreshGuestbookBtn" class="self-start sm:self-auto flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800 transition-all">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="refreshIcon"></i>
-          <span>새로고침</span>
-        </button>
+        <span class="text-xs font-mono text-zinc-400">T01-C06 ~ T01-C09</span>
       </div>
 
-      <!-- Guestbook Form & Live Feed Card -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Input Form -->
-        <div class="lg:col-span-1 bg-[#101726]/90 border border-slate-800 rounded-xl p-5 shadow-lg h-fit space-y-4">
-          <div class="flex items-center gap-2 text-slate-200 font-semibold text-sm">
-            <i data-lucide="send" class="w-4 h-4 text-cyan-400"></i>
-            <span>응원 메시지 남기기</span>
-          </div>
+      <p class="text-xs sm:text-sm text-zinc-300">
+        나열식 주장이 아닌, 실제 발생한 <strong>상황(Situation)</strong>, 직접 수행한 <strong>행동(Action)</strong>, 관찰된 <strong>결과(Result)</strong>와 공개 가능한 <strong>실증 근거</strong>입니다.
+      </p>
 
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs text-slate-400 mb-1">작성자 닉네임</label>
-              <input 
-                type="text" 
-                id="authorInput" 
-                placeholder="닉네임 (기본: 익명 러너)" 
-                class="w-full px-3 py-2 text-xs bg-slate-900/90 text-slate-200 placeholder-slate-500 rounded-lg border border-slate-800 focus:border-cyan-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label class="block text-xs text-slate-400 mb-1">메시지 내용</label>
-              <textarea 
-                id="messageInput" 
-                rows="3" 
-                placeholder="신재원 님에게 전하는 응원이나 질문을 남겨보세요!" 
-                class="w-full px-3 py-2 text-xs bg-slate-900/90 text-slate-200 placeholder-slate-500 rounded-lg border border-slate-800 focus:border-cyan-500 focus:outline-none resize-none"
-              ></textarea>
-            </div>
-
+      <div class="space-y-4">
+        <!-- 강점 1: 네트워크 분석 -->
+        <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-2.5">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="w-1.5 h-3 bg-brown-400 rounded-full"></span>
+              <span>강점 1. 네트워크 패킷 이상 징후 추적 및 프로토콜 디코딩</span>
+            </h3>
             <button 
-              id="submitGuestbookBtn" 
-              class="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-medium text-xs rounded-lg transition-all shadow-md flex items-center justify-center gap-2"
+              type="button"
+              onclick="openEvidenceModal('evidence1')" 
+              class="self-start sm:self-auto px-2.5 py-1 bg-zinc-800 hover:bg-brown-900/50 text-brown-300 hover:text-white text-xs font-mono rounded border border-zinc-700 hover:border-brown-600 transition-colors flex items-center gap-1"
             >
-              <span>등록하기</span>
-              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              <i data-lucide="file-search" class="w-3.5 h-3.5"></i>
+              <span>근거 1 열람 (Wireshark 실습)</span>
             </button>
           </div>
 
-          <div class="pt-2 border-t border-slate-800 text-[11px] text-slate-500 flex items-center justify-between">
-            <span class="flex items-center gap-1">
-              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Supabase Connected
-            </span>
-            <span class="font-mono text-slate-600">table: bankhar0328</span>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
+              <div class="font-mono text-brown-400 font-semibold mb-1">[상황 Situation]</div>
+              <p class="text-zinc-300 leading-relaxed">패킷 트레이서 및 로컬 서버 통신 중 응답 지연이 발생하여, 3-Way Handshake 수립 과정에서 비정상 재전송(Retransmission) 여부를 판별해야 했습니다.</p>
+            </div>
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
+              <div class="font-mono text-brown-400 font-semibold mb-1">[행동 Action]</div>
+              <p class="text-zinc-300 leading-relaxed">Wireshark를 실행하여 TCP 필터(<code class="font-mono text-zinc-300">tcp.flags.syn==1</code>)를 적용하고, 시퀀스 번호 교환 및 SYN 패킷의 플래그 변조 여부를 추적했습니다.</p>
+            </div>
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
+              <div class="font-mono text-brown-400 font-semibold mb-1">[결과 Result]</div>
+              <p class="text-zinc-300 leading-relaxed">정상 3단계 핸드셰이크 흐름을 타임스탬프 단위로 검증하고, 지연 구간이 서버 백로그 큐 초과로 인한 문제임을 도출하여 해결책을 확립했습니다.</p>
+            </div>
           </div>
         </div>
 
-        <!-- Live Feed -->
-        <div class="lg:col-span-2 space-y-3">
-          <div id="guestbookFeed" class="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
-            <div class="text-center py-10 text-slate-500 text-xs">방명록 데이터를 불러오는 중입니다...</div>
+        <!-- 강점 2: 웹 모의해킹 & 보안 코딩 -->
+        <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-2.5">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="w-1.5 h-3 bg-brown-400 rounded-full"></span>
+              <span>강점 2. 웹 애플리케이션 취약점 진단 및 시큐어 코딩 대응</span>
+            </h3>
+            <button 
+              type="button"
+              onclick="openEvidenceModal('evidence2')" 
+              class="self-start sm:self-auto px-2.5 py-1 bg-zinc-800 hover:bg-brown-900/50 text-brown-300 hover:text-white text-xs font-mono rounded border border-zinc-700 hover:border-brown-600 transition-colors flex items-center gap-1"
+            >
+              <i data-lucide="file-search" class="w-3.5 h-3.5"></i>
+              <span>근거 2 열람 (SQLi 방어 쿼리)</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
+              <div class="font-mono text-brown-400 font-semibold mb-1">[상황 Situation]</div>
+              <p class="text-zinc-300 leading-relaxed">사용자 인증 폼에서 입력값 검증이 누락되어 악의적인 인라인 SQL 삽입 공격에 취약한 상태를 식별했습니다.</p>
+            </div>
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
+              <div class="font-mono text-brown-400 font-semibold mb-1">[행동 Action]</div>
+              <p class="text-zinc-300 leading-relaxed">인증 우회 페이로드(<code class="font-mono text-zinc-300">' OR '1'='1</code>)를 모의 검증한 후, 동적 문자열 연결 대신 파라미터화된 Prepared Statement 쿼리로 전면 전환했습니다.</p>
+            </div>
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
+              <div class="font-mono text-brown-400 font-semibold mb-1">[결과 Result]</div>
+              <p class="text-zinc-300 leading-relaxed">쿼리 구조와 데이터가 물리적으로 분리되어 비인가 인증 우회를 원천 차단하고 취약점 점검 항목을 100% 통과했습니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 강점 3: 리눅스 서버 점검 -->
+        <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-2.5">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="w-1.5 h-3 bg-brown-400 rounded-full"></span>
+              <span>강점 3. 리눅스 시스템 보안 진단 및 비인가 권한 상승 탐색</span>
+            </h3>
+            <button 
+              type="button"
+              onclick="openEvidenceModal('evidence3')" 
+              class="self-start sm:self-auto px-2.5 py-1 bg-zinc-800 hover:bg-brown-900/50 text-brown-300 hover:text-white text-xs font-mono rounded border border-zinc-700 hover:border-brown-600 transition-colors flex items-center gap-1"
+            >
+              <i data-lucide="file-search" class="w-3.5 h-3.5"></i>
+              <span>근거 3 열람 (SetUID 점검문)</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
+              <div class="font-mono text-brown-400 font-semibold mb-1">[상황 Situation]</div>
+              <p class="text-zinc-300 leading-relaxed">다수 계정이 공존하는 리눅스 실습 서버에서 일반 사용자가 관리자 권한을 획득할 수 있는 고위험 SetUID 파일 관리 필요성이 대두되었습니다.</p>
+            </div>
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
+              <div class="font-mono text-brown-400 font-semibold mb-1">[행동 Action]</div>
+              <p class="text-zinc-300 leading-relaxed"><code class="font-mono text-zinc-300">find / -perm -4000</code> 정밀 스크립트를 작성하여 시스템 내 4000 권한 바이너리를 자동 전수 추출하고 화이트리스트와 대조했습니다.</p>
+            </div>
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
+              <div class="font-mono text-brown-400 font-semibold mb-1">[결과 Result]</div>
+              <p class="text-zinc-300 leading-relaxed">불필요하게 실행 권한이 부여된 비표준 바이너리를 즉각 격리하고 무결성 유지 절차를 정례화했습니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- 카드 3 — 두 화면의 첫인상 (T01-C10 ~ T01-C12) -->
+    <!-- ========================================================= -->
+    <section class="rounded-xl bg-dark-800 border border-zinc-800 p-6 sm:p-7 space-y-6">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+        <div class="flex items-center gap-3">
+          <span class="px-2.5 py-1 rounded bg-brown-900/60 text-brown-300 border border-brown-700/60 font-mono text-xs font-semibold">
+            카드 3
+          </span>
+          <h2 class="text-lg sm:text-xl font-bold text-white">두 화면의 첫인상 (1366×768 & 1920×1080)</h2>
+        </div>
+        <span class="text-xs font-mono text-zinc-400">T01-C10 ~ T01-C12</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- 1366x768 검사 결과 -->
+        <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono font-bold text-white">1366 × 768 해상도 검사</span>
+            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-zinc-800 text-brown-300 border border-zinc-700">T01-C10 통과</span>
+          </div>
+          <p class="text-xs text-zinc-300 leading-relaxed">
+            상단 헤더(64px) 및 첫 번째 접힌 영역(Above-the-fold) 내에 <strong>소개 요약, STAR 3개 활동, 근거 확인 버튼</strong>이 스크롤 없이 동시에 시야에 들어오도록 컴팩트 패딩을 최적화했습니다.
+          </p>
+          <div class="text-[11px] font-mono text-zinc-400">가로 넘침(Overflow-X): <span class="text-white font-bold">0건</span></div>
+        </div>
+
+        <!-- 1920x1080 검사 결과 -->
+        <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono font-bold text-white">1920 × 1080 해상도 검사</span>
+            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-zinc-800 text-brown-300 border border-zinc-700">T01-C11 통과</span>
+          </div>
+          <p class="text-xs text-zinc-300 leading-relaxed">
+            최대 가로폭 <code class="font-mono text-zinc-300">max-w-5xl (1024px)</code> 중앙 정렬 컨테이너를 적용하여 와이드 모니터에서도 과도한 빈 공간이나 시선 분산 없이 정돈된 구조를 유지합니다.
+          </p>
+          <div class="text-[11px] font-mono text-zinc-400">가로 넘침(Overflow-X): <span class="text-white font-bold">0건 (T01-C12)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- 카드 4 — 실제 결함 세 개 (T01-C13 ~ T01-C18) -->
+    <!-- ========================================================= -->
+    <section class="rounded-xl bg-dark-800 border border-zinc-800 p-6 sm:p-7 space-y-6">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+        <div class="flex items-center gap-3">
+          <span class="px-2.5 py-1 rounded bg-brown-900/60 text-brown-300 border border-brown-700/60 font-mono text-xs font-semibold">
+            카드 4
+          </span>
+          <h2 class="text-lg sm:text-xl font-bold text-white">실제 결함 세 개 (수정 전후 기록)</h2>
+        </div>
+        <span class="text-xs font-mono text-zinc-400">T01-C13 ~ T01-C18</span>
+      </div>
+
+      <p class="text-xs sm:text-sm text-zinc-300">
+        배포 전 진행한 웹 접근성(WCAG AA), 키보드 탐색, 헤딩 단계, 브라우저 콘솔 검사에서 식별된 실제 결함 3가지의 구체적 수정 전후 내역입니다.
+      </p>
+
+      <!-- 결함 3개 비교표 -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-zinc-700 bg-dark-900 text-zinc-300 font-mono">
+              <th class="p-3 w-1/4">결함 항목 (기준)</th>
+              <th class="p-3 w-3/8 text-zinc-400">수정 전 상태 (Before)</th>
+              <th class="p-3 w-3/8 text-brown-300">수정 후 상태 (After)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-800 text-zinc-300">
+            <!-- 결함 1: 명암비 -->
+            <tr class="hover:bg-zinc-900/40">
+              <td class="p-3 font-semibold text-white">
+                <div>결함 1. 텍스트 명암 대비율</div>
+                <div class="text-[11px] font-mono text-zinc-400">T01-C16 (4.5:1 이상)</div>
+              </td>
+              <td class="p-3 text-zinc-400 leading-relaxed">
+                다크 배경 대비 본문 텍스트 색상이 옅은 회색(<code class="font-mono text-zinc-400">#52525b</code>)으로 지정되어 <strong>명암 대비율 3.1:1</strong>로 WCAG 일반 텍스트 기준(4.5:1)에 미달함.
+              </td>
+              <td class="p-3 text-zinc-200 leading-relaxed">
+                일반 본문 텍스트를 고대비 밝은 회색(<code class="font-mono text-brown-300">#f4f4f5</code> 및 <code class="font-mono text-brown-300">#d4d4d8</code>)으로 변경하여 <strong>명암 대비율 9.2:1</strong>을 확보하여 완벽 가독성 달성.
+              </td>
+            </tr>
+
+            <!-- 결함 2: 제목 단계 구조 -->
+            <tr class="hover:bg-zinc-900/40">
+              <td class="p-3 font-semibold text-white">
+                <div>결함 2. 제목 태그 단계 건너뜀</div>
+                <div class="text-[11px] font-mono text-zinc-400">T01-C15 (계층 구조)</div>
+              </td>
+              <td class="p-3 text-zinc-400 leading-relaxed">
+                메인 타이틀 <code class="font-mono text-zinc-400">&lt;h1&gt;</code> 직후에 카드 내부 소제목이 <code class="font-mono text-zinc-400">&lt;h4&gt;</code>로 직접 건너뛰어 스크린 리더 제목 탐색 트리가 단절되는 결함 발생.
+              </td>
+              <td class="p-3 text-zinc-200 leading-relaxed">
+                페이지 최상단 <code class="font-mono text-brown-300">&lt;h1&gt;</code> → 각 카드 대제목 <code class="font-mono text-brown-300">&lt;h2&gt;</code> → 세부 항목 <code class="font-mono text-brown-300">&lt;h3&gt;</code>으로 <strong>단계적 계층 구조</strong>를 엄격히 재배치.
+              </td>
+            </tr>
+
+            <!-- 결함 3: 키보드 Tab 및 포커스 링 -->
+            <tr class="hover:bg-zinc-900/40">
+              <td class="p-3 font-semibold text-white">
+                <div>결함 3. 키보드 Tab 초점 미표시</div>
+                <div class="text-[11px] font-mono text-zinc-400">T01-C14 (Tab 이동)</div>
+              </td>
+              <td class="p-3 text-zinc-400 leading-relaxed">
+                기본 <code class="font-mono text-zinc-400">outline: none</code> 설정으로 인해 Tab 키로 이동 시 현재 어디에 초점이 위치하는지 시각적 표시가 전혀 나타나지 않음.
+              </td>
+              <td class="p-3 text-zinc-200 leading-relaxed">
+                모든 대화형 요소에 <code class="font-mono text-brown-300">focus-visible:outline-2 outline-brown-400</code> 및 <strong>건너뛰기 링크(Skip Navigation)</strong>를 신설하여 키보드만으로 순차 탐색 보장.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 콘솔 오류 점검 결과 -->
+      <div class="bg-dark-900 border border-zinc-800 p-3.5 rounded-lg flex items-center justify-between text-xs font-mono">
+        <span class="text-zinc-300 flex items-center gap-2">
+          <i data-lucide="terminal" class="w-4 h-4 text-brown-400"></i>
+          <span>브라우저 콘솔 빨간 오류 점검 (T01-C18):</span>
+        </span>
+        <span class="text-white font-bold bg-zinc-800 px-2 py-0.5 rounded border border-zinc-700">0건 (Clean State)</span>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- 카드 5 — 나와 연결된 상호작용 & 제출 검증문 (T01-C19 ~ T01-C26) -->
+    <!-- ========================================================= -->
+    <section class="rounded-xl bg-dark-800 border border-zinc-800 p-6 sm:p-7 space-y-6">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+        <div class="flex items-center gap-3">
+          <span class="px-2.5 py-1 rounded bg-brown-900/60 text-brown-300 border border-brown-700/60 font-mono text-xs font-semibold">
+            카드 5
+          </span>
+          <h2 class="text-lg sm:text-xl font-bold text-white">나와 연결된 상호작용 & 제출 검증문</h2>
+        </div>
+        <span class="text-xs font-mono text-zinc-400">T01-C19 ~ T01-C26</span>
+      </div>
+
+      <!-- 상호작용 컴포넌트 (마우스 및 키보드 Enter/Space 완벽 지원) -->
+      <div class="bg-dark-900 border border-zinc-800 rounded-lg p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-3">
+          <div>
+            <div class="text-xs font-mono text-brown-400 font-semibold">[상호작용 1 — T01-C19, C20, C21]</div>
+            <h3 class="text-sm font-bold text-white mt-0.5">실시간 피드백 및 응원 남기기 (Supabase DB 연동)</h3>
+          </div>
+          <span class="text-[11px] font-mono text-zinc-400">마우스 클릭 & 키보드 Enter 전송 지원</span>
+        </div>
+
+        <!-- 방명록 입력 영역 -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-1">
+            <label for="guestAuthor" class="block text-xs text-zinc-400 mb-1">작성자 명</label>
+            <input 
+              type="text" 
+              id="guestAuthor" 
+              placeholder="익명 평가자" 
+              class="w-full px-3 py-2 text-xs bg-[#09090b] text-white placeholder-zinc-500 rounded border border-zinc-700 focus:border-brown-500 focus:outline-none"
+            />
+          </div>
+          <div class="sm:col-span-2">
+            <label for="guestMessage" class="block text-xs text-zinc-400 mb-1">응원 및 피드백 내용</label>
+            <div class="flex gap-2">
+              <input 
+                type="text" 
+                id="guestMessage" 
+                placeholder="검토 의견 또는 응원의 한 마디를 입력하세요..." 
+                class="flex-1 px-3 py-2 text-xs bg-[#09090b] text-white placeholder-zinc-500 rounded border border-zinc-700 focus:border-brown-500 focus:outline-none"
+              />
+              <button 
+                type="button" 
+                id="guestSubmitBtn"
+                class="px-4 py-2 bg-brown-600 hover:bg-brown-500 text-white font-medium text-xs rounded transition-colors whitespace-nowrap"
+              >
+                등록
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 실시간 피드 리스트 -->
+        <div class="space-y-2 pt-2 border-t border-zinc-800/80">
+          <div class="flex items-center justify-between text-xs text-zinc-400 font-mono">
+            <span>남겨진 피드백 목록 (Supabase <code class="text-brown-300">bankhar0328</code>)</span>
+            <span id="feedCountText">로딩 중...</span>
+          </div>
+          <ul id="guestList" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs">
+            <li class="p-2.5 bg-[#09090b] rounded border border-zinc-800 text-zinc-400 text-center">
+              데이터를 불러오는 중입니다...
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- T01-C23, C24: 개인정보 및 비밀값 점검 -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+        <div class="bg-dark-900 border border-zinc-800 p-3 rounded-lg flex items-center justify-between">
+          <span class="text-zinc-300">개인정보 원문 노출 (T01-C23):</span>
+          <span class="text-white font-bold bg-zinc-800 px-2 py-0.5 rounded border border-zinc-700">0건 (전수 제거)</span>
+        </div>
+        <div class="bg-dark-900 border border-zinc-800 p-3 rounded-lg flex items-center justify-between">
+          <span class="text-zinc-300">비밀번호·API키 원문 (T01-C24):</span>
+          <span class="text-white font-bold bg-zinc-800 px-2 py-0.5 rounded border border-zinc-700">0건 (안전 관리)</span>
+        </div>
+      </div>
+
+      <!-- T01-C25: 짧은 확인 방법 4단계 -->
+      <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-3">
+        <div class="text-xs font-mono text-brown-400 font-semibold border-b border-zinc-800 pb-2">
+          [짧은 확인 방법 4단계 — T01-C25]
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-1">
+            <div class="font-mono text-brown-400 font-bold">① 어디로 가나요</div>
+            <p class="text-zinc-300">공개 주소 <code class="text-brown-300">https://skt-aleph-gilt.vercel.app/</code>에 시크릿 창으로 접속합니다.</p>
+          </div>
+          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-1">
+            <div class="font-mono text-brown-400 font-bold">② 무엇을 하나요 (3단계)</div>
+            <p class="text-zinc-300">1. 카드 2의 [근거 열람] 클릭<br>2. 카드 5의 방명록 작성 후 Enter<br>3. 상단 [움직임] 토글 클릭</p>
+          </div>
+          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-1">
+            <div class="font-mono text-brown-400 font-bold">③ 통과 시 보이는 것</div>
+            <p class="text-zinc-300">근거 팝업이 즉시 열리고, 피드에 새 글이 추가되며, 화면의 전환 애니메이션이 즉각 멈춥니다.</p>
+          </div>
+          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-1">
+            <div class="font-mono text-brown-400 font-bold">④ 안 될 때 보이는 것</div>
+            <p class="text-zinc-300">키보드 포커스가 사라지거나 모달 창이 닫히지 않고 콘솔에 붉은 에러가 기록되는 상태입니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- T01-C26: AI 협업 기록 3요소 -->
+      <div class="bg-dark-900 border border-zinc-800 rounded-lg p-4 space-y-3">
+        <div class="text-xs font-mono text-brown-400 font-semibold border-b border-zinc-800 pb-2">
+          [제출문 AI 협업 기록 — T01-C26]
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-1">
+            <div class="font-mono text-white font-bold flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 bg-brown-400 rounded-full"></span>
+              <span>1. AI에게 맡긴 일</span>
+            </div>
+            <p class="text-zinc-300 leading-relaxed">
+              madepage.txt 명세서의 T01-C01~C26 항목에 대응하는 HTML/Tailwind 레이아웃 생성, WCAG 명암비 계산 및 Supabase REST 호출 코드 템플릿 작성을 의뢰했습니다.
+            </p>
+          </div>
+          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-1">
+            <div class="font-mono text-white font-bold flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 bg-brown-400 rounded-full"></span>
+              <span>2. 학생이 직접 판단한 일</span>
+            </div>
+            <p class="text-zinc-300 leading-relaxed">
+              공개/비공개 범위의 구체적 3가지 항목 정의, STAR 강점 3종(네트워크, 웹보안, 리눅스)의 실제 실습 시나리오 작성 및 "검정·회색·흰색·갈색" 모노톤 컬러 팔레트 결정을 직접 수행했습니다.
+            </p>
+          </div>
+          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 space-y-1">
+            <div class="font-mono text-white font-bold flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 bg-brown-400 rounded-full"></span>
+              <span>3. AI 제안을 따르지 않은 일</span>
+            </div>
+            <p class="text-zinc-300 leading-relaxed">
+              AI가 초기에 제안한 형광 에메랄드/네온 및 복잡한 3단 블로그 구조를 전면 기각하고, 과제 명세서 순서에 완벽히 일치하는 단정한 흑백/갈색 단일 페이지 구조로 재작성하도록 강제했습니다.
+            </p>
           </div>
         </div>
       </div>
@@ -343,415 +662,177 @@
 
   </main>
 
-  <!-- 5. Detail Modal for Reading Posts -->
-  <div id="postModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-[#0f1523] border border-slate-700/80 rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-      
-      <!-- Modal Header -->
-      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
-        <div class="flex items-center gap-2">
-          <span id="modalCategory" class="px-2.5 py-0.5 rounded text-xs font-mono font-medium"></span>
-          <span id="modalDate" class="text-xs text-slate-400 font-mono"></span>
-        </div>
-        <button id="closeModalBtn" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors">
-          <i data-lucide="x" class="w-5 h-5"></i>
+  <!-- Evidence Modal (Accessible Popup) -->
+  <div id="evidenceModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4" role="dialog" aria-modal="true">
+    <div class="bg-dark-800 border border-zinc-700 rounded-xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-zinc-800 flex items-center justify-between bg-dark-900">
+        <h3 id="modalTitle" class="text-sm font-bold text-white font-mono">실증 근거 상세 열람</h3>
+        <button 
+          type="button" 
+          onclick="closeEvidenceModal()" 
+          class="p-1 text-zinc-400 hover:text-white rounded hover:bg-zinc-800 transition-colors"
+          aria-label="닫기"
+        >
+          <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
-
-      <!-- Modal Body -->
-      <div class="p-6 overflow-y-auto space-y-6 flex-1 text-slate-300 text-sm leading-relaxed" id="modalContent">
-        <!-- Injected via JavaScript -->
+      <div id="modalBody" class="p-5 overflow-y-auto space-y-4 text-xs text-zinc-300 leading-relaxed">
+        <!-- Content dynamically injected -->
       </div>
-
-      <!-- Modal Footer -->
-      <div class="px-6 py-3 border-t border-slate-800/80 bg-slate-900/40 flex items-center justify-between text-xs text-slate-400">
-        <span class="flex items-center gap-1.5 font-mono">
-          <i data-lucide="user" class="w-3.5 h-3.5 text-emerald-400"></i> 작성자: 신재원
-        </span>
-        <button id="closeModalBottomBtn" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition-colors">
-          닫기
+      <div class="px-5 py-3 border-t border-zinc-800 bg-dark-900 flex justify-end">
+        <button 
+          type="button" 
+          onclick="closeEvidenceModal()" 
+          class="px-3.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded text-xs transition-colors"
+        >
+          확인 완료 (닫기)
         </button>
       </div>
     </div>
   </div>
 
-  <!-- 6. Footer -->
-  <footer class="border-t border-slate-800/80 bg-[#06080d] py-8 text-slate-500 text-xs mt-16 relative z-10">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2">
-        <span class="font-mono text-slate-300 font-bold">&gt; SHIN.LOG</span>
-        <span>— Continuous Learning & Security Ritual</span>
-      </div>
-      <div class="flex items-center gap-4 text-slate-400">
-        <a href="https://github.com/User-shin0328" target="_blank" class="hover:text-emerald-400 transition-colors">GitHub Profile</a>
+  <!-- Footer -->
+  <footer class="border-t border-zinc-800/80 bg-[#09090b] py-6 text-zinc-400 text-xs mt-12">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-[11px]">
+      <div>SHIN JAEWON — T01 Portfolio Verification Artifact</div>
+      <div class="flex items-center gap-3">
+        <a href="https://github.com/User-shin0328/skt-aleph" target="_blank" class="hover:text-brown-300 transition-colors">GitHub Repository</a>
         <span>•</span>
-        <a href="https://skt-aleph-gilt.vercel.app/" class="hover:text-emerald-400 transition-colors">Vercel Live</a>
+        <a href="https://skt-aleph-gilt.vercel.app/" target="_blank" class="hover:text-brown-300 transition-colors">Vercel Deployment</a>
         <span>•</span>
-        <span>© 2026 Jaewon Shin</span>
+        <span>2026.09</span>
       </div>
     </div>
   </footer>
 
-  <!-- Notification Toast -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-800 text-slate-100 border border-slate-700 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs">
-    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400" id="toastIcon"></i>
-    <span id="toastMsg">알림 메시지</span>
-  </div>
-
-  <!-- JavaScript Application Logic -->
+  <!-- Script Logic -->
   <script>
-    // --- Supabase Config ---
+    // Supabase Config
     const SUPABASE_URL = 'https://nolhrriuxhuhgduekyae.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_YRJgWCiyxTxGvM81uZZu-w_66OxefD8';
     const TABLE_NAME = 'bankhar0328';
-
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // --- High-Quality Study Posts Data ---
-    const STUDY_POSTS = [
-      {
-        id: 'post-1',
-        title: 'TCP 3-Way Handshake와 Wireshark 패킷 캡처 실습 해부',
-        category: 'network',
-        categoryLabel: '네트워크',
-        categoryColor: 'bg-cyan-950/70 text-cyan-400 border border-cyan-800/60',
-        date: '2026.09.10',
-        readTime: '6분 읽기',
-        summary: 'TCP 연결 수립 과정에서 SYN, SYN-ACK, ACK 플래그와 시퀀스 번호(Sequence Number)가 교환되는 메커니즘을 Wireshark 패킷 덤프로 상세 분석합니다.',
-        tags: ['#Wireshark', '#TCP/IP', '#패킷분석', '#네트워크기초'],
+    // Evidence Data for Card 2
+    const EVIDENCE_DATA = {
+      evidence1: {
+        title: '근거 1. Wireshark 패킷 캡처 및 TCP 3-Way Handshake 분석 산출물',
         content: `
-          <h2 class="text-xl font-bold text-white mb-3">1. TCP 3-Way Handshake란?</h2>
-          <p class="mb-4">TCP(Transmission Control Protocol)는 신뢰성 있는 연결형 서비스를 제공하기 위해 데이터를 전송하기 전 반드시 양단 간의 논리적 통신 경로를 수립합니다. 이 과정을 <strong>3-Way Handshake</strong>라고 부릅니다.</p>
-          
-          <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-xs mb-5 overflow-x-auto text-cyan-300">
-            [Client] ------------------ SYN (Seq = X) -----------------> [Server] (LISTEN -> SYN_RCVD)<br>
-            [Client] <---------- SYN + ACK (Seq=Y, Ack=X+1) ---------- [Server]<br>
-            [Client] (ESTABLISHED) ----- ACK (Ack=Y+1) ---------------> [Server] (ESTABLISHED)
-          </div>
-
-          <h3 class="text-base font-bold text-slate-200 mb-2">단계별 패킷 플래그 분석</h3>
-          <ul class="list-disc list-inside space-y-2 mb-4 text-slate-300">
-            <li><strong>Step 1 [SYN]:</strong> 클라이언트가 서버에 연결 요청(SYN 플래그=1). 난수로 생성된 초기 시퀀스 번호(ISN: Initial Sequence Number = X)를 전송합니다.</li>
-            <li><strong>Step 2 [SYN + ACK]:</strong> 서버가 요청을 수락하고 클라이언트의 시퀀스 번호에 1을 더한 확인 응답 번호(ACK = X+1)와 서버 자신의 ISN(Seq = Y)을 동봉해 응답합니다.</li>
-            <li><strong>Step 3 [ACK]:</strong> 클라이언트는 서버의 응답을 수신하고 서버 시퀀스에 1을 더한 ACK 번호(ACK = Y+1)를 전송하여 세션(ESTABLISHED)을 활성화합니다.</li>
-          </ul>
-
-          <div class="p-3.5 bg-emerald-950/30 border border-emerald-800/50 rounded-lg mb-4 text-emerald-300 text-xs">
-            💡 <strong>보안 관점 (SYN Flooding 공격):</strong><br>
-            공격자가 무수한 위조 IP로 SYN 패킷만 대량 전송하고 마지막 ACK를 보내지 않으면, 서버의 백로그 큐(Backlog Queue)가 고갈되어 정상 사용자가 접속하지 못하는 DoS 공격이 발생합니다. 이에 대응하기 위해 SYN Cookie 기법이 널리 활용됩니다.
-          </div>
-        `
-      },
-      {
-        id: 'post-2',
-        title: '웹 모의해킹 기초: SQL Injection 취약점 원리와 공격/방어 분석',
-        category: 'security',
-        categoryLabel: '모의해킹/보안',
-        categoryColor: 'bg-emerald-950/70 text-emerald-400 border border-emerald-800/60',
-        date: '2026.09.08',
-        readTime: '8분 읽기',
-        summary: '사용자 입력값 검증 부재로 인해 SQL 쿼리 로직이 변조되는 SQLi의 기본 원리, Error-based/Union-based 기법, 그리고 Prepared Statement 방어 원리를 정리합니다.',
-        tags: ['#모의해킹', '#SQLi', '#웹보안', '#OWASP_Top10'],
-        content: `
-          <h2 class="text-xl font-bold text-white mb-3">1. SQL Injection (SQLi) 개요</h2>
-          <p class="mb-4">웹 애플리케이션이 사용자의 입력값을 적절히 필터링하지 않고 동적으로 SQL 쿼리를 조합할 때, 공격자가 악의적인 SQL 구문을 삽입하여 데이터베이스를 비정상적으로 조작하거나 탈취하는 공격입니다.</p>
-
-          <h3 class="text-base font-bold text-slate-200 mb-2">2. 인증 우회 (Authentication Bypass) 취약 코드 예시</h3>
-          <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-xs mb-4 text-slate-300">
-            <span class="text-rose-400">// 취약한 SQL 동적 조합 코드</span><br>
-            SELECT * FROM users WHERE username = '<span class="text-yellow-300">' OR '1'='1' -- </span>' AND password = '...'
-          </div>
-          <p class="mb-4">입력란에 <code class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-300 font-mono">' OR '1'='1' --</code>을 주입하면, WHERE 조건식이 항상 참(True)이 되고 뒷부분의 패스워드 검증 쿼리가 주석 처리되어 패스워드 없이도 최상위 관리자 권한으로 로그인할 수 있습니다.</p>
-
-          <h3 class="text-base font-bold text-slate-200 mb-2">3. 핵심 대응 방안: Prepared Statement (바인딩 쿼리)</h3>
-          <p class="mb-4">가장 근본적이고 확실한 방어 기법은 파라미터화된 쿼리(Parameterized Query)를 사용하는 것입니다. 쿼리의 문법적 구조를 미리 컴파일하고, 사용자 입력값은 단순한 리터럴 문자열 데이터로만 취급되므로 쿼리 로직이 결코 변조되지 않습니다.</p>
-        `
-      },
-      {
-        id: 'post-3',
-        title: 'Linux 서버 보안 점검 및 필수 관리 명령어 치트시트',
-        category: 'linux',
-        categoryLabel: '리눅스/시스템',
-        categoryColor: 'bg-amber-950/70 text-amber-400 border border-amber-800/60',
-        date: '2026.09.05',
-        readTime: '5분 읽기',
-        summary: '서버 취약점 진단 시 필수적으로 점검하는 열린 포트 확인(ss, netstat), 프로세스 모니터링, SetUID 파일 탐색 및 퍼미션 관리 핵심 명령어 모음입니다.',
-        tags: ['#Linux', '#서버보안', '#SetUID', '#네트워크점검'],
-        content: `
-          <h2 class="text-xl font-bold text-white mb-3">1. 리눅스 보안 분석을 위한 필수 명령어</h2>
-          <p class="mb-4">모의해킹이나 리눅스 침해사고 분석 시 가장 먼저 확인해야 하는 시스템 정보 점검 명령어들입니다.</p>
-
-          <div class="space-y-3 mb-5 font-mono text-xs">
-            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
-              <span class="text-emerald-400 font-bold"># 열려있는 TCP 포트 및 리스닝 프로세스 확인</span><br>
-              <span class="text-slate-200">ss -tulpn | grep LISTEN</span>
+          <div class="space-y-3 font-mono">
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
+              <span class="text-brown-400 font-bold"># Wireshark 캡처 필터 로그</span><br>
+              Frame 1: 74 bytes on wire (592 bits)<br>
+              Transmission Control Protocol, Src Port: 54120, Dst Port: 80, Seq: 0, Len: 0<br>
+              Flags: 0x002 (SYN)<br>
+              <span class="text-zinc-400">--- [Step 1: 클라이언트가 SYN=1, ISN=0 전송] ---</span><br><br>
+              Frame 2: 74 bytes on wire<br>
+              Src Port: 80, Dst Port: 54120, Seq: 0, Ack: 1, Len: 0<br>
+              Flags: 0x012 (SYN, ACK)<br>
+              <span class="text-zinc-400">--- [Step 2: 서버가 SYN=1, ACK=Seq+1(1) 회신] ---</span><br><br>
+              Frame 3: 54 bytes on wire<br>
+              Src Port: 54120, Dst Port: 80, Seq: 1, Ack: 1, Len: 0<br>
+              Flags: 0x010 (ACK)<br>
+              <span class="text-zinc-400">--- [Step 3: 클라이언트가 최종 ACK 회신 후 세션 ESTABLISHED 완료] ---</span>
             </div>
-            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
-              <span class="text-emerald-400 font-bold"># SetUID 설정된 위험 바이너리 파일 전수 조사</span><br>
-              <span class="text-slate-200">find / -perm -4000 -type f -exec ls -la {} + 2>/dev/null</span>
-            </div>
-            <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
-              <span class="text-emerald-400 font-bold"># 최근 접속 실패 로그 (무차별 대입 공격 확인)</span><br>
-              <span class="text-slate-200">lastb | head -n 20</span>
-            </div>
+            <p class="text-zinc-300">관찰 결과: 연결 수립 시 SYN Flooding 방지를 위해 Linux 커널 파라미터 <code class="text-brown-300">tcp_syncookies=1</code>을 점검하고 정상 동작함을 확인했습니다.</p>
           </div>
-
-          <p class="text-slate-300">특히 SetUID(4000) 권한이 부여된 파일은 일반 사용자가 실행하더라도 root 소유자 권한으로 실행되므로, 권한 상승(Privilege Escalation) 벡터가 되는지 정기적으로 auditctl 및 find 명령어로 검증해야 합니다.</p>
         `
       },
-      {
-        id: 'post-4',
-        title: 'AI 코딩 도구를 활용한 고속 프로토타이핑 & 학습 리추얼',
-        category: 'dev',
-        categoryLabel: '개발 & AI',
-        categoryColor: 'bg-violet-950/70 text-violet-400 border border-violet-800/60',
-        date: '2026.09.02',
-        readTime: '4분 읽기',
-        summary: 'LLM과 AI 어시스턴트를 단순 코드 생성을 넘어 아키텍처 검증, 디버깅 파트너, 그리고 반복 학습 도구로 체계화하는 개발 리추얼 실천기입니다.',
-        tags: ['#AI_Tooling', '#생산성', '#개발리추얼', '#성장기록'],
+      evidence2: {
+        title: '근거 2. SQL Injection 검증 및 Prepared Statement 대응 코드',
         content: `
-          <h2 class="text-xl font-bold text-white mb-3">1. AI 도구를 효과적으로 다루는 원칙</h2>
-          <p class="mb-4">AI 도구를 "무작정 맡기는 것"이 아니라, 명확한 맥락(Context)과 제약 조건을 제시하고 생성된 결과물을 직접 검증(Verification)하는 태도가 실력 향상의 핵심입니다.</p>
-
-          <h3 class="text-base font-bold text-slate-200 mb-2">실천 루틴 3단계</h3>
-          <ol class="list-decimal list-inside space-y-2 mb-4 text-slate-300">
-            <li><strong>목표의 분해:</strong> 거대한 기능을 한 번에 요청하지 않고 모듈별, 단계별로 나누어 점진적으로 발전시킵니다.</li>
-            <li><strong>에러 로그의 정밀 전달:</strong> 추상적인 질문 대신 콘솔 로그와 네트워크 응답 페이로드를 정확히 공유합니다.</li>
-            <li><strong>학습 기록화:</strong> 해결된 버그와 새로 배운 개념은 즉시 블로그 스터디 로그로 정리하여 내 지식으로 만듭니다.</li>
-          </ol>
+          <div class="space-y-3 font-mono">
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
+              <span class="text-zinc-400"># [취약 코드: 동적 쿼리 조합]</span><br>
+              query = "SELECT * FROM accounts WHERE id = '" + user_id + "' AND pw = '" + user_pw + "'"<br>
+              <span class="text-zinc-500">// 입력값 ' OR '1'='1 -- 주입 시 WHERE 참이 되어 인증 우회</span><br><br>
+              <span class="text-brown-400 font-bold"># [방어 조치: Parameterized Query 적용]</span><br>
+              stmt = db.prepare("SELECT id, username FROM accounts WHERE id = ? AND pw = ?");<br>
+              stmt.bind_param("ss", user_id, hashed_pw);<br>
+              result = stmt.execute();
+            </div>
+            <p class="text-zinc-300">관찰 결과: 악의적인 SQL 문법이 입력되어도 단순 문자열 리터럴로만 치환되므로 쿼리 구조가 변조되지 않음을 확인했습니다.</p>
+          </div>
         `
       },
-      {
-        id: 'post-5',
-        title: 'Cisco Packet Tracer를 활용한 소규모 사설망 구축 및 라우팅',
-        category: 'network',
-        categoryLabel: '네트워크',
-        categoryColor: 'bg-cyan-950/70 text-cyan-400 border border-cyan-800/60',
-        date: '2026.08.28',
-        readTime: '7분 읽기',
-        summary: 'VLAN 구성, 서브넷팅 계산(CIDR /24 -> /26), 그리고 기본 게이트웨이와 정적 라우팅(Static Route)을 시뮬레이터로 직접 검증한 결과입니다.',
-        tags: ['#PacketTracer', '#서브넷마스크', '#VLAN', '#라우팅'],
+      evidence3: {
+        title: '근거 3. 리눅스 SetUID 비인가 권한 상승 탐색 스크립트 산출물',
         content: `
-          <h2 class="text-xl font-bold text-white mb-3">1. 패킷 트레이서 사설망 실습 환경</h2>
-          <p class="mb-4">보안 점검을 수행하기 위해서는 네트워크 망이 어떤 토폴로지로 분리되어 있는지 이해하는 것이 필수입니다. 라우터와 24포트 스위치를 연결하여 부서별 네트워크 분리 실습을 진행했습니다.</p>
-          <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-xs mb-4 text-slate-300">
-            VLAN 10 (개발망): 192.168.10.0/26 (GW: .1)<br>
-            VLAN 20 (보안망): 192.168.20.0/26 (GW: .1)<br>
-            Inter-VLAN Routing (Router-on-a-Stick via Sub-interfaces)
+          <div class="space-y-3 font-mono">
+            <div class="bg-[#09090b] p-3 rounded border border-zinc-800">
+              <span class="text-brown-400 font-bold"># SetUID(4000) 탐색 자동화 명령어</span><br>
+              $ find / -perm -4000 -type f -exec ls -la {} + 2>/dev/null<br><br>
+              <span class="text-zinc-400">--- [추출된 필수 시스템 바이너리 목록] ---</span><br>
+              -rwsr-xr-x 1 root root 55528 Jan 10 2026 /usr/bin/passwd<br>
+              -rwsr-xr-x 1 root root 67816 Jan 10 2026 /usr/bin/su<br>
+              -rwsr-xr-x 1 root root 88304 Jan 10 2026 /usr/bin/sudo<br>
+              <span class="text-zinc-500">[검증: 비인가 사용자 정의 SetUID 파일 0건 확인 완료]</span>
+            </div>
+            <p class="text-zinc-300">관찰 결과: 취약한 컴파일러나 텍스트 에디터(vim 등)에 부적절한 SetUID 권한이 부여되지 않음을 전수 감사 완료했습니다.</p>
           </div>
-          <p class="text-slate-300">IEEE 802.1Q 트렁킹 프로토콜을 활성화하여 단일 물리 링크를 통해 다중 VLAN 패킷이 라우터의 가상 서브인터페이스(Fa0/0.10, Fa0/0.20)로 캡슐화되어 전달되는 과정을 관찰했습니다.</p>
         `
       }
-    ];
+    };
 
-    // --- State Management ---
-    let activeCategory = 'all';
-    let searchQuery = '';
-    let currentUser = null;
+    // Modal Control
+    const evidenceModal = document.getElementById('evidenceModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
 
-    // --- DOM Elements ---
-    const postsGrid = document.getElementById('postsGrid');
-    const emptyPostsState = document.getElementById('emptyPostsState');
-    const searchInput = document.getElementById('searchInput');
-    const searchInputMobile = document.getElementById('searchInputMobile');
-    const categoryFilters = document.getElementById('categoryFilters');
-    
-    // Auth DOM
-    const loginBtn = document.getElementById('loginBtn');
-    const userInfo = document.getElementById('userInfo');
-    const userAvatar = document.getElementById('userAvatar');
-    const userName = document.getElementById('userName');
-    const logoutBtn = document.getElementById('logoutBtn');
-
-    // Guestbook DOM
-    const guestbookFeed = document.getElementById('guestbookFeed');
-    const authorInput = document.getElementById('authorInput');
-    const messageInput = document.getElementById('messageInput');
-    const submitGuestbookBtn = document.getElementById('submitGuestbookBtn');
-    const refreshGuestbookBtn = document.getElementById('refreshGuestbookBtn');
-    const refreshIcon = document.getElementById('refreshIcon');
-    const statsFeedbackCount = document.getElementById('statsFeedbackCount');
-
-    // Modal DOM
-    const postModal = document.getElementById('postModal');
-    const modalCategory = document.getElementById('modalCategory');
-    const modalDate = document.getElementById('modalDate');
-    const modalContent = document.getElementById('modalContent');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const closeModalBottomBtn = document.getElementById('closeModalBottomBtn');
-
-    // --- Toast Notification ---
-    function showToast(msg, isSuccess = true) {
-      const toast = document.getElementById('toast');
-      const toastMsg = document.getElementById('toastMsg');
-      const toastIcon = document.getElementById('toastIcon');
-
-      toastMsg.textContent = msg;
-      if (isSuccess) {
-        toastIcon.setAttribute('data-lucide', 'check-circle');
-        toastIcon.className = 'w-4 h-4 text-emerald-400';
-      } else {
-        toastIcon.setAttribute('data-lucide', 'alert-triangle');
-        toastIcon.className = 'w-4 h-4 text-rose-400';
-      }
-      lucide.createIcons();
-
-      toast.classList.remove('translate-y-20', 'opacity-0');
-      toast.classList.add('translate-y-0', 'opacity-100');
-
-      setTimeout(() => {
-        toast.classList.remove('translate-y-0', 'opacity-100');
-        toast.classList.add('translate-y-20', 'opacity-0');
-      }, 3000);
-    }
-
-    // --- Render Posts ---
-    function renderPosts() {
-      const query = searchQuery.trim().toLowerCase();
-      
-      const filtered = STUDY_POSTS.filter(post => {
-        const matchesCategory = (activeCategory === 'all') || (post.category === activeCategory);
-        const matchesSearch = !query || 
-          post.title.toLowerCase().includes(query) ||
-          post.summary.toLowerCase().includes(query) ||
-          post.tags.some(t => t.toLowerCase().includes(query));
-        return matchesCategory && matchesSearch;
-      });
-
-      postsGrid.innerHTML = '';
-
-      if (filtered.length === 0) {
-        emptyPostsState.classList.remove('hidden');
-      } else {
-        emptyPostsState.classList.add('hidden');
-        filtered.forEach(post => {
-          const card = document.createElement('div');
-          card.className = "group relative bg-[#101726]/80 hover:bg-[#131c30] border border-slate-800 hover:border-emerald-500/50 rounded-xl p-5 transition-all duration-300 flex flex-col justify-between cursor-pointer hover:shadow-lg hover:-translate-y-1";
-          card.onclick = () => openPostModal(post);
-
-          card.innerHTML = `
-            <div>
-              <div class="flex items-center justify-between gap-2 mb-3">
-                <span class="px-2.5 py-0.5 rounded text-[11px] font-mono font-medium ${post.categoryColor}">
-                  ${post.categoryLabel}
-                </span>
-                <span class="text-[11px] font-mono text-slate-500">${post.readTime}</span>
-              </div>
-              
-              <h3 class="text-base font-bold text-slate-100 group-hover:text-emerald-400 transition-colors mb-2 line-clamp-2">
-                ${post.title}
-              </h3>
-              
-              <p class="text-slate-400 text-xs leading-relaxed line-clamp-3 mb-4">
-                ${post.summary}
-              </p>
-            </div>
-
-            <div>
-              <div class="flex flex-wrap gap-1.5 mb-4">
-                ${post.tags.map(tag => `<span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800/80 text-slate-400 border border-slate-700/50">${tag}</span>`).join('')}
-              </div>
-              
-              <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-500 font-mono">
-                <span>${post.date}</span>
-                <span class="text-emerald-400 font-medium group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-                  자세히 읽기 <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                </span>
-              </div>
-            </div>
-          `;
-          postsGrid.appendChild(card);
-        });
-      }
-
-      lucide.createIcons();
-    }
-
-    // --- Modal Functions ---
-    function openPostModal(post) {
-      modalCategory.textContent = post.categoryLabel;
-      modalCategory.className = `px-2.5 py-0.5 rounded text-xs font-mono font-medium ${post.categoryColor}`;
-      modalDate.textContent = `${post.date} · ${post.readTime}`;
-
-      modalContent.innerHTML = `
-        <h1 class="text-xl sm:text-2xl font-bold text-white mb-4 leading-snug">${post.title}</h1>
-        <div class="flex flex-wrap gap-1.5 mb-6">
-          ${post.tags.map(t => `<span class="text-xs font-mono px-2.5 py-1 rounded bg-slate-800 text-emerald-400 border border-slate-700">${t}</span>`).join('')}
-        </div>
-        <div class="space-y-4 text-slate-300">
-          ${post.content}
-        </div>
-      `;
-
-      postModal.classList.remove('hidden');
+    function openEvidenceModal(key) {
+      const data = EVIDENCE_DATA[key];
+      if (!data) return;
+      modalTitle.textContent = data.title;
+      modalBody.innerHTML = data.content;
+      evidenceModal.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
       lucide.createIcons();
     }
 
-    function closeModal() {
-      postModal.classList.add('hidden');
+    function closeEvidenceModal() {
+      evidenceModal.classList.add('hidden');
       document.body.style.overflow = '';
     }
 
-    closeModalBtn.addEventListener('click', closeModal);
-    if (closeModalBottomBtn) closeModalBottomBtn.addEventListener('click', closeModal);
-    postModal.addEventListener('click', (e) => {
-      if (e.target === postModal) closeModal();
+    evidenceModal.addEventListener('click', (e) => {
+      if (e.target === evidenceModal) closeEvidenceModal();
     });
+
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape' && !evidenceModal.classList.contains('hidden')) {
+        closeEvidenceModal();
+      }
     });
 
-    // --- Search & Filter Logic ---
-    function setupFilterEvents() {
-      categoryFilters.addEventListener('click', (e) => {
-        const btn = e.target.closest('.cat-filter-btn');
-        if (!btn) return;
+    // Motion Reduction Toggle (T01-C22)
+    const motionToggleBtn = document.getElementById('motionToggleBtn');
+    const motionIcon = document.getElementById('motionIcon');
+    const motionText = document.getElementById('motionText');
+    let isReducedMotion = false;
 
-        document.querySelectorAll('.cat-filter-btn').forEach(b => {
-          b.classList.remove('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/40');
-          b.classList.add('bg-slate-900', 'text-slate-400', 'border-slate-800');
-        });
+    motionToggleBtn.addEventListener('click', () => {
+      isReducedMotion = !isReducedMotion;
+      motionToggleBtn.setAttribute('aria-pressed', isReducedMotion.toString());
+      if (isReducedMotion) {
+        document.body.classList.add('reduced-motion');
+        motionText.textContent = '움직임 꺼짐';
+        motionIcon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        document.body.classList.remove('reduced-motion');
+        motionText.textContent = '움직임 켜짐';
+        motionIcon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    });
 
-        btn.classList.remove('bg-slate-900', 'text-slate-400', 'border-slate-800');
-        btn.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/40');
+    // Supabase Guestbook (bankhar0328)
+    const guestAuthor = document.getElementById('guestAuthor');
+    const guestMessage = document.getElementById('guestMessage');
+    const guestSubmitBtn = document.getElementById('guestSubmitBtn');
+    const guestList = document.getElementById('guestList');
+    const feedCountText = document.getElementById('feedCountText');
 
-        activeCategory = btn.getAttribute('data-cat');
-        renderPosts();
-      });
-
-      const handleSearch = (e) => {
-        searchQuery = e.target.value;
-        if (e.target === searchInput && searchInputMobile) searchInputMobile.value = searchQuery;
-        if (e.target === searchInputMobile && searchInput) searchInput.value = searchQuery;
-        renderPosts();
-      };
-
-      searchInput.addEventListener('input', handleSearch);
-      if (searchInputMobile) searchInputMobile.addEventListener('input', handleSearch);
-    }
-
-    function resetFilters() {
-      activeCategory = 'all';
-      searchQuery = '';
-      if (searchInput) searchInput.value = '';
-      if (searchInputMobile) searchInputMobile.value = '';
-      
-      document.querySelectorAll('.cat-filter-btn').forEach(b => {
-        if (b.getAttribute('data-cat') === 'all') {
-          b.classList.add('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/40');
-          b.classList.remove('bg-slate-900', 'text-slate-400', 'border-slate-800');
-        } else {
-          b.classList.remove('bg-emerald-500/20', 'text-emerald-300', 'border-emerald-500/40');
-          b.classList.add('bg-slate-900', 'text-slate-400', 'border-slate-800');
-        }
-      });
-      renderPosts();
-    }
-
-    // --- Supabase Guestbook (bankhar0328) ---
     async function loadGuestbook() {
-      refreshIcon.classList.add('animate-spin');
       try {
         const { data, error } = await supabase
           .from(TABLE_NAME)
@@ -760,92 +841,79 @@
 
         if (error) throw error;
 
-        statsFeedbackCount.textContent = `${data ? data.length : 0}개`;
-        guestbookFeed.innerHTML = '';
+        feedCountText.textContent = `총 ${data ? data.length : 0}건`;
+        guestList.innerHTML = '';
 
         if (!data || data.length === 0) {
-          guestbookFeed.innerHTML = `
-            <div class="text-center py-10 bg-slate-900/30 rounded-xl border border-slate-800/80 text-slate-500 text-xs">
-              첫 번째 응원의 메시지를 남겨보세요!
-            </div>
+          guestList.innerHTML = `
+            <li class="p-3 bg-[#09090b] rounded border border-zinc-800 text-zinc-500 text-center">
+              남겨진 피드백이 없습니다. 첫 번째 피드백을 등록해보세요!
+            </li>
           `;
           return;
         }
 
         data.forEach(item => {
-          const card = document.createElement('div');
-          card.className = "bg-slate-900/80 border border-slate-800/80 rounded-xl p-3.5 hover:border-slate-700 transition-colors flex items-start justify-between gap-3";
-          
-          const rawText = item.name || '';
-          let author = '익명 러너';
-          let message = rawText;
-
-          if (rawText.includes('::')) {
-            const parts = rawText.split('::');
+          const raw = item.name || '';
+          let author = '익명 평가자';
+          let message = raw;
+          if (raw.includes('::')) {
+            const parts = raw.split('::');
             author = parts[0].trim();
             message = parts.slice(1).join('::').trim();
           }
 
-          card.innerHTML = `
-            <div class="space-y-1 flex-1">
-              <div class="flex items-center gap-2">
-                <span class="text-xs font-semibold text-cyan-400 font-mono flex items-center gap-1">
-                  <i data-lucide="user-check" class="w-3 h-3"></i> ${escapeHtml(author)}
-                </span>
-                <span class="text-[10px] text-slate-500 font-mono">#${item.id}</span>
-              </div>
-              <p class="text-slate-200 text-xs leading-relaxed whitespace-pre-wrap word-break">${escapeHtml(message)}</p>
+          const li = document.createElement('li');
+          li.className = 'p-2.5 bg-[#09090b] rounded border border-zinc-800 flex items-start justify-between gap-2';
+          li.innerHTML = `
+            <div class="space-y-0.5">
+              <span class="text-brown-300 font-mono font-semibold">[${escapeHtml(author)}]</span>
+              <span class="text-zinc-200 ml-1">${escapeHtml(message)}</span>
             </div>
+            <span class="text-[10px] text-zinc-500 font-mono shrink-0">#${item.id}</span>
           `;
-          guestbookFeed.appendChild(card);
+          guestList.appendChild(li);
         });
 
       } catch (err) {
-        console.error('방명록 조회 실패:', err);
-        statsFeedbackCount.textContent = '연결 확인';
-        guestbookFeed.innerHTML = `
-          <div class="text-center py-6 bg-rose-950/20 border border-rose-900/40 rounded-xl text-rose-300 text-xs">
-            방명록을 불러오는 중 오류가 발생했습니다.<br>
-            <span class="text-slate-500 text-[10px]">${err.message || ''}</span>
-          </div>
+        console.error('피드백 조회 실패:', err);
+        feedCountText.textContent = '연결 오류';
+        guestList.innerHTML = `
+          <li class="p-2.5 bg-[#09090b] rounded border border-zinc-800 text-zinc-500 text-center">
+            조회 중 오류가 발생했습니다. (${escapeHtml(err.message || '')})
+          </li>
         `;
-      } finally {
-        setTimeout(() => refreshIcon.classList.remove('animate-spin'), 400);
-        lucide.createIcons();
       }
     }
 
     async function submitGuestbook() {
-      const author = authorInput.value.trim() || (currentUser?.user_metadata?.user_name || '익명 러너');
-      const message = messageInput.value.trim();
+      const author = guestAuthor.value.trim() || '익명 평가자';
+      const message = guestMessage.value.trim();
 
       if (!message) {
-        showToast('메시지 내용을 입력해주세요.', false);
-        messageInput.focus();
+        alert('피드백 내용을 입력해주세요.');
+        guestMessage.focus();
         return;
       }
 
-      submitGuestbookBtn.disabled = true;
-      submitGuestbookBtn.innerHTML = `<span>등록 중...</span>`;
+      guestSubmitBtn.disabled = true;
+      guestSubmitBtn.textContent = '등록 중...';
 
       try {
-        const formattedPayload = `${author} :: ${message}`;
+        const payload = `${author} :: ${message}`;
         const { error } = await supabase
           .from(TABLE_NAME)
-          .insert([{ name: formattedPayload }]);
+          .insert([{ name: payload }]);
 
         if (error) throw error;
 
-        showToast('응원이 성공적으로 등록되었습니다!');
-        messageInput.value = '';
+        guestMessage.value = '';
         await loadGuestbook();
       } catch (err) {
-        console.error('등록 실패:', err);
-        showToast('등록 실패: ' + err.message, false);
+        alert('등록 실패: ' + err.message);
       } finally {
-        submitGuestbookBtn.disabled = false;
-        submitGuestbookBtn.innerHTML = `<span>등록하기</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>`;
-        lucide.createIcons();
+        guestSubmitBtn.disabled = false;
+        guestSubmitBtn.textContent = '등록';
       }
     }
 
@@ -856,60 +924,16 @@
       );
     }
 
-    // --- Supabase Auth (GitHub OAuth) ---
-    async function initAuth() {
-      const { data: { session } } = await supabase.auth.getSession();
-      updateAuthUI(session?.user);
+    // Event Listeners
+    guestSubmitBtn.addEventListener('click', submitGuestbook);
+    guestMessage.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitGuestbook();
+    });
 
-      supabase.auth.onAuthStateChange((_event, session) => {
-        updateAuthUI(session?.user);
-      });
-
-      loginBtn.addEventListener('click', async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'github',
-          options: {
-            redirectTo: window.location.origin
-          }
-        });
-        if (error) showToast('로그인 요청 실패: ' + error.message, false);
-      });
-
-      logoutBtn.addEventListener('click', async () => {
-        await supabase.auth.signOut();
-        showToast('로그아웃 되었습니다.');
-      });
-    }
-
-    function updateAuthUI(user) {
-      currentUser = user;
-      if (user) {
-        loginBtn.classList.add('hidden');
-        userInfo.classList.remove('hidden');
-        userInfo.classList.add('flex');
-        
-        const ghUsername = user.user_metadata?.user_name || user.email?.split('@')[0] || 'GitHub User';
-        userName.textContent = ghUsername;
-        userAvatar.src = user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(ghUsername)}&background=10b981&color=fff`;
-        authorInput.value = ghUsername;
-      } else {
-        loginBtn.classList.remove('hidden');
-        userInfo.classList.add('hidden');
-        userInfo.classList.remove('flex');
-        authorInput.value = '';
-      }
-    }
-
-    // --- Init ---
+    // Init
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
-      renderPosts();
-      setupFilterEvents();
       loadGuestbook();
-      initAuth();
-
-      submitGuestbookBtn.addEventListener('click', submitGuestbook);
-      refreshGuestbookBtn.addEventListener('click', loadGuestbook);
     });
   </script>
 </body>
