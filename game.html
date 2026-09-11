@@ -146,8 +146,12 @@
       z-index: 20;
     }
 
+    .hidden {
+      display: none !important;
+    }
+
     .overlay.hidden {
-      display: none;
+      display: none !important;
     }
 
     .overlay-card {
@@ -342,7 +346,7 @@
           </div>
 
           <!-- CASE 2: 1등 신기록을 세웠을 때만 표시 (닉네임 입력란) -->
-          <div id="newRecordBox" class="hidden bg-[#09090b] p-4 rounded-xl border border-[#ba9578] text-xs font-mono space-y-2.5 text-left">
+          <div id="newRecordBox" class="hidden bg-[#09090b] p-4 rounded-xl border border-[#ba9578] text-xs font-mono space-y-2.5 text-left" style="display: none;">
             <div id="recordInputRow">
               <div class="text-[#ba9578] font-bold text-sm mb-1">🎉 축하합니다! 새로운 1위 신기록 달성!</div>
               <p class="text-[11px] text-zinc-400 mb-2">1등의 닉네임을 입력하여 등록하세요.</p>
@@ -352,7 +356,7 @@
               </div>
             </div>
             <!-- 등록 완료 시에만 나타나는 메시지 -->
-            <div id="recordSuccessMsg" class="hidden text-[#ba9578] font-bold py-1.5 text-center">
+            <div id="recordSuccessMsg" class="hidden text-[#ba9578] font-bold py-1.5 text-center" style="display: none;">
               ✓ 1위 기록으로 등록되었습니다!
             </div>
           </div>
@@ -394,7 +398,7 @@
           </div>
 
           <!-- 완주 후 1등 신기록까지 달성했을 때만 표시 (이름 등록창) -->
-          <div id="successRecordBox" class="hidden bg-[#09090b] p-4 rounded-xl border border-[#ba9578] text-xs font-mono space-y-2.5 text-left">
+          <div id="successRecordBox" class="hidden bg-[#09090b] p-4 rounded-xl border border-[#ba9578] text-xs font-mono space-y-2.5 text-left" style="display: none;">
             <div id="successRecordInputRow">
               <div class="text-[#ba9578] font-bold text-sm mb-1">🎉 완주 & 새로운 1위 신기록 달성!</div>
               <p class="text-[11px] text-zinc-400 mb-2">1등의 닉네임을 입력하여 등록하세요.</p>
@@ -403,7 +407,7 @@
                 <button type="button" id="saveSuccessRecordBtn" class="btn btn-primary px-3.5 py-2 text-xs font-bold">1위 등록</button>
               </div>
             </div>
-            <div id="successRecordSuccessMsg" class="hidden text-[#ba9578] font-bold py-1.5 text-center">
+            <div id="successRecordSuccessMsg" class="hidden text-[#ba9578] font-bold py-1.5 text-center" style="display: none;">
               ✓ 1위 기록으로 등록되었습니다!
             </div>
           </div>
@@ -685,17 +689,37 @@
       successOverlay.classList.add('hidden');
 
       // 신기록 폼 및 메시지 초기화
+      newRecordBox.style.display = 'none';
       newRecordBox.classList.add('hidden');
-      if (recordInputRow) recordInputRow.classList.remove('hidden');
-      if (recordSuccessMsg) recordSuccessMsg.classList.add('hidden');
+      if (recordInputRow) {
+        recordInputRow.style.display = 'block';
+        recordInputRow.classList.remove('hidden');
+      }
+      if (recordSuccessMsg) {
+        recordSuccessMsg.style.display = 'none';
+        recordSuccessMsg.classList.add('hidden');
+      }
       if (recordNameInput) recordNameInput.value = '';
-      if (tryAgainBox) tryAgainBox.classList.add('hidden');
+      if (tryAgainBox) {
+        tryAgainBox.style.display = 'none';
+        tryAgainBox.classList.add('hidden');
+      }
 
+      successRecordBox.style.display = 'none';
       successRecordBox.classList.add('hidden');
-      if (successRecordInputRow) successRecordInputRow.classList.remove('hidden');
-      if (successRecordSuccessMsg) successRecordSuccessMsg.classList.add('hidden');
+      if (successRecordInputRow) {
+        successRecordInputRow.style.display = 'block';
+        successRecordInputRow.classList.remove('hidden');
+      }
+      if (successRecordSuccessMsg) {
+        successRecordSuccessMsg.style.display = 'none';
+        successRecordSuccessMsg.classList.add('hidden');
+      }
       if (successNameInput) successNameInput.value = '';
-      if (successTryAgainBox) successTryAgainBox.classList.add('hidden');
+      if (successTryAgainBox) {
+        successTryAgainBox.style.display = 'none';
+        successTryAgainBox.classList.add('hidden');
+      }
 
       timeVal.textContent = remainingTime.toFixed(1) + 's';
       scoreVal.textContent = '0';
@@ -793,19 +817,33 @@
       // ★ 최고 점수 갱신 여부 판정 (기록이 없거나, 기존 1위 점수보다 높을 때만 1등!)
       const isNewRecord = finalScoreVal > 0 && (!bestRecord || finalScoreVal > bestRecord.score);
       if (isNewRecord) {
-        // [1등 달성 시]: 입력란 노출, 다시도전 박스 숨김
+        // [1등 달성 시]: 입력란 노출, 다시도전 박스 완전 숨김
+        newRecordBox.style.display = 'block';
         newRecordBox.classList.remove('hidden');
-        if (recordInputRow) recordInputRow.classList.remove('hidden');
-        if (recordSuccessMsg) recordSuccessMsg.classList.add('hidden');
-        if (tryAgainBox) tryAgainBox.classList.add('hidden');
+        if (recordInputRow) {
+          recordInputRow.style.display = 'block';
+          recordInputRow.classList.remove('hidden');
+        }
+        if (recordSuccessMsg) {
+          recordSuccessMsg.style.display = 'none';
+          recordSuccessMsg.classList.add('hidden');
+        }
+        if (tryAgainBox) {
+          tryAgainBox.style.display = 'none';
+          tryAgainBox.classList.add('hidden');
+        }
         if (recordNameInput) {
           recordNameInput.value = '';
           setTimeout(() => recordNameInput.focus(), 50);
         }
       } else {
-        // [1등 미달 시]: 1등 메시지 및 입력란 일체 숨김, 오직 다시도전 메시지만 단독 표시!
+        // [1등 미달 시]: 1등 메시지 및 입력란 일체 제거 및 숨김! 오직 다시도전 메시지만 단독 표시!
+        newRecordBox.style.display = 'none';
         newRecordBox.classList.add('hidden');
-        if (tryAgainBox) tryAgainBox.classList.remove('hidden');
+        if (tryAgainBox) {
+          tryAgainBox.style.display = 'block';
+          tryAgainBox.classList.remove('hidden');
+        }
       }
 
       gameOverOverlay.classList.remove('hidden');
@@ -828,18 +866,32 @@
       // 완주 시에도 최고 점수를 넘었을 때만 1등 등록창 노출
       const isNewRecord = finalScoreVal > 0 && (!bestRecord || finalScoreVal > bestRecord.score);
       if (isNewRecord) {
+        successRecordBox.style.display = 'block';
         successRecordBox.classList.remove('hidden');
-        if (successRecordInputRow) successRecordInputRow.classList.remove('hidden');
-        if (successRecordSuccessMsg) successRecordSuccessMsg.classList.add('hidden');
-        if (successTryAgainBox) successTryAgainBox.classList.add('hidden');
+        if (successRecordInputRow) {
+          successRecordInputRow.style.display = 'block';
+          successRecordInputRow.classList.remove('hidden');
+        }
+        if (successRecordSuccessMsg) {
+          successRecordSuccessMsg.style.display = 'none';
+          successRecordSuccessMsg.classList.add('hidden');
+        }
+        if (successTryAgainBox) {
+          successTryAgainBox.style.display = 'none';
+          successTryAgainBox.classList.add('hidden');
+        }
         if (successNameInput) {
           successNameInput.value = '';
           setTimeout(() => successNameInput.focus(), 50);
         }
       } else {
         // 완주했으나 1등 미달 시: 입력창 숨기고 다시도전 박스만 표시
+        successRecordBox.style.display = 'none';
         successRecordBox.classList.add('hidden');
-        if (successTryAgainBox) successTryAgainBox.classList.remove('hidden');
+        if (successTryAgainBox) {
+          successTryAgainBox.style.display = 'block';
+          successTryAgainBox.classList.remove('hidden');
+        }
       }
 
       successOverlay.classList.remove('hidden');
@@ -853,9 +905,13 @@
       updateAllRecordDisplays(bestRecord);
       
       // 입력창 숨기고 성공 멘트만 단독 표시
-      if (recordInputRow) recordInputRow.classList.add('hidden');
+      if (recordInputRow) {
+        recordInputRow.style.display = 'none';
+        recordInputRow.classList.add('hidden');
+      }
       if (recordSuccessMsg) {
         recordSuccessMsg.textContent = `✓ 1위로 등록되었습니다! (${bestRecord.name} - ${bestRecord.score.toLocaleString()} PTS)`;
+        recordSuccessMsg.style.display = 'block';
         recordSuccessMsg.classList.remove('hidden');
       }
     });
@@ -867,9 +923,13 @@
       updateAllRecordDisplays(bestRecord);
 
       // 입력창 숨기고 성공 멘트만 단독 표시
-      if (successRecordInputRow) successRecordInputRow.classList.add('hidden');
+      if (successRecordInputRow) {
+        successRecordInputRow.style.display = 'none';
+        successRecordInputRow.classList.add('hidden');
+      }
       if (successRecordSuccessMsg) {
         successRecordSuccessMsg.textContent = `✓ 1위로 등록되었습니다! (${bestRecord.name} - ${bestRecord.score.toLocaleString()} PTS)`;
+        successRecordSuccessMsg.style.display = 'block';
         successRecordSuccessMsg.classList.remove('hidden');
       }
     });
