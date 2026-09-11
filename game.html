@@ -73,6 +73,8 @@
       height: auto;
       aspect-ratio: 800 / 400;
       background: #110d0a;
+      touch-action: none;
+      -webkit-touch-callout: none;
     }
 
     /* HUD 컨트롤 바 */
@@ -216,6 +218,65 @@
       color: #ba9578;
       border: 1px solid #ba9578;
     }
+
+    /* 모바일 반응형 최적화 (스마트폰에서 오버레이 잘림 및 실행 불가 완벽 해결) */
+    @media (max-width: 640px) {
+      .container-box {
+        padding: 8px 10px;
+      }
+      .hud-bar {
+        padding: 8px 10px;
+        font-size: 11px;
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+      .hud-stat {
+        gap: 3px;
+      }
+      .btn {
+        padding: 4px 8px;
+        font-size: 11px;
+      }
+      /* 모바일에서는 오버레이가 160px 캔버스 래퍼에 갇히지 않고 전체 화면에 모달로 쾌적하게 팝업 */
+      .overlay {
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 9999 !important;
+        padding: 16px !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        justify-content: center !important;
+      }
+      .overlay-card {
+        padding: 20px 16px !important;
+        max-width: 100% !important;
+        margin: auto 0 !important;
+      }
+      .start-header-box {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+      }
+      .start-header-box button {
+        width: 100% !important;
+        padding: 11px !important;
+        font-size: 13px !important;
+      }
+      .desc-line {
+        white-space: normal !important;
+        align-items: flex-start !important;
+      }
+      .desc-line span:last-child {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+      }
+      .controls-guide {
+        margin-top: 10px;
+        padding: 10px 12px;
+        font-size: 11px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -268,8 +329,8 @@
       <!-- 시작 화면 오버레이 -->
       <div id="startOverlay" class="overlay">
         <div class="overlay-card text-left" style="max-width: 620px; padding: 28px 26px;">
-          <!-- 상단 헤더: 타이틀(좌) + 바로 시작 버튼(우) -->
-          <div class="flex items-center justify-between border-b border-zinc-800 pb-3.5 mb-4 gap-3">
+          <!-- 상단 헤더: 타이틀(좌) + 바로 시작 버튼(우 / 모바일 풀너비) -->
+          <div class="start-header-box flex items-center justify-between border-b border-zinc-800 pb-3.5 mb-4 gap-3">
             <div class="text-left">
               <div class="text-[11px] font-mono font-bold text-[#ba9578] uppercase tracking-wider mb-1">WESTERN RUNNER</div>
               <h1 class="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight flex items-center gap-2">
@@ -277,9 +338,9 @@
                 <span class="text-xs font-normal text-zinc-400 font-sans">총잡이 러너</span>
               </h1>
             </div>
-            <!-- 바로 시작 버튼 (우측 상단) -->
-            <button id="startBtn" class="btn btn-primary px-4 py-2.5 text-xs sm:text-sm font-bold shadow-lg shrink-0" type="button">
-              <span>⚡ 게임 시작 (Space)</span>
+            <!-- 바로 시작 버튼 (PC 우측 상단 / 모바일 상단 풀너비) -->
+            <button id="startBtn" class="btn btn-primary px-4 py-2.5 text-xs sm:text-sm font-bold shadow-lg shrink-0 justify-center" type="button">
+              <span>⚡ 게임 시작 (Space / 터치)</span>
             </button>
           </div>
 
@@ -289,24 +350,24 @@
             <span class="text-[#ba9578] font-bold" id="startBestRecord">등록된 1위 기록 없음 (-)</span>
           </div>
 
-          <!-- 넉넉한 줄간격, 글머리 기호 단일화, 한 줄 깔끔 표시 게임 설명 -->
-          <div class="bg-[#141418] p-5 rounded-xl border border-zinc-800/90 text-left">
-            <div class="space-y-4 text-xs text-zinc-300" style="line-height: 2.1;">
-              <div class="flex items-center gap-2.5 whitespace-nowrap overflow-hidden">
-                <span class="text-[#ba9578] text-sm shrink-0 leading-none">▪</span>
-                <span class="truncate"><strong class="text-white font-bold">Space</strong> 키 또는 <strong class="text-white font-bold">화면 터치</strong>로 점프하며, 공중에서 한 번 더 누르면 <strong class="text-[#ba9578] font-bold">2단 점프</strong>를 합니다.</span>
+          <!-- 넉넉한 줄간격, 글머리 기호 단일화, PC 한 줄 깔끔 / 모바일 자동 줄바꿈 지원 -->
+          <div class="bg-[#141418] p-4 sm:p-5 rounded-xl border border-zinc-800/90 text-left">
+            <div class="space-y-3.5 sm:space-y-4 text-xs text-zinc-300" style="line-height: 2.1;">
+              <div class="desc-line flex items-start sm:items-center gap-2.5 sm:whitespace-nowrap overflow-hidden">
+                <span class="text-[#ba9578] text-sm shrink-0 leading-none mt-0.5 sm:mt-0">▪</span>
+                <span class="truncate leading-relaxed sm:leading-normal"><strong class="text-white font-bold">Space</strong> 키 또는 <strong class="text-white font-bold">화면 터치</strong>로 점프하며, 공중에서 한 번 더 누르면 <strong class="text-[#ba9578] font-bold">2단 점프</strong>를 합니다.</span>
               </div>
-              <div class="flex items-center gap-2.5 whitespace-nowrap overflow-hidden">
-                <span class="text-[#ba9578] text-sm shrink-0 leading-none">▪</span>
-                <span class="truncate"><strong class="text-amber-400 font-bold">거대 선인장</strong>은 1단 점프로 넘을 수 없으므로 반드시 <strong class="text-[#ba9578] font-bold">2단 점프</strong>로 넘어야 합니다.</span>
+              <div class="desc-line flex items-start sm:items-center gap-2.5 sm:whitespace-nowrap overflow-hidden">
+                <span class="text-[#ba9578] text-sm shrink-0 leading-none mt-0.5 sm:mt-0">▪</span>
+                <span class="truncate leading-relaxed sm:leading-normal"><strong class="text-amber-400 font-bold">거대 선인장</strong>은 1단 점프로 넘을 수 없으므로 반드시 <strong class="text-[#ba9578] font-bold">2단 점프</strong>로 넘어야 합니다.</span>
               </div>
-              <div class="flex items-center gap-2.5 whitespace-nowrap overflow-hidden">
-                <span class="text-[#ba9578] text-sm shrink-0 leading-none">▪</span>
-                <span class="truncate">30초 동안 시간이 흐를수록 속도가 <strong class="text-white font-bold">최대 3배</strong>까지 점차 빨라집니다.</span>
+              <div class="desc-line flex items-start sm:items-center gap-2.5 sm:whitespace-nowrap overflow-hidden">
+                <span class="text-[#ba9578] text-sm shrink-0 leading-none mt-0.5 sm:mt-0">▪</span>
+                <span class="truncate leading-relaxed sm:leading-normal">30초 동안 시간이 흐를수록 속도가 <strong class="text-white font-bold">최대 3배</strong>까지 점차 빨라집니다.</span>
               </div>
-              <div class="flex items-center gap-2.5 whitespace-nowrap overflow-hidden">
-                <span class="text-[#ba9578] text-sm shrink-0 leading-none">▪</span>
-                <span class="truncate">점프 및 장애물 회피로 <strong class="text-white font-bold">추가 점수</strong>를 획득하여 최고 점수를 기록해 보세요.</span>
+              <div class="desc-line flex items-start sm:items-center gap-2.5 sm:whitespace-nowrap overflow-hidden">
+                <span class="text-[#ba9578] text-sm shrink-0 leading-none mt-0.5 sm:mt-0">▪</span>
+                <span class="truncate leading-relaxed sm:leading-normal">점프 및 장애물 회피로 <strong class="text-white font-bold">추가 점수</strong>를 획득하여 최고 점수를 기록해 보세요.</span>
               </div>
             </div>
           </div>
@@ -1309,15 +1370,31 @@
       }
     });
 
-    canvas.addEventListener('pointerdown', (e) => {
-      e.preventDefault();
-      jump();
-    });
+    // 포인터 및 터치 점프 처리 (모바일 터치 완벽 지원)
+    function handlePointerJump(e) {
+      // 폼 컨트롤(버튼, 인풋, 링크 등) 터치 시 점프 이벤트 방지
+      if (e.target && (e.target.closest('button') || e.target.closest('input') || e.target.closest('a'))) {
+        return;
+      }
+      if (gameState === 'IDLE') {
+        initAudio();
+        resetGame();
+        return;
+      }
+      if (gameState === 'PLAYING') {
+        if (e.cancelable) e.preventDefault();
+        jump();
+      }
+    }
 
-    startBtn.addEventListener('click', () => {
+    canvas.addEventListener('pointerdown', handlePointerJump);
+    gameWrapper.addEventListener('pointerdown', handlePointerJump);
+
+    function handleStart() {
       initAudio();
       resetGame();
-    });
+    }
+    startBtn.addEventListener('click', handleStart);
     restartBtn.addEventListener('click', resetGame);
     successRestartBtn.addEventListener('click', resetGame);
     pauseBtn.addEventListener('click', togglePause);
