@@ -3,7 +3,7 @@
 작성자: 신재원
 게임 타이틀: WESTERN RUNNER (서부의 총잡이 러너 게임)
 실행 경로: https://skt-aleph-gilt.vercel.app/game.html (메인 페이지 하단 버튼 연결)
-저장소: https://github.com/User-shin0328/skt-aleph
+저장소: https://github.com/User-shin0328/skt-aleph2 (또는 https://github.com/User-shin0328/skt-aleph)
 ================================================================================
 
 --------------------------------------------------------------------------------
