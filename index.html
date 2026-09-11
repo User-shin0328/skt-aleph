@@ -143,46 +143,24 @@
   </header>
 
   <!-- 본문 컨테이너 -->
-  <main id="main-content" class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 space-y-12">
+  <main id="main-content" class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 space-y-10">
 
-    <!-- 1. 프로필 요약 (첫 화면 해상도 최적화 영역) -->
-    <section class="rounded-xl bg-[#141418] border border-zinc-800 p-6 sm:p-7 shadow-sm">
-      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div class="space-y-3 max-w-2xl">
-          <div class="inline-flex items-center gap-2 text-xs font-mono font-medium text-[#ba9578] uppercase tracking-wider">
-            <span>Security & Network Engineering</span>
-            <span class="text-zinc-600">/</span>
-            <span>Profile Archive</span>
-          </div>
-          
-          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-[#ba9578]">
-            신재원 — 기술 역량 및 시스템 포트폴리오
-          </h1>
-          
-          <p class="text-white text-sm sm:text-base leading-relaxed font-medium">
-            체계적인 계획과 정리, 문제의 밑바닥까지 파고드는 집요한 탐구력, 그리고 팀원의 성장을 돕는 공감으로 견고한 IT 보안 및 네트워크 환경을 구축합니다.
-          </p>
-          
-          <p class="text-[#a1a1aa] text-xs sm:text-sm leading-relaxed">
-            전공 진입 초기부터 산업 수요를 분석하여 공인 자격을 단계별로 취득하였고, 자동화 도구 개발 과정에서 겪은 네트워크 인터페이스 오류를 집요하게 추적해 해결하며 실무 역량을 다져왔습니다.
-          </p>
+    <!-- 1. 프로필 소개 (깔끔하고 정돈된 히어로) -->
+    <section class="rounded-xl bg-[#141418] border border-zinc-800 p-6 sm:p-8 shadow-sm">
+      <div class="space-y-3 max-w-3xl">
+        <div class="inline-flex items-center gap-2 text-xs font-mono font-medium text-[#ba9578] uppercase tracking-wider">
+          <span>Security & Network Engineering</span>
+          <span class="text-zinc-600">/</span>
+          <span>Profile Archive</span>
         </div>
-
-        <!-- 핵심 역량 요약 위젯 -->
-        <div class="grid grid-cols-3 gap-2 min-w-[280px] bg-[#09090b] border border-zinc-800 p-3 rounded-lg text-center font-mono">
-          <div class="border-r border-zinc-800 pr-2">
-            <div class="text-[10px] text-[#a1a1aa]">계획 & 정리</div>
-            <div class="text-xs font-bold text-[#ba9578] mt-1">자격 3종 취득</div>
-          </div>
-          <div class="border-r border-zinc-800 pr-2">
-            <div class="text-[10px] text-[#a1a1aa]">파고들기</div>
-            <div class="text-xs font-bold text-[#ba9578] mt-1">IDS 오류해결</div>
-          </div>
-          <div>
-            <div class="text-[10px] text-[#a1a1aa]">협업 시너지</div>
-            <div class="text-xs font-bold text-white mt-1">공감·피드백</div>
-          </div>
-        </div>
+        
+        <p class="text-white text-base sm:text-lg leading-relaxed font-semibold">
+          체계적인 계획과 정리, 문제의 밑바닥까지 파고드는 집요한 탐구력, 그리고 팀원의 성장을 돕는 공감으로 견고한 IT 보안 및 네트워크 환경을 구축합니다.
+        </p>
+        
+        <p class="text-[#a1a1aa] text-xs sm:text-sm leading-relaxed">
+          전공 진입 초기부터 산업 수요를 분석하여 공인 기술 자격을 단계별로 취득하였고, 자동화 도구 개발 과정에서 겪은 네트워크 인터페이스 오류를 집요하게 추적해 해결하며 실무 엔지니어링 역량을 다져왔습니다.
+        </p>
       </div>
     </section>
 
@@ -378,122 +356,7 @@
       </div>
     </section>
 
-    <!-- 4. 해상도 및 화면 최적화 검증 -->
-    <section class="rounded-xl bg-[#141418] border border-zinc-800 p-6 sm:p-7 space-y-6">
-      <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
-        <h2 class="text-lg sm:text-xl font-bold text-[#ba9578] flex items-center gap-2">
-          <span>다양한 해상도 최적화 검증</span>
-        </h2>
-        <span class="text-xs font-mono text-[#a1a1aa]">Viewport & Responsiveness</span>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- 1366x768 검사 -->
-        <div class="bg-[#09090b] border border-zinc-800 rounded-lg p-4 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-mono font-bold text-white">노트북 표준 해상도 (1366 × 768)</span>
-            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-[#141418] text-[#ba9578] border border-zinc-700">검증 완료</span>
-          </div>
-          <p class="text-xs text-zinc-300 leading-relaxed">
-            상단 헤더(64px) 및 첫 화면(Above-the-fold) 내에 <strong class="text-white">소개 요약, 3대 역량, 근거 확인 버튼</strong>이 스크롤 없이 동시에 시야에 들어오도록 컴팩트 레이아웃을 완성했습니다.
-          </p>
-          <div class="text-[11px] font-mono text-[#a1a1aa]">가로 넘침(Overflow-X): <span class="text-white font-bold">0건 (가로 스크롤 없음)</span></div>
-        </div>
-
-        <!-- 1920x1080 검사 -->
-        <div class="bg-[#09090b] border border-zinc-800 rounded-lg p-4 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-mono font-bold text-white">FHD 데스크톱 해상도 (1920 × 1080)</span>
-            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-[#141418] text-[#ba9578] border border-zinc-700">검증 완료</span>
-          </div>
-          <p class="text-xs text-zinc-300 leading-relaxed">
-            최대 폭 <code class="font-mono text-[#ba9578]">max-w-5xl (1024px)</code> 중앙 정렬 컨테이너를 적용하여 대형 모니터에서도 과도한 여백이나 시선 분산 없이 정돈된 구조를 유지합니다.
-          </p>
-          <div class="text-[11px] font-mono text-[#a1a1aa]">가로 넘침(Overflow-X): <span class="text-white font-bold">0건 (안정적 렌더링)</span></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5. 웹 접근성 및 품질 개선 기록 -->
-    <section class="rounded-xl bg-[#141418] border border-zinc-800 p-6 sm:p-7 space-y-6">
-      <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
-        <h2 class="text-lg sm:text-xl font-bold text-[#ba9578] flex items-center gap-2">
-          <span>웹 표준 및 품질 개선 기록</span>
-        </h2>
-        <span class="text-xs font-mono text-[#a1a1aa]">Accessibility & Quality Notes</span>
-      </div>
-
-      <p class="text-xs sm:text-sm text-zinc-300">
-        배포 전 단계에서 철저한 웹 접근성(WCAG AA)과 브라우저 콘솔 점검을 거쳐 개선한 3가지 핵심 내역입니다.
-      </p>
-
-      <!-- 품질 개선 비교표 -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-xs">
-          <thead>
-            <tr class="border-b border-zinc-700 bg-[#09090b] text-[#ba9578] font-mono">
-              <th class="p-3 w-1/4">점검 항목</th>
-              <th class="p-3 w-3/8 text-zinc-400">개선 전 상태 (Before)</th>
-              <th class="p-3 w-3/8 text-white">개선 후 상태 (After)</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-zinc-800 text-zinc-300">
-            <!-- 1. 명암비 -->
-            <tr class="hover:bg-zinc-900/40">
-              <td class="p-3 font-semibold text-white">
-                <div class="text-[#ba9578]">1. 텍스트 명암 대비율</div>
-                <div class="text-[11px] font-mono text-[#a1a1aa]">WCAG AA 기준 준수</div>
-              </td>
-              <td class="p-3 text-zinc-400 leading-relaxed">
-                배경 대비 본문 텍스트 색상이 옅은 회색(<code class="font-mono text-zinc-400">#52525b</code>)으로 명암비가 3.1:1 수준에 불과하여 가독성이 저하됨.
-              </td>
-              <td class="p-3 text-zinc-200 leading-relaxed">
-                선명한 화이트(<code class="font-mono text-[#ba9578]">#f4f4f5</code>) 및 고대비 그레이(<code class="font-mono text-[#ba9578]">#d4d4d8</code>)를 전면 적용하여 <strong class="text-white font-bold">9.2:1</strong>의 높은 명암비를 확보.
-              </td>
-            </tr>
-
-            <!-- 2. 제목 단계 구조 -->
-            <tr class="hover:bg-zinc-900/40">
-              <td class="p-3 font-semibold text-white">
-                <div class="text-[#ba9578]">2. 시맨틱 제목 단계 구조</div>
-                <div class="text-[11px] font-mono text-[#a1a1aa]">Heading Hierarchy</div>
-              </td>
-              <td class="p-3 text-zinc-400 leading-relaxed">
-                메인 타이틀 직후에 카드 소제목이 <code class="font-mono text-zinc-400">&lt;h4&gt;</code>로 건너뛰어 스크린 리더 탐색 위계가 단절되는 결함 발생.
-              </td>
-              <td class="p-3 text-zinc-200 leading-relaxed">
-                최상단 <code class="font-mono text-[#ba9578]">&lt;h1&gt;</code> → 섹션 제목 <code class="font-mono text-[#ba9578]">&lt;h2&gt;</code> → 세부 역량 <code class="font-mono text-[#ba9578]">&lt;h3&gt;</code>으로 <strong class="text-white font-bold">순차적인 계층 구조</strong>를 엄격히 재구성.
-              </td>
-            </tr>
-
-            <!-- 3. 키보드 Tab 및 포커스 링 -->
-            <tr class="hover:bg-zinc-900/40">
-              <td class="p-3 font-semibold text-white">
-                <div class="text-[#ba9578]">3. 키보드 Tab 초점 시각화</div>
-                <div class="text-[11px] font-mono text-[#a1a1aa]">Keyboard Navigation</div>
-              </td>
-              <td class="p-3 text-zinc-400 leading-relaxed">
-                기본 외곽선이 제거되어 Tab 키로 탐색 시 현재 어떤 버튼이나 링크에 초점이 있는지 식별할 수 없음.
-              </td>
-              <td class="p-3 text-zinc-200 leading-relaxed">
-                모든 대화형 요소에 <code class="font-mono text-[#ba9578]">focus-visible:outline-brown-400</code> 링과 <strong class="text-white font-bold">본문 건너뛰기 링크</strong>를 신설하여 키보드만으로 완벽 탐색 가능.
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- 콘솔 오류 점검 결과 -->
-      <div class="bg-[#09090b] border border-zinc-800 p-3.5 rounded-lg flex items-center justify-between text-xs font-mono">
-        <span class="text-zinc-300 flex items-center gap-2">
-          <i data-lucide="terminal" class="w-4 h-4 text-[#ba9578]"></i>
-          <span>브라우저 콘솔 오류 상태:</span>
-        </span>
-        <span class="text-white font-bold bg-[#141418] px-2 py-0.5 rounded border border-zinc-700">0건 (무결점 상태 확인)</span>
-      </div>
-    </section>
-
-    <!-- 6. 실시간 피드백 컴포넌트 -->
+    <!-- 4. 실시간 피드백 컴포넌트 -->
     <section class="rounded-xl bg-[#141418] border border-zinc-800 p-6 sm:p-7 space-y-6">
       <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
         <h2 class="text-lg sm:text-xl font-bold text-[#ba9578] flex items-center gap-2">
