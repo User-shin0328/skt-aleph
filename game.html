@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>WESTERN RUNNER — 서부의 총잡이 러너 게임 (과제 2)</title>
+  <title>WESTERN RUNNER — 서부의 총잡이 러너 (과제 2)</title>
   
   <!-- Pretendard & JetBrains Mono Fonts -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
@@ -41,7 +41,7 @@
     }
 
     /* Tab 포커스 링 */
-    a:focus-visible, button:focus-visible {
+    a:focus-visible, button:focus-visible, input:focus-visible {
       outline: 2px solid var(--brown-main) !important;
       outline-offset: 2px !important;
     }
@@ -135,7 +135,7 @@
     .overlay {
       position: absolute;
       inset: 0;
-      background: rgba(9, 9, 11, 0.85);
+      background: rgba(9, 9, 11, 0.88);
       backdrop-filter: blur(4px);
       display: flex;
       flex-direction: column;
@@ -155,7 +155,7 @@
       border: 2px solid var(--brown-main);
       border-radius: 12px;
       padding: 24px 32px;
-      max-width: 440px;
+      max-width: 460px;
       width: 100%;
       box-shadow: 0 20px 40px rgba(0,0,0,0.9);
     }
@@ -197,6 +197,21 @@
       border-radius: 4px;
       color: var(--brown-main);
     }
+
+    /* 뱃지 */
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+    .badge-gold {
+      background: #34251a;
+      color: #ba9578;
+      border: 1px solid #ba9578;
+    }
   </style>
 </head>
 <body>
@@ -205,7 +220,7 @@
     
     <!-- 상단 네비 및 HUD 바 -->
     <div class="hud-bar">
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-4 flex-wrap">
         <a href="/" class="btn" title="메인 포트폴리오로 돌아가기">
           <span>&larr; 포트폴리오</span>
         </a>
@@ -217,9 +232,9 @@
           <span class="text-zinc-500">점수:</span>
           <span id="scoreVal" class="hud-val">0</span>
         </div>
-        <div class="hud-stat">
-          <span class="text-zinc-500">최고:</span>
-          <span id="highScoreVal" class="hud-val">0</span>
+        <div class="hud-stat" title="역대 최장 생존 기록">
+          <span class="text-zinc-500">🏆최장생존:</span>
+          <span id="bestSurvivalVal" class="hud-val">30.0s</span>
         </div>
       </div>
 
@@ -245,12 +260,22 @@
       <!-- 시작 화면 오버레이 -->
       <div id="startOverlay" class="overlay">
         <div class="overlay-card space-y-4">
-          <div class="text-xs font-mono text-[#ba9578] uppercase tracking-widest">[ 과제 2 : 서부 총잡이 러너 ]</div>
+          <div class="text-xs font-mono text-[#ba9578] uppercase tracking-widest">[ 서부의 총잡이 러너 : 과제 2 ]</div>
           <h1 class="text-xl sm:text-2xl font-bold text-white font-mono">WESTERN RUNNER</h1>
           <p class="text-xs text-[#a1a1aa] leading-relaxed">
-            황야의 총잡이가 되어 30초 동안 굴러오는 회전초와 날카로운 선인장을 피해 달리세요!<br>
-            30초 동안 생존하여 보안관 배지를 획득하면 완주 성공입니다.
+            30초 동안 굴러오는 회전초와 날카로운 선인장을 피해 달리세요!<br>
+            <strong class="text-white font-semibold">★ 공중에서 한 번 더 눌러 '2단 점프' 가능!</strong><br>
+            거대한 <span class="text-[#ba9578] font-bold">2단 복합 장애물</span>은 2단 점프로만 뛰어넘을 수 있습니다.
           </p>
+
+          <!-- 역대 최장 기록 명예의 전당 배너 -->
+          <div class="bg-[#09090b] p-3 rounded-lg border border-zinc-800 text-xs font-mono flex items-center justify-between">
+            <span class="text-zinc-400 flex items-center gap-1.5">
+              <span>🏆</span> <span>역대 최장 생존자:</span>
+            </span>
+            <span class="text-[#ba9578] font-bold" id="startBestRecord">30.0s (보안관 신재원)</span>
+          </div>
+
           <div class="pt-2">
             <button id="startBtn" class="btn btn-primary w-full py-2.5 text-sm justify-center" type="button">
               <span>게임 시작 (Space)</span>
@@ -261,20 +286,44 @@
 
       <!-- 게임 오버 오버레이 -->
       <div id="gameOverOverlay" class="overlay hidden">
-        <div class="overlay-card space-y-3">
+        <div class="overlay-card space-y-3.5">
           <div class="text-xs font-mono text-zinc-500 uppercase tracking-widest">[ 현상수배 : 충돌 발생 ]</div>
           <h2 class="text-2xl font-bold text-white font-mono text-[#ba9578]">GAME OVER</h2>
           <p class="text-xs text-zinc-300" id="gameOverMsg">장애물에 걸려 쓰러졌습니다.</p>
-          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 font-mono text-xs space-y-1">
+
+          <!-- 내 기록 박스 -->
+          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 font-mono text-xs space-y-1.5">
             <div class="flex justify-between">
-              <span class="text-zinc-500">생존 시간:</span>
-              <span class="text-white" id="finalTime">0s</span>
+              <span class="text-zinc-400">이번 생존 시간:</span>
+              <span class="text-white font-bold" id="finalTime">0s</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-zinc-500">획득 점수:</span>
-              <span class="text-[#ba9578] font-bold" id="finalScore">0</span>
+              <span class="text-zinc-400">이번 획득 점수:</span>
+              <span class="text-[#ba9578] font-bold" id="finalScore">0 PTS</span>
             </div>
           </div>
+
+          <!-- 가장 오래 버틴 사람 기록 (사용자 요청 핵심!) -->
+          <div class="bg-[#1e1712] border border-[#ba9578]/50 p-3 rounded-lg font-mono text-xs space-y-1">
+            <div class="flex items-center justify-between text-[#ba9578] font-bold">
+              <span>👑 가장 오래 버틴 사람 기록</span>
+              <span class="badge badge-gold" id="recordBadge">TOP SURVIVOR</span>
+            </div>
+            <div class="flex justify-between text-zinc-300 pt-1 border-t border-zinc-800 text-[11px]">
+              <span id="bestRecordHolderName">보안관 신재원</span>
+              <span class="text-white font-bold" id="bestRecordTime">30.0s</span>
+            </div>
+          </div>
+
+          <!-- 신기록 달성 시 닉네임 입력창 -->
+          <div id="newRecordBox" class="hidden bg-[#09090b] p-2.5 rounded border border-[#ba9578] text-xs font-mono space-y-1.5">
+            <div class="text-[#ba9578] font-bold">🎉 새로운 최장 생존 기록 달성!</div>
+            <div class="flex gap-2">
+              <input type="text" id="recordNameInput" placeholder="닉네임 입력" maxlength="10" class="flex-1 px-2 py-1 bg-[#141418] text-white text-xs border border-zinc-700 rounded focus:border-[#ba9578] focus:outline-none">
+              <button type="button" id="saveRecordBtn" class="btn btn-primary px-3 py-1 text-xs">저장</button>
+            </div>
+          </div>
+
           <button id="restartBtn" class="btn btn-primary w-full py-2 text-sm justify-center mt-2" type="button">
             <span>다시 도전 (R)</span>
           </button>
@@ -283,16 +332,43 @@
 
       <!-- 완주 성공 오버레이 -->
       <div id="successOverlay" class="overlay hidden">
-        <div class="overlay-card space-y-3">
+        <div class="overlay-card space-y-3.5">
           <div class="text-xs font-mono text-[#ba9578] uppercase tracking-widest">★ MISSION COMPLETE ★</div>
           <h2 class="text-2xl font-bold text-white font-mono text-[#ba9578]">30초 완주 성공!</h2>
-          <p class="text-xs text-zinc-300">황야를 가로질러 무사히 마을에 도착하여 보안관 배지를 수여받았습니다!</p>
-          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 font-mono text-xs space-y-1">
+          <p class="text-xs text-zinc-300">황야의 2단 장애물을 모두 뛰어넘고 마을에 무사히 도착했습니다!</p>
+
+          <div class="bg-[#09090b] p-3 rounded border border-zinc-800 font-mono text-xs space-y-1.5">
             <div class="flex justify-between">
-              <span class="text-zinc-500">완주 보너스 점수:</span>
-              <span class="text-[#ba9578] font-bold">+300 PTS</span>
+              <span class="text-zinc-400">생존 시간:</span>
+              <span class="text-white font-bold">30.0s (MAX)</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-zinc-400">최종 점수:</span>
+              <span class="text-[#ba9578] font-bold" id="successScore">600 PTS</span>
             </div>
           </div>
+
+          <!-- 가장 오래 버틴 사람 기록 -->
+          <div class="bg-[#1e1712] border border-[#ba9578]/50 p-3 rounded-lg font-mono text-xs space-y-1">
+            <div class="flex items-center justify-between text-[#ba9578] font-bold">
+              <span>👑 가장 오래 버틴 사람 기록</span>
+              <span class="badge badge-gold">SHERIFF</span>
+            </div>
+            <div class="flex justify-between text-zinc-300 pt-1 border-t border-zinc-800 text-[11px]">
+              <span id="successRecordHolderName">보안관 신재원</span>
+              <span class="text-white font-bold" id="successRecordTime">30.0s</span>
+            </div>
+          </div>
+
+          <!-- 완주자 이름 기록 -->
+          <div id="successRecordBox" class="bg-[#09090b] p-2.5 rounded border border-[#ba9578] text-xs font-mono space-y-1.5">
+            <div class="text-[#ba9578] font-bold">명예의 전당에 완주자 닉네임 등록</div>
+            <div class="flex gap-2">
+              <input type="text" id="successNameInput" placeholder="보안관 닉네임" maxlength="10" class="flex-1 px-2 py-1 bg-[#141418] text-white text-xs border border-zinc-700 rounded focus:border-[#ba9578] focus:outline-none">
+              <button type="button" id="saveSuccessRecordBtn" class="btn btn-primary px-3 py-1 text-xs">등록</button>
+            </div>
+          </div>
+
           <button id="successRestartBtn" class="btn btn-primary w-full py-2 text-sm justify-center mt-2" type="button">
             <span>새 게임 시작 (R)</span>
           </button>
@@ -304,14 +380,14 @@
     <!-- 하단 조작 가이드 -->
     <div class="controls-guide">
       <div class="flex items-center gap-4 flex-wrap">
-        <span><kbd>Space</kbd> 또는 <kbd>&uarr;</kbd> 점프</span>
+        <span><kbd>Space</kbd> / <kbd>&uarr;</kbd> 점프 (공중 1회 추가 입력 시 <strong>2단 점프</strong>)</span>
         <span><kbd>P</kbd> 일시정지</span>
         <span><kbd>R</kbd> 재시작</span>
         <span class="text-zinc-500">|</span>
-        <span class="text-zinc-400">모바일: 화면 터치로 점프</span>
+        <span class="text-zinc-400">모바일: 화면 터치 (연속 2회 탭 시 2단 점프)</span>
       </div>
-      <div class="text-zinc-500 font-mono text-[11px]">
-        30초 루프 · Web Audio 효과 · 무손실 복구
+      <div class="text-[#ba9578] font-mono text-[11px] font-semibold">
+        ★ 거대 2단 선인장은 반드시 2단 점프로 회피!
       </div>
     </div>
 
@@ -345,38 +421,47 @@
         osc.connect(gain);
         gain.connect(audioCtx.destination);
 
-        if (type === 'jump') {
-          // 점프 슉 소리 (주파수 상승)
+        if (type === 'jump1') {
+          // 1단 점프 슉 소리
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(150, now);
-          osc.frequency.exponentialRampToValueAtTime(450, now + 0.15);
+          osc.frequency.setValueAtTime(160, now);
+          osc.frequency.exponentialRampToValueAtTime(420, now + 0.14);
           gain.gain.setValueAtTime(0.2, now);
-          gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.14);
           osc.start(now);
-          osc.stop(now + 0.15);
+          osc.stop(now + 0.14);
+        } else if (type === 'jump2') {
+          // 2단 점프 슉슉 더 높은 청량한 도약음
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(350, now);
+          osc.frequency.exponentialRampToValueAtTime(750, now + 0.16);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.16);
+          osc.start(now);
+          osc.stop(now + 0.16);
         } else if (type === 'hit') {
-          // 충돌 쾅 소리 (낮은 둔탁한 소리)
+          // 충돌 쾅 소리
           osc.type = 'sawtooth';
           osc.frequency.setValueAtTime(120, now);
-          osc.frequency.linearRampToValueAtTime(40, now + 0.25);
+          osc.frequency.linearRampToValueAtTime(35, now + 0.25);
           gain.gain.setValueAtTime(0.35, now);
           gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
           osc.start(now);
           osc.stop(now + 0.25);
         } else if (type === 'win') {
           // 30초 완주 팡파르
-          const notes = [261.63, 329.63, 392.00, 523.25];
+          const notes = [261.63, 329.63, 392.00, 523.25, 659.25];
           notes.forEach((freq, idx) => {
             const nOsc = audioCtx.createOscillator();
             const nGain = audioCtx.createGain();
             nOsc.connect(nGain);
             nGain.connect(audioCtx.destination);
             nOsc.type = 'sine';
-            nOsc.frequency.setValueAtTime(freq, now + idx * 0.12);
-            nGain.gain.setValueAtTime(0.2, now + idx * 0.12);
-            nGain.gain.linearRampToValueAtTime(0.01, now + (idx + 1) * 0.12);
-            nOsc.start(now + idx * 0.12);
-            nOsc.stop(now + (idx + 1) * 0.12);
+            nOsc.frequency.setValueAtTime(freq, now + idx * 0.1);
+            nGain.gain.setValueAtTime(0.2, now + idx * 0.1);
+            nGain.gain.linearRampToValueAtTime(0.01, now + (idx + 1) * 0.1);
+            nOsc.start(now + idx * 0.1);
+            nOsc.stop(now + (idx + 1) * 0.1);
           });
         }
       } catch (e) {
@@ -385,37 +470,52 @@
     }
 
     // ==========================================
-    // 2. 스토리지 저장 및 손상 복구 (카드 4)
+    // 2. 가장 오래 버틴 사람 기록 저장 & 손상 복구 (카드 4)
     // ==========================================
-    const STORAGE_KEY = 'western_runner_highscore';
+    const SURVIVOR_RECORD_KEY = 'western_runner_best_survivor_v2';
 
-    function getSafeHighScore() {
+    // 기본 초기 명예 기록
+    const DEFAULT_RECORD = {
+      time: 30.0,
+      name: '보안관 신재원',
+      score: 600
+    };
+
+    function getBestSurvivorRecord() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw === null || raw === '') return 0;
-        const parsed = parseInt(raw, 10);
-        return isNaN(parsed) ? 0 : Math.max(0, parsed);
+        const raw = localStorage.getItem(SURVIVOR_RECORD_KEY);
+        if (!raw) return DEFAULT_RECORD;
+        const parsed = JSON.parse(raw);
+        if (typeof parsed.time === 'number' && parsed.name) {
+          return parsed;
+        }
+        return DEFAULT_RECORD;
       } catch (e) {
-        // 손상되거나 차단된 경우 안전 기본값 0 반환
-        return 0;
+        // 손상 복구
+        return DEFAULT_RECORD;
       }
     }
 
-    function saveHighScore(score) {
+    function saveBestSurvivorRecord(time, name, score) {
       try {
-        const current = getSafeHighScore();
-        if (score > current) {
-          localStorage.setItem(STORAGE_KEY, score.toString());
-          return score;
+        const current = getBestSurvivorRecord();
+        if (time >= current.time) {
+          const newRecord = {
+            time: parseFloat(time.toFixed(1)),
+            name: name.trim() || '익명의 총잡이',
+            score: score
+          };
+          localStorage.setItem(SURVIVOR_RECORD_KEY, JSON.stringify(newRecord));
+          return newRecord;
         }
         return current;
       } catch (e) {
-        return score;
+        return current;
       }
     }
 
     // ==========================================
-    // 3. 게임 엔진 & 상태 관리 (카드 1, 2, 3)
+    // 3. 게임 엔진 & 캔버스 상태
     // ==========================================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -424,7 +524,8 @@
     // DOM UI
     const timeVal = document.getElementById('timeVal');
     const scoreVal = document.getElementById('scoreVal');
-    const highScoreVal = document.getElementById('highScoreVal');
+    const bestSurvivalVal = document.getElementById('bestSurvivalVal');
+    const startBestRecord = document.getElementById('startBestRecord');
     const muteBtn = document.getElementById('muteBtn');
     const muteIcon = document.getElementById('muteIcon');
     const muteText = document.getElementById('muteText');
@@ -442,19 +543,33 @@
     const successRestartBtn = document.getElementById('successRestartBtn');
     const finalTime = document.getElementById('finalTime');
     const finalScore = document.getElementById('finalScore');
+    const bestRecordHolderName = document.getElementById('bestRecordHolderName');
+    const bestRecordTime = document.getElementById('bestRecordTime');
+    const successRecordHolderName = document.getElementById('successRecordHolderName');
+    const successRecordTime = document.getElementById('successRecordTime');
+    const successScore = document.getElementById('successScore');
+    const newRecordBox = document.getElementById('newRecordBox');
+    const recordNameInput = document.getElementById('recordNameInput');
+    const saveRecordBtn = document.getElementById('saveRecordBtn');
+    const successRecordBox = document.getElementById('successRecordBox');
+    const successNameInput = document.getElementById('successNameInput');
+    const saveSuccessRecordBtn = document.getElementById('saveSuccessRecordBtn');
+
+    // 기록 초기 표시
+    let bestRecord = getBestSurvivorRecord();
+    bestSurvivalVal.textContent = bestRecord.time.toFixed(1) + 's';
+    startBestRecord.textContent = `${bestRecord.time.toFixed(1)}s (${bestRecord.name})`;
 
     // 게임 상태 (State)
     const GAME_DURATION = 30.0; // 30초 루프
-    const BASE_SPEED = 7.0;     // 카드 3 최종 채택 난이도 (Speed 7)
+    const BASE_SPEED = 7.0;     // 카드 3 확정 속도
     let gameState = 'IDLE';     // IDLE, PLAYING, PAUSED, GAMEOVER, SUCCESS
     let lastTime = 0;
     let remainingTime = GAME_DURATION;
     let currentScore = 0;
-    let highScore = getSafeHighScore();
+    let survivalTime = 0;
 
-    highScoreVal.textContent = highScore;
-
-    // 플레이어 객체 (서부 총잡이)
+    // 플레이어 객체 (2단 점프 탑재!)
     const player = {
       x: 80,
       y: 300,
@@ -462,31 +577,36 @@
       height: 48,
       velocityY: 0,
       gravity: 0.85,
-      jumpStrength: -15,
+      jumpStrength1: -14.2,  // 1단 점프
+      jumpStrength2: -12.0,  // 2단 점프
+      jumpCount: 0,          // 현재 점프 횟수 (최대 2)
+      maxJumps: 2,           // 2단 점프 허용
       isGrounded: true,
-      lastJumpTime: 0
+      lastJumpTime: 0,
+      doubleJumpEffect: 0    // 2단 점프 이펙트 타이머
     };
 
     const GROUND_Y = 348;
 
-    // 장애물 (회전초 & 선인장)
+    // 장애물 목록
     let obstacles = [];
     let nextObstacleTimer = 0;
-
-    // 배경 스크롤 오프셋
     let bgOffset = 0;
 
     // ==========================================
-    // 4. 게임 리셋 및 루프 함수
+    // 4. 게임 리셋 및 점프 로직 (2단 점프 핵심)
     // ==========================================
     function resetGame() {
       gameState = 'PLAYING';
       remainingTime = GAME_DURATION;
       currentScore = 0;
+      survivalTime = 0;
       player.y = GROUND_Y - player.height;
       player.velocityY = 0;
+      player.jumpCount = 0;
       player.isGrounded = true;
       player.lastJumpTime = 0;
+      player.doubleJumpEffect = 0;
       obstacles = [];
       nextObstacleTimer = 1.0;
       bgOffset = 0;
@@ -494,6 +614,7 @@
       startOverlay.classList.add('hidden');
       gameOverOverlay.classList.add('hidden');
       successOverlay.classList.add('hidden');
+      newRecordBox.classList.add('hidden');
 
       timeVal.textContent = remainingTime.toFixed(1) + 's';
       scoreVal.textContent = '0';
@@ -501,6 +622,7 @@
       requestAnimationFrame(gameLoop);
     }
 
+    // ★ 점프 함수 (1단 및 2단 점프 지원)
     function jump() {
       if (gameState === 'IDLE') {
         initAudio();
@@ -509,13 +631,23 @@
       }
       if (gameState !== 'PLAYING') return;
 
-      // 연속 입력 중복 방지 (카드 2 — 지면에 있을 때만 1회 점프 정확히 반영)
       const now = performance.now();
-      if (player.isGrounded && now - player.lastJumpTime > 200) {
-        player.velocityY = player.jumpStrength;
+
+      // 1단 점프 (지면)
+      if (player.isGrounded) {
+        player.velocityY = player.jumpStrength1;
         player.isGrounded = false;
+        player.jumpCount = 1;
         player.lastJumpTime = now;
-        playSound('jump');
+        playSound('jump1');
+      } 
+      // 2단 점프 (공중에서 1회 추가 점프!)
+      else if (player.jumpCount < player.maxJumps && now - player.lastJumpTime > 120) {
+        player.velocityY = player.jumpStrength2;
+        player.jumpCount = 2;
+        player.lastJumpTime = now;
+        player.doubleJumpEffect = 15; // 2단 점프 바람 파티클 활성화
+        playSound('jump2');
       }
     }
 
@@ -531,6 +663,7 @@
       }
     }
 
+    // 게임 오버
     function gameOver() {
       gameState = 'GAMEOVER';
       playSound('hit');
@@ -540,28 +673,63 @@
         setTimeout(() => gameWrapper.classList.remove('screen-shake'), 300);
       }
 
-      highScore = saveHighScore(currentScore);
-      highScoreVal.textContent = highScore;
+      survivalTime = GAME_DURATION - remainingTime;
+      finalTime.textContent = survivalTime.toFixed(1) + 's';
+      finalScore.textContent = currentScore + ' PTS';
 
-      finalTime.textContent = (GAME_DURATION - remainingTime).toFixed(1) + 's';
-      finalScore.textContent = currentScore;
+      // 가장 오래 버틴 사람 기록 확인 및 갱신 표시
+      bestRecord = getBestSurvivorRecord();
+      bestRecordHolderName.textContent = bestRecord.name;
+      bestRecordTime.textContent = bestRecord.time.toFixed(1) + 's';
+
+      if (survivalTime > bestRecord.time) {
+        newRecordBox.classList.remove('hidden');
+        recordNameInput.value = '';
+        recordNameInput.focus();
+      } else {
+        newRecordBox.classList.add('hidden');
+      }
+
       gameOverOverlay.classList.remove('hidden');
     }
 
+    // 완주 성공 (30초 생존)
     function gameSuccess() {
       gameState = 'SUCCESS';
       playSound('win');
 
+      survivalTime = 30.0;
       currentScore += 300;
       scoreVal.textContent = currentScore;
-      highScore = saveHighScore(currentScore);
-      highScoreVal.textContent = highScore;
+      successScore.textContent = currentScore + ' PTS';
+
+      bestRecord = getBestSurvivorRecord();
+      successRecordHolderName.textContent = bestRecord.name;
+      successRecordTime.textContent = bestRecord.time.toFixed(1) + 's';
 
       successOverlay.classList.remove('hidden');
     }
 
+    // 신기록 저장 핸들러
+    saveRecordBtn.addEventListener('click', () => {
+      const name = recordNameInput.value.trim() || '익명의 총잡이';
+      bestRecord = saveBestSurvivorRecord(survivalTime, name, currentScore);
+      bestSurvivalVal.textContent = bestRecord.time.toFixed(1) + 's';
+      bestRecordHolderName.textContent = bestRecord.name;
+      bestRecordTime.textContent = bestRecord.time.toFixed(1) + 's';
+      newRecordBox.innerHTML = `<div class="text-[#ba9578] font-bold">✓ 랭킹에 성공적으로 등록되었습니다! (${bestRecord.name})</div>`;
+    });
+
+    saveSuccessRecordBtn.addEventListener('click', () => {
+      const name = successNameInput.value.trim() || '보안관 신재원';
+      bestRecord = saveBestSurvivorRecord(30.0, name, currentScore);
+      bestSurvivalVal.textContent = '30.0s';
+      successRecordHolderName.textContent = bestRecord.name;
+      successRecordBox.innerHTML = `<div class="text-[#ba9578] font-bold">✓ 명예의 전당 등록 완료! (${bestRecord.name})</div>`;
+    });
+
     // ==========================================
-    // 5. 프레임 업데이트 & 렌더링
+    // 5. 프레임 업데이트 & 장애물 스폰 (2단 점프 전용 거대 장애물 추가!)
     // ==========================================
     function gameLoop(currentTime) {
       if (gameState !== 'PLAYING') return;
@@ -569,7 +737,7 @@
       const dt = Math.min((currentTime - lastTime) / 1000, 0.1);
       lastTime = currentTime;
 
-      // 시간 및 점수 업데이트
+      // 시간 및 점수
       remainingTime -= dt;
       currentScore += Math.floor(dt * 10);
       scoreVal.textContent = currentScore;
@@ -582,7 +750,7 @@
       }
       timeVal.textContent = remainingTime.toFixed(1) + 's';
 
-      // 물리 업데이트 (플레이어)
+      // 플레이어 물리
       player.velocityY += player.gravity;
       player.y += player.velocityY;
 
@@ -590,17 +758,40 @@
         player.y = GROUND_Y - player.height;
         player.velocityY = 0;
         player.isGrounded = true;
+        player.jumpCount = 0; // 지면 착지 시 점프 카운트 0 리셋
       }
 
-      // 배경 오프셋
+      if (player.doubleJumpEffect > 0) {
+        player.doubleJumpEffect--;
+      }
+
       bgOffset += BASE_SPEED * 60 * dt * 0.5;
 
-      // 장애물 스폰
+      // 장애물 스폰 (일반 선인장, 회전초, 그리고 ★ 2단 점프로만 피하는 거대 선인장!)
       nextObstacleTimer -= dt;
       if (nextObstacleTimer <= 0) {
-        const type = Math.random() > 0.4 ? 'cactus' : 'tumbleweed';
-        const width = type === 'cactus' ? 24 : 26;
-        const height = type === 'cactus' ? 44 : 26;
+        const rand = Math.random();
+        let type = 'cactus';
+        let width = 24;
+        let height = 44;
+
+        if (rand < 0.28) {
+          // ★ 2단 점프로만 피하는 거대 2단 선인장 (높이 74px!)
+          type = 'tall_cactus';
+          width = 30;
+          height = 74;
+        } else if (rand < 0.65) {
+          // 회전초
+          type = 'tumbleweed';
+          width = 26;
+          height = 26;
+        } else {
+          // 일반 선인장
+          type = 'cactus';
+          width = 24;
+          height = 44;
+        }
+
         obstacles.push({
           x: canvas.width + 20,
           y: GROUND_Y - height,
@@ -609,46 +800,51 @@
           type: type,
           rotation: 0
         });
-        // 1.2초 ~ 2.4초 간격 스폰
-        nextObstacleTimer = 1.2 + Math.random() * 1.2;
+
+        // 거대 장애물 뒤에는 여유 시간 조금 더 제공
+        nextObstacleTimer = (type === 'tall_cactus') ? 2.0 + Math.random() * 0.8 : 1.2 + Math.random() * 1.3;
       }
 
-      // 장애물 이동 및 충돌 판정
+      // 장애물 이동 및 충돌 검사
       for (let i = obstacles.length - 1; i >= 0; i--) {
         const obs = obstacles[i];
         obs.x -= BASE_SPEED * 60 * dt;
         if (obs.type === 'tumbleweed') {
-          obs.rotation += 0.1;
+          obs.rotation += 0.12;
         }
 
-        // AABB 충돌 검사 (피격 판정 살짝 여유)
-        const pad = 6;
+        // 충돌 박스
+        const padX = 6;
+        const padY = 5;
         if (
-          player.x + pad < obs.x + obs.width - pad &&
-          player.x + player.width - pad > obs.x + pad &&
-          player.y + pad < obs.y + obs.height - pad &&
-          player.y + player.height - pad > obs.y + pad
+          player.x + padX < obs.x + obs.width - padX &&
+          player.x + player.width - padX > obs.x + padX &&
+          player.y + padY < obs.y + obs.height - padY &&
+          player.y + player.height - padY > obs.y + padY
         ) {
           gameOver();
           return;
         }
 
         // 화면 밖 제거
-        if (obs.x + obs.width < -50) {
+        if (obs.x + obs.width < -60) {
           obstacles.splice(i, 1);
         }
       }
 
-      // 그리기
+      // 렌더
       render();
 
       requestAnimationFrame(gameLoop);
     }
 
+    // ==========================================
+    // 6. 캔버스 렌더링
+    // ==========================================
     function render() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // 1. 서부 황야 하늘 그라데이션
+      // 1. 서부 하늘 노을 그라데이션
       const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
       skyGrad.addColorStop(0, '#1c120c');
       skyGrad.addColorStop(0.6, '#3a2012');
@@ -656,13 +852,13 @@
       ctx.fillStyle = skyGrad;
       ctx.fillRect(0, 0, canvas.width, GROUND_Y);
 
-      // 붉은 서부 석양 태양
+      // 서부 석양 태양
       ctx.fillStyle = '#ba6838';
       ctx.beginPath();
       ctx.arc(680, 100, 42, 0, Math.PI * 2);
       ctx.fill();
 
-      // 2. 원경 사막 협곡 산맥 실루엣
+      // 2. 사막 협곡 산맥 실루엣
       ctx.fillStyle = '#22140e';
       ctx.beginPath();
       ctx.moveTo(0, GROUND_Y);
@@ -689,11 +885,30 @@
 
       // 4. 장애물 그리기
       obstacles.forEach(obs => {
-        if (obs.type === 'cactus') {
-          // 선인장
+        if (obs.type === 'tall_cactus') {
+          // ★ 2단 점프로만 넘을 수 있는 거대 2단 선인장 (Double Cactus)
+          ctx.fillStyle = '#3d2b1a';
+          // 줄기 본체
+          ctx.fillRect(obs.x + 10, obs.y, 10, obs.height);
+          // 아랫단 가지
+          ctx.fillRect(obs.x, obs.y + 40, 10, 8);
+          ctx.fillRect(obs.x, obs.y + 26, 8, 16);
+          ctx.fillRect(obs.x + 20, obs.y + 48, 10, 8);
+          ctx.fillRect(obs.x + 22, obs.y + 34, 8, 16);
+          // 윗단 가지
+          ctx.fillRect(obs.x + 2, obs.y + 14, 8, 6);
+          ctx.fillRect(obs.x + 2, obs.y + 6, 6, 10);
+          ctx.fillRect(obs.x + 20, obs.y + 20, 8, 6);
+          ctx.fillRect(obs.x + 22, obs.y + 10, 6, 12);
+          
+          // 상단 경고 표식 (2단 점프 요구 표시)
+          ctx.fillStyle = '#ba9578';
+          ctx.font = 'bold 10px JetBrains Mono';
+          ctx.fillText('2단점프!', obs.x - 6, obs.y - 8);
+        } else if (obs.type === 'cactus') {
+          // 일반 선인장
           ctx.fillStyle = '#5c4028';
           ctx.fillRect(obs.x + 8, obs.y, 8, obs.height);
-          // 선인장 좌우 가지
           ctx.fillRect(obs.x, obs.y + 12, 8, 6);
           ctx.fillRect(obs.x, obs.y + 6, 6, 12);
           ctx.fillRect(obs.x + 16, obs.y + 18, 8, 6);
@@ -714,7 +929,16 @@
         }
       });
 
-      // 5. 총잡이 플레이어 (서부 건슬링어 실루엣)
+      // 5. 2단 점프 바람 이펙트
+      if (player.doubleJumpEffect > 0) {
+        ctx.strokeStyle = '#ba9578';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(player.x + player.width / 2, player.y + player.height + 4, 16 - player.doubleJumpEffect, 0, Math.PI);
+        ctx.stroke();
+      }
+
+      // 6. 총잡이 플레이어 렌더링
       ctx.fillStyle = '#ba9578';
       // 중절모 챙
       ctx.fillRect(player.x - 4, player.y + 4, player.width + 8, 4);
@@ -738,16 +962,20 @@
           ctx.fillRect(player.x + 18, player.y + 36, 8, 12);
         }
       } else {
-        // 점프 공중 자세
-        ctx.fillRect(player.x + 2, player.y + 36, 8, 8);
-        ctx.fillRect(player.x + 16, player.y + 34, 10, 6);
+        // 공중 점프 자세 (2단 점프 시 살짝 몸을 웅크림)
+        if (player.jumpCount === 2) {
+          ctx.fillRect(player.x + 4, player.y + 32, 10, 8);
+          ctx.fillRect(player.x + 16, player.y + 30, 10, 8);
+        } else {
+          ctx.fillRect(player.x + 2, player.y + 36, 8, 8);
+          ctx.fillRect(player.x + 16, player.y + 34, 10, 6);
+        }
       }
     }
 
     // ==========================================
-    // 6. 이벤트 리스너 바인딩 (키보드, 마우스, 터치)
+    // 7. 이벤트 바인딩
     // ==========================================
-    // 키보드 조작
     window.addEventListener('keydown', (e) => {
       if (e.code === 'Space' || e.code === 'ArrowUp') {
         e.preventDefault();
@@ -761,13 +989,11 @@
       }
     });
 
-    // 캔버스 클릭/터치 조작 (모바일/PC 지원)
     canvas.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       jump();
     });
 
-    // 버튼 이벤트
     startBtn.addEventListener('click', () => {
       initAudio();
       resetGame();
@@ -776,7 +1002,6 @@
     successRestartBtn.addEventListener('click', resetGame);
     pauseBtn.addEventListener('click', togglePause);
 
-    // 음소거 토글 (카드 5)
     muteBtn.addEventListener('click', () => {
       initAudio();
       isMuted = !isMuted;
@@ -790,21 +1015,18 @@
       }
     });
 
-    // 움직임 줄이기 토글 (카드 5)
     motionBtn.addEventListener('click', () => {
       isReduceMotion = !isReduceMotion;
       motionBtn.setAttribute('aria-pressed', isReduceMotion.toString());
       motionText.textContent = isReduceMotion ? '흔들림 꺼짐' : '흔들림 켜짐';
     });
 
-    // 창 포커스 이탈 시 자동 일시정지 (카드 2)
     window.addEventListener('blur', () => {
       if (gameState === 'PLAYING') {
         togglePause();
       }
     });
 
-    // 초기 화면 1회 렌더
     render();
   </script>
 </body>
