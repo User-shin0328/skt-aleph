@@ -464,7 +464,7 @@
     <div class="workflow-guide">
       <div class="workflow-step">
         <span class="num">1</span>
-        <span>이미지 넣기 (업로드 또는 추천 배경)</span>
+        <span>이미지 넣기 (업로드 또는 단색 추천 배경)</span>
       </div>
       <span style="color: var(--border-light);">&rarr;</span>
       <div class="workflow-step">
@@ -496,7 +496,7 @@
       <!-- 좌측: 조작 패널 -->
       <div style="display: flex; flex-direction: column; gap: 16px;">
         
-        <!-- 1. 이미지 넣기 -->
+        <!-- 1. 이미지 넣기 (추천 배경: 단색 흰색, 검은색, 회색) -->
         <div class="panel-card">
           <div class="panel-title">
             <span>1. 이미지 넣기 (IMAGE)</span>
@@ -511,9 +511,9 @@
 
           <div style="margin-top: 12px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
             <span style="font-size: 11px; font-family: monospace; color: #a1a1aa;">추천 배경:</span>
-            <button type="button" class="btn btn-sm" id="presetWesternBtn">서부 황야</button>
-            <button type="button" class="btn btn-sm" id="presetSecurityBtn">사이버 보안</button>
-            <button type="button" class="btn btn-sm" id="presetDarkBtn">모던 다크</button>
+            <button type="button" class="btn btn-sm" id="presetWhiteBtn" style="background: #ffffff; color: #141418; border-color: #e4e4e7; font-weight: bold;">단색 흰색</button>
+            <button type="button" class="btn btn-sm" id="presetBlackBtn" style="background: #09090b; color: #ffffff; border-color: #3f3f46; font-weight: bold;">단색 검은색</button>
+            <button type="button" class="btn btn-sm" id="presetGrayBtn" style="background: #4b5563; color: #ffffff; border-color: #6b7280; font-weight: bold;">단색 회색</button>
             <button type="button" class="btn btn-sm btn-danger" style="margin-left: auto;" id="removeImageBtn">이미지 제거</button>
           </div>
         </div>
@@ -626,10 +626,9 @@
               
               <!-- 빠른 배경색 프리셋 -->
               <div style="display: flex; gap: 4px; margin-left: auto;">
-                <button type="button" class="btn btn-sm" id="presetBgDark" style="padding: 4px 8px; font-size: 10px; background: #141418; border-color: #3f3f46;">다크</button>
-                <button type="button" class="btn btn-sm" id="presetBgNavy" style="padding: 4px 8px; font-size: 10px; background: #0d1b2a; border-color: #1b263b;">네이비</button>
-                <button type="button" class="btn btn-sm" id="presetBgBrown" style="padding: 4px 8px; font-size: 10px; background: #2b1810; border-color: #4a2818;">브라운</button>
-                <button type="button" class="btn btn-sm" id="presetBgWhite" style="padding: 4px 8px; font-size: 10px; background: #ffffff; color: #141418; border-color: #e4e4e7;">화이트</button>
+                <button type="button" class="btn btn-sm" id="presetBgWhite" style="padding: 4px 8px; font-size: 10px; background: #ffffff; color: #141418; border-color: #e4e4e7;">흰색</button>
+                <button type="button" class="btn btn-sm" id="presetBgDark" style="padding: 4px 8px; font-size: 10px; background: #09090b; color: #ffffff; border-color: #3f3f46;">검은색</button>
+                <button type="button" class="btn btn-sm" id="presetBgGray" style="padding: 4px 8px; font-size: 10px; background: #4b5563; color: #ffffff; border-color: #6b7280;">회색</button>
               </div>
             </div>
           </div>
@@ -800,7 +799,7 @@
 
   <!-- JavaScript 핵심 로직 -->
   <script>
-    // 1. 전역 상태 관리 (기본 필터: none 필터 없음)
+    // 1. 전역 상태 관리 (기본 필터: none 필터 없음, 기본 배경: 검은색 단색)
     const state = {
       aspectRatio: '1:1',
       text: '버그를 만났을 때 총 대신 로그를 뽑아라 🤠',
@@ -810,7 +809,7 @@
       posY: 50,
       textAlign: 'center',
       textOutline: true,
-      bgColor: '#141418',
+      bgColor: '#09090b',
       bgOverlay: 'none',
       image: null,
       activeTemplateId: null
@@ -873,7 +872,7 @@
       if (banner) banner.classList.remove('show');
     }
 
-    // 4-1. 글자 수 카운터 업데이트
+    // 4-1. 글자 수 카운터 업데이트 (메인 300자, 서브 100자)
     function updateCharCounts() {
       const mainText = (document.getElementById('textInput') ? document.getElementById('textInput').value : state.text) || '';
       const subText = (document.getElementById('subTextInput') ? document.getElementById('subTextInput').value : state.subText) || '';
@@ -925,59 +924,25 @@
       reader.readAsDataURL(file);
     }
 
-    // 6. 추천 배경 생성 및 DataURL 생성
+    // 6. 단색 추천 배경 생성 (흰색, 검은색, 회색)
     function getPresetDataUrl(type) {
       const pCanvas = document.createElement('canvas');
       pCanvas.width = 1080;
       pCanvas.height = 1080;
       const pctx = pCanvas.getContext('2d');
 
-      if (type === 'western') {
-        const grad = pctx.createLinearGradient(0, 0, 0, 1080);
-        grad.addColorStop(0, '#2d180d');
-        grad.addColorStop(0.5, '#7a3c1a');
-        grad.addColorStop(1, '#1b120c');
-        pctx.fillStyle = grad;
+      if (type === 'white') {
+        pctx.fillStyle = '#ffffff';
         pctx.fillRect(0, 0, 1080, 1080);
-
-        pctx.fillStyle = '#ba6838';
-        pctx.beginPath();
-        pctx.arc(740, 360, 150, 0, Math.PI * 2);
-        pctx.fill();
-
-        pctx.fillStyle = '#170f08';
-        pctx.fillRect(0, 880, 1080, 200);
-      } else if (type === 'security') {
-        const grad = pctx.createLinearGradient(0, 0, 1080, 1080);
-        grad.addColorStop(0, '#0a1018');
-        grad.addColorStop(0.5, '#131e2b');
-        grad.addColorStop(1, '#05070a');
-        pctx.fillStyle = grad;
+      } else if (type === 'gray') {
+        pctx.fillStyle = '#4b5563';
         pctx.fillRect(0, 0, 1080, 1080);
-
-        pctx.strokeStyle = 'rgba(186, 149, 120, 0.15)';
-        pctx.lineWidth = 2;
-        for (let x = 0; x < 1080; x += 100) {
-          pctx.beginPath();
-          pctx.moveTo(x, 0);
-          pctx.lineTo(x, 1080);
-          pctx.stroke();
-        }
-        for (let y = 0; y < 1080; y += 100) {
-          pctx.beginPath();
-          pctx.moveTo(0, y);
-          pctx.lineTo(1080, y);
-          pctx.stroke();
-        }
-      } else {
-        const grad = pctx.createLinearGradient(0, 0, 0, 1080);
-        grad.addColorStop(0, '#1c1c24');
-        grad.addColorStop(1, '#09090b');
-        pctx.fillStyle = grad;
+      } else { // 'black' or default
+        pctx.fillStyle = '#09090b';
         pctx.fillRect(0, 0, 1080, 1080);
       }
 
-      return pCanvas.toDataURL('image/jpeg', 0.85);
+      return pCanvas.toDataURL('image/jpeg', 0.9);
     }
 
     function loadPresetBackground(type) {
@@ -985,7 +950,25 @@
       const img = new Image();
       img.onload = () => {
         state.image = img;
-        showAlert('추천 배경 이미지가 적용되었습니다.', 'info');
+        if (type === 'white') {
+          state.bgColor = '#ffffff';
+          if (state.fontColor === '#ffffff') {
+            updateState({ fontColor: '#18181b' });
+          }
+          showAlert('단색 흰색 배경이 적용되었습니다.', 'info');
+        } else if (type === 'gray') {
+          state.bgColor = '#4b5563';
+          if (state.fontColor === '#4b5563') {
+            updateState({ fontColor: '#ffffff' });
+          }
+          showAlert('단색 회색 배경이 적용되었습니다.', 'info');
+        } else {
+          state.bgColor = '#09090b';
+          if (state.fontColor === '#09090b' || state.fontColor === '#18181b') {
+            updateState({ fontColor: '#ffffff' });
+          }
+          showAlert('단색 검은색 배경이 적용되었습니다.', 'info');
+        }
         render();
       };
       img.src = dataUrl;
@@ -1117,23 +1100,22 @@
         ctx.fillStyle = 'rgba(9, 9, 11, 0.65)';
         ctx.fillRect(0, 0, W, H);
       } else if (state.bgOverlay === 'solid') {
-        // 단색 배경 필터: 사용자가 고른 bgColor로 전체 배경 칠하기
         ctx.fillStyle = state.bgColor;
         ctx.fillRect(0, 0, W, H);
       }
-      // 'none'일 경우 추가 필터 레이어 없이 원본 이미지/배경색 그대로 출력
 
-      // 클래식 골드 테두리 프레임
-      ctx.strokeStyle = '#ba9578';
+      // 테두리 프레임 (배경이 흰색일 때는 다크 브라운으로 테두리 가독성 확보)
+      const isWhiteBg = (state.bgOverlay === 'solid' || !state.image) && (state.bgColor === '#ffffff' || state.bgColor.toLowerCase() === '#fff');
+      ctx.strokeStyle = isWhiteBg ? '#8c674b' : '#ba9578';
       ctx.lineWidth = 4;
       ctx.strokeRect(32, 32, W - 64, H - 64);
 
-      ctx.strokeStyle = 'rgba(186, 149, 120, 0.3)';
+      ctx.strokeStyle = isWhiteBg ? 'rgba(140, 103, 75, 0.3)' : 'rgba(186, 149, 120, 0.3)';
       ctx.lineWidth = 1;
       ctx.strokeRect(44, 44, W - 88, H - 88);
 
       // 상단 헤더 뱃지 텍스트
-      ctx.fillStyle = '#ba9578';
+      ctx.fillStyle = isWhiteBg ? '#8c674b' : '#ba9578';
       ctx.font = 'bold 22px "JetBrains Mono", monospace';
       ctx.textAlign = 'left';
       ctx.fillText(`MEME & CARD STUDIO [${state.aspectRatio}]`, 60, 80);
@@ -1167,7 +1149,7 @@
 
       lines.forEach(line => {
         if (state.textOutline) {
-          ctx.strokeStyle = 'rgba(0, 0, 0, 0.88)';
+          ctx.strokeStyle = isWhiteBg ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.88)';
           ctx.lineWidth = Math.max(4, currentFontSize * 0.12);
           ctx.lineJoin = 'round';
           ctx.strokeText(line, targetX, startY);
@@ -1180,14 +1162,14 @@
       if (state.subText && state.subText.trim().length > 0) {
         const subFontSize = Math.max(18, Math.round(currentFontSize * 0.45));
         ctx.font = `500 ${subFontSize}px 'Pretendard', sans-serif`;
-        ctx.fillStyle = '#e4d3c4';
+        ctx.fillStyle = isWhiteBg ? '#4b5563' : '#e4d3c4';
         const subLines = wrapText(ctx, state.subText, maxTextWidth);
         const subLineHeight = subFontSize * 1.4;
         let subStartY = startY + 16;
 
         subLines.forEach(sLine => {
           if (state.textOutline) {
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.strokeStyle = isWhiteBg ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)';
             ctx.lineWidth = 3;
             ctx.strokeText(sLine, targetX, subStartY);
           }
@@ -1197,7 +1179,7 @@
       }
 
       // 우측 하단 워터마크
-      ctx.fillStyle = '#71717a';
+      ctx.fillStyle = isWhiteBg ? '#6b7280' : '#71717a';
       ctx.font = '16px "JetBrains Mono", monospace';
       ctx.textAlign = 'right';
       ctx.fillText('Creator: Shin Jaewon | SKT-ALEPH', W - 60, H - 56);
@@ -1313,7 +1295,7 @@
     const defaultTemplates = [
       {
         id: 'tpl-default-1',
-        name: '개발자 명언 카드 (1:1)',
+        name: '개발자 명언 카드 (단색 검은색)',
         aspectRatio: '1:1',
         text: '버그를 만났을 때 총 대신 로그를 뽑아라 🤠',
         subText: '침착하게 패킷을 추적하는 엔지니어의 자세',
@@ -1322,13 +1304,13 @@
         posY: 50,
         textAlign: 'center',
         textOutline: true,
-        bgColor: '#141418',
+        bgColor: '#09090b',
         bgOverlay: 'none',
         imageDataUrl: null
       },
       {
         id: 'tpl-default-2',
-        name: '사이버 보안 명언 (4:5)',
+        name: '보안 가이드 카드 (단색 회색)',
         aspectRatio: '4:5',
         text: '견고한 보안은 작은 인터페이스 점검에서 시작된다 🛡️',
         subText: '원인을 끝까지 파고드는 트러블슈팅의 미학',
@@ -1337,22 +1319,22 @@
         posY: 45,
         textAlign: 'center',
         textOutline: true,
-        bgColor: '#090d14',
+        bgColor: '#4b5563',
         bgOverlay: 'none',
         imageDataUrl: null
       },
       {
         id: 'tpl-default-3',
-        name: '서부 러너 홍보 스토리 (9:16)',
+        name: '심플 스토리 카드 (단색 흰색)',
         aspectRatio: '9:16',
-        text: '서부의 총잡이 러너 30초 생존 챌린지! 🌵',
-        subText: '거대 선인장을 2단 점프로 뛰어넘고 1위를 차지하라!',
-        fontSize: 56,
-        fontColor: '#ffffff',
+        text: '기본에 충실할 때 가장 견고한 시스템이 완성된다 ✨',
+        subText: '단순함과 명확함을 추구하는 엔지니어링',
+        fontSize: 54,
+        fontColor: '#18181b',
         posY: 42,
         textAlign: 'center',
-        textOutline: true,
-        bgColor: '#1c120c',
+        textOutline: false,
+        bgColor: '#ffffff',
         bgOverlay: 'none',
         imageDataUrl: null
       }
@@ -1360,9 +1342,9 @@
 
     function ensureDefaultTemplateImages(list) {
       list.forEach(t => {
-        if (t.id === 'tpl-default-1' && !t.imageDataUrl) t.imageDataUrl = getPresetDataUrl('western');
-        if (t.id === 'tpl-default-2' && !t.imageDataUrl) t.imageDataUrl = getPresetDataUrl('security');
-        if (t.id === 'tpl-default-3' && !t.imageDataUrl) t.imageDataUrl = getPresetDataUrl('dark');
+        if (t.id === 'tpl-default-1' && !t.imageDataUrl) t.imageDataUrl = getPresetDataUrl('black');
+        if (t.id === 'tpl-default-2' && !t.imageDataUrl) t.imageDataUrl = getPresetDataUrl('gray');
+        if (t.id === 'tpl-default-3' && !t.imageDataUrl) t.imageDataUrl = getPresetDataUrl('white');
       });
     }
 
@@ -1500,7 +1482,7 @@
         posY: tpl.posY,
         textAlign: tpl.textAlign || 'center',
         textOutline: tpl.textOutline !== undefined ? tpl.textOutline : true,
-        bgColor: tpl.bgColor || '#141418',
+        bgColor: tpl.bgColor || '#09090b',
         bgOverlay: targetBgOverlay
       });
 
@@ -1552,7 +1534,7 @@
           tpl.imageDataUrl = getImageDataUrl(state.image);
         }
         saveStoredTemplates(templates);
-        showAlert(`템플릿 '${tpl.name}'이 수정되었습니다.`, 'success');
+        showAlert(`템플릿 '${tpl.name}'이 이미지와 함께 수정되었습니다.`, 'success');
       }
     }
 
@@ -1679,10 +1661,10 @@
         });
       }
 
-      // 4) 추천 배경 버튼
-      document.getElementById('presetWesternBtn').addEventListener('click', () => loadPresetBackground('western'));
-      document.getElementById('presetSecurityBtn').addEventListener('click', () => loadPresetBackground('security'));
-      document.getElementById('presetDarkBtn').addEventListener('click', () => loadPresetBackground('dark'));
+      // 4) 추천 배경 버튼 (단색 흰색, 단색 검은색, 단색 회색)
+      document.getElementById('presetWhiteBtn').addEventListener('click', () => loadPresetBackground('white'));
+      document.getElementById('presetBlackBtn').addEventListener('click', () => loadPresetBackground('black'));
+      document.getElementById('presetGrayBtn').addEventListener('click', () => loadPresetBackground('gray'));
       document.getElementById('removeImageBtn').addEventListener('click', removeImage);
 
       // 5) 문구 입력 리스너 (글자 수 카운트 동기화)
@@ -1754,10 +1736,9 @@
           updateState({ bgColor: e.target.value });
         });
       }
-      document.getElementById('presetBgDark').addEventListener('click', () => updateState({ bgColor: '#141418' }));
-      document.getElementById('presetBgNavy').addEventListener('click', () => updateState({ bgColor: '#0d1b2a' }));
-      document.getElementById('presetBgBrown').addEventListener('click', () => updateState({ bgColor: '#2b1810' }));
       document.getElementById('presetBgWhite').addEventListener('click', () => updateState({ bgColor: '#ffffff' }));
+      document.getElementById('presetBgDark').addEventListener('click', () => updateState({ bgColor: '#09090b' }));
+      document.getElementById('presetBgGray').addEventListener('click', () => updateState({ bgColor: '#4b5563' }));
 
       // 10) 텍스트 정렬
       document.getElementById('alignLeftBtn').addEventListener('click', () => setTextAlign('left'));
@@ -1789,10 +1770,10 @@
       document.getElementById('downloadPngBtn').addEventListener('click', () => downloadImage('png'));
       document.getElementById('downloadJpgBtn').addEventListener('click', () => downloadImage('jpeg'));
 
-      // 초기 실행: 글자수 카운트 반영, 1:1 비율 설정, 추천 배경 로드, 템플릿 목록 렌더링
+      // 초기 실행: 글자수 카운트 반영, 1:1 비율 설정, 단색 검은색 배경 로드, 템플릿 목록 렌더링
       updateCharCounts();
       setAspectRatio('1:1');
-      loadPresetBackground('western');
+      loadPresetBackground('black');
       renderTemplateList();
     });
   </script>
