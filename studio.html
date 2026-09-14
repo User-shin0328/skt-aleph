@@ -150,7 +150,7 @@
       font-weight: bold;
     }
 
-    /* 메인 2컬럼 레이아웃 (좌측: 제어 도구, 우측: 완성된 이미지) */
+    /* 메인 2컬럼 레이아웃 (좌측: 제어 패널, 우측: 완성된 이미지) */
     .studio-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -289,7 +289,7 @@
       display: grid;
       grid-template-columns: 1fr;
       gap: 8px;
-      max-height: 240px;
+      max-height: 250px;
       overflow-y: auto;
       padding-right: 4px;
     }
@@ -297,7 +297,7 @@
       background: #0d0d10;
       border: 1px solid var(--border-zinc);
       border-radius: 8px;
-      padding: 9px 12px;
+      padding: 8px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -622,17 +622,17 @@
           </div>
         </div>
 
-        <!-- 4. 템플릿 보관함 -->
+        <!-- 4. 템플릿 보관함 (이미지 & 문구 동시 보관) -->
         <div class="panel-card">
           <div class="panel-title">
             <span>4. 템플릿 보관함 (TEMPLATES)</span>
-            <span style="color: #a1a1aa; font-size: 11px;">저장 및 불러오기</span>
+            <span style="color: #a1a1aa; font-size: 11px;">이미지 &amp; 문구 동시 저장</span>
           </div>
 
           <div style="display: flex; gap: 8px; margin-bottom: 12px;">
             <input type="text" id="templateNameInput" placeholder="템플릿 이름 입력" class="form-input" style="flex: 1; font-size: 12px;" maxlength="25">
-            <button type="button" class="btn btn-primary btn-sm" id="saveTemplateBtn" style="flex-shrink: 0;">
-              <span>+ 현재 카드 저장</span>
+            <button type="button" class="btn btn-primary btn-sm" id="saveTemplateBtn" style="flex-shrink: 0;" title="현재 이미지와 텍스트 설정을 함께 템플릿으로 저장">
+              <span>+ 현재 카드 저장 (이미지 포함)</span>
             </button>
           </div>
 
@@ -640,7 +640,7 @@
 
           <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #27272a; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
             <div style="display: flex; gap: 6px;">
-              <button type="button" class="btn btn-sm" id="exportJsonBtn" title="템플릿 목록을 JSON 파일로 백업">⬇ JSON 백업</button>
+              <button type="button" class="btn btn-sm" id="exportJsonBtn" title="템플릿 목록과 이미지를 JSON 파일로 백업">⬇ JSON 백업</button>
               <button type="button" class="btn btn-sm" id="importJsonTriggerBtn" title="JSON 파일에서 템플릿 복원">⬆ JSON 복원</button>
               <input type="file" id="jsonFileInput" accept=".json,application/json" style="display: none;">
             </div>
@@ -873,8 +873,8 @@
       reader.readAsDataURL(file);
     }
 
-    // 6. 추천 배경 생성
-    function loadPresetBackground(type) {
+    // 6. 추천 배경 생성 및 DataURL 생성
+    function getPresetDataUrl(type) {
       const pCanvas = document.createElement('canvas');
       pCanvas.width = 1080;
       pCanvas.height = 1080;
@@ -925,19 +925,48 @@
         pctx.fillRect(0, 0, 1080, 1080);
       }
 
+      return pCanvas.toDataURL('image/jpeg', 0.85);
+    }
+
+    function loadPresetBackground(type) {
+      const dataUrl = getPresetDataUrl(type);
       const img = new Image();
       img.onload = () => {
         state.image = img;
         showAlert('추천 배경 이미지가 적용되었습니다.', 'info');
         render();
       };
-      img.src = pCanvas.toDataURL('image/png');
+      img.src = dataUrl;
     }
 
     function removeImage() {
       state.image = null;
       showAlert('배경 이미지가 제거되었습니다.', 'info');
       render();
+    }
+
+    // 6-1. 현재 이미지(업로드 또는 프리셋)를 템플릿 보관용 DataURL로 최적화 변환
+    function getImageDataUrl(img, maxDim = 1080) {
+      if (!img) return null;
+      try {
+        const offCanvas = document.createElement('canvas');
+        let w = img.naturalWidth || img.width || 800;
+        let h = img.naturalHeight || img.height || 800;
+
+        if (w > maxDim || h > maxDim) {
+          const scale = Math.min(maxDim / w, maxDim / h);
+          w = Math.round(w * scale);
+          h = Math.round(h * scale);
+        }
+        offCanvas.width = w;
+        offCanvas.height = h;
+        const offCtx = offCanvas.getContext('2d');
+        offCtx.drawImage(img, 0, 0, w, h);
+        return offCanvas.toDataURL('image/jpeg', 0.85);
+      } catch (err) {
+        console.warn('이미지 DataURL 변환 실패:', err);
+        return null;
+      }
     }
 
     // 7. 지능형 텍스트 줄바꿈 함수 (단어 및 음절 분할)
@@ -1208,7 +1237,7 @@
       }
     }
 
-    // 14. 템플릿 로컬 저장소 CRUD
+    // 14. 템플릿 로컬 저장소 CRUD (이미지 DataURL 동시 저장 & 복원)
     const TEMPLATES_KEY = 'meme_card_studio_templates_v1';
 
     const defaultTemplates = [
@@ -1224,7 +1253,8 @@
         textAlign: 'center',
         textOutline: true,
         bgColor: '#141418',
-        bgOverlay: 'gradient'
+        bgOverlay: 'gradient',
+        imageDataUrl: null // initDefaultTemplates에서 자동 생성
       },
       {
         id: 'tpl-default-2',
@@ -1238,7 +1268,8 @@
         textAlign: 'center',
         textOutline: true,
         bgColor: '#090d14',
-        bgOverlay: 'darken'
+        bgOverlay: 'darken',
+        imageDataUrl: null
       },
       {
         id: 'tpl-default-3',
@@ -1252,18 +1283,35 @@
         textAlign: 'center',
         textOutline: true,
         bgColor: '#1c120c',
-        bgOverlay: 'gradient'
+        bgOverlay: 'gradient',
+        imageDataUrl: null
       }
     ];
+
+    function ensureDefaultTemplateImages(list) {
+      list.forEach(t => {
+        if (t.id === 'tpl-default-1' && !t.imageDataUrl) t.imageDataUrl = getPresetDataUrl('western');
+        if (t.id === 'tpl-default-2' && !t.imageDataUrl) t.imageDataUrl = getPresetDataUrl('security');
+        if (t.id === 'tpl-default-3' && !t.imageDataUrl) t.imageDataUrl = getPresetDataUrl('dark');
+      });
+    }
 
     function getStoredTemplates() {
       try {
         const raw = localStorage.getItem(TEMPLATES_KEY);
-        if (!raw) return defaultTemplates;
+        if (!raw) {
+          ensureDefaultTemplateImages(defaultTemplates);
+          return defaultTemplates;
+        }
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          ensureDefaultTemplateImages(parsed);
+          return parsed;
+        }
+        ensureDefaultTemplateImages(defaultTemplates);
         return defaultTemplates;
       } catch (e) {
+        ensureDefaultTemplateImages(defaultTemplates);
         return defaultTemplates;
       }
     }
@@ -1288,12 +1336,19 @@
           loadTemplate(tpl.id);
         };
 
+        const thumbHtml = tpl.imageDataUrl
+          ? `<img src="${tpl.imageDataUrl}" alt="썸네일" style="width: 36px; height: 36px; object-fit: cover; border-radius: 4px; border: 1px solid #3f3f46; flex-shrink: 0;">`
+          : `<div style="width: 36px; height: 36px; border-radius: 4px; background: #1e1e24; border: 1px solid #27272a; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;" title="단색 배경">🎨</div>`;
+
         div.innerHTML = `
-          <div class="template-meta">
-            <div class="template-name">${escapeHtml(tpl.name)}</div>
-            <div class="template-sub">[${tpl.aspectRatio}] ${escapeHtml((tpl.text || '').slice(0, 18))}...</div>
+          <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+            ${thumbHtml}
+            <div class="template-meta">
+              <div class="template-name">${escapeHtml(tpl.name)}</div>
+              <div class="template-sub">[${tpl.aspectRatio}] ${escapeHtml((tpl.text || '').slice(0, 16))}...</div>
+            </div>
           </div>
-          <div style="display: flex; align-items: center; gap: 4px;">
+          <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
             <button type="button" class="btn btn-sm" onclick="editTemplatePrompt('${tpl.id}')" title="이름 및 내용 수정">수정</button>
             <button type="button" class="btn btn-sm btn-danger" onclick="deleteTemplate('${tpl.id}')" title="삭제">&times;</button>
           </div>
@@ -1305,6 +1360,7 @@
     function saveCurrentAsTemplate() {
       const nameInput = document.getElementById('templateNameInput');
       const name = nameInput.value.trim() || `새 템플릿 ${new Date().toLocaleTimeString('ko-KR')}`;
+      const imgData = getImageDataUrl(state.image);
 
       const newTpl = {
         id: 'tpl-' + Date.now(),
@@ -1318,17 +1374,32 @@
         textAlign: state.textAlign,
         textOutline: state.textOutline,
         bgColor: state.bgColor,
-        bgOverlay: state.bgOverlay
+        bgOverlay: state.bgOverlay,
+        imageDataUrl: imgData
       };
 
       const templates = getStoredTemplates();
       templates.unshift(newTpl);
-      saveStoredTemplates(templates);
 
-      state.activeTemplateId = newTpl.id;
-      nameInput.value = '';
-      showAlert(`새 템플릿 '${name}'이 저장되었습니다.`, 'success');
-      renderTemplateList();
+      try {
+        saveStoredTemplates(templates);
+        state.activeTemplateId = newTpl.id;
+        nameInput.value = '';
+        showAlert(imgData 
+          ? `새 템플릿 '${name}'이 이미지와 함께 안전하게 저장되었습니다!` 
+          : `새 템플릿 '${name}'이 저장되었습니다 (단색 배경).`, 'success');
+        renderTemplateList();
+      } catch (err) {
+        // 로컬스토리지 5MB 용량 초과 예외 처리
+        if (imgData) {
+          newTpl.imageDataUrl = null;
+          saveStoredTemplates(templates);
+          showAlert(`새 템플릿 '${name}'이 저장되었습니다 (브라우저 저장 공간 제한으로 이미지는 제외됨).`, 'info');
+          renderTemplateList();
+        } else {
+          showAlert('템플릿 저장 중 오류가 발생했습니다: ' + err.message, 'danger');
+        }
+      }
     }
 
     function loadTemplate(id) {
@@ -1363,8 +1434,27 @@
       setTextAlign(tpl.textAlign || 'center');
       setTextOutline(tpl.textOutline !== undefined ? tpl.textOutline : true);
 
+      // 이미지 동시 복원
+      if (tpl.imageDataUrl) {
+        const img = new Image();
+        img.onload = () => {
+          state.image = img;
+          render();
+        };
+        img.onerror = () => {
+          state.image = null;
+          render();
+        };
+        img.src = tpl.imageDataUrl;
+      } else {
+        state.image = null;
+        render();
+      }
+
       renderTemplateList();
-      showAlert(`템플릿 '${tpl.name}'을 불러왔습니다.`, 'info');
+      showAlert(tpl.imageDataUrl 
+        ? `템플릿 '${tpl.name}'을 이미지와 함께 불러왔습니다!` 
+        : `템플릿 '${tpl.name}'을 불러왔습니다.`, 'info');
     }
 
     function editTemplatePrompt(id) {
@@ -1375,7 +1465,7 @@
       const newName = prompt('템플릿 이름을 입력하세요:', tpl.name);
       if (newName && newName.trim().length > 0) {
         tpl.name = newName.trim();
-        if (confirm(`'${tpl.name}' 템플릿을 현재 작업 중인 문구와 스타일로 덮어쓰시겠습니까?`)) {
+        if (confirm(`'${tpl.name}' 템플릿을 현재 작업 중인 이미지, 문구, 스타일로 덮어쓰시겠습니까?`)) {
           tpl.aspectRatio = state.aspectRatio;
           tpl.text = state.text;
           tpl.subText = state.subText;
@@ -1386,9 +1476,10 @@
           tpl.textOutline = state.textOutline;
           tpl.bgColor = state.bgColor;
           tpl.bgOverlay = state.bgOverlay;
+          tpl.imageDataUrl = getImageDataUrl(state.image);
         }
         saveStoredTemplates(templates);
-        showAlert(`템플릿 '${tpl.name}'이 수정되었습니다.`, 'success');
+        showAlert(`템플릿 '${tpl.name}'이 이미지와 함께 수정되었습니다.`, 'success');
       }
     }
 
@@ -1407,12 +1498,13 @@
 
     function resetDefaultTemplates() {
       if (confirm('모든 템플릿을 초기 기본 3종으로 복원하시겠습니까?')) {
+        ensureDefaultTemplateImages(defaultTemplates);
         saveStoredTemplates(defaultTemplates);
         showAlert('기본 템플릿으로 복원되었습니다.', 'success');
       }
     }
 
-    // 15. JSON 가져오기 / 내보내기
+    // 15. JSON 가져오기 / 내보내기 (이미지 DataURL 포함)
     function exportTemplatesJSON() {
       const templates = getStoredTemplates();
       const exportData = {
@@ -1433,7 +1525,7 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      showAlert(`총 ${templates.length}개의 템플릿이 JSON 파일로 백업되었습니다.`, 'success');
+      showAlert(`총 ${templates.length}개의 템플릿(이미지 포함)이 JSON 파일로 백업되었습니다.`, 'success');
     }
 
     function importTemplatesJSON(file) {
