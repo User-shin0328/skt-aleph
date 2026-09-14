@@ -116,6 +116,125 @@
       stroke-linecap: round;
       stroke-linejoin: round;
     }
+
+    /* ========================================================
+       통일된 상단 빠른이동 네비게이션 헤더 (공통 디자인 시스템)
+       ======================================================== */
+    .app-nav-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(9, 9, 11, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid #27272a;
+      width: 100%;
+    }
+    .app-nav-inner {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 0 14px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    @media (min-width: 640px) {
+      .app-nav-inner {
+        padding: 0 24px;
+        height: 60px;
+        gap: 16px;
+      }
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #f4f4f5;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+      transition: color 0.15s ease;
+    }
+    @media (min-width: 640px) {
+      .app-brand {
+        font-size: 15px;
+      }
+    }
+    .app-brand:hover {
+      color: #ba9578;
+    }
+    .app-brand-arrow {
+      color: #ba9578;
+      font-weight: 800;
+    }
+    .app-quick-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    @media (min-width: 640px) {
+      .app-quick-nav {
+        gap: 8px;
+      }
+    }
+    .quick-nav-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      background: #141418;
+      border: 1px solid #27272a;
+      color: #a1a1aa;
+    }
+    @media (min-width: 640px) {
+      .quick-nav-item {
+        padding: 6px 12px;
+        font-size: 12px;
+        gap: 6px;
+      }
+    }
+    .quick-nav-item:hover {
+      background: #1f1f24;
+      border-color: #3f3f46;
+      color: #ffffff;
+    }
+    .quick-nav-item.active {
+      background: #2a221b;
+      border-color: #ba9578;
+      color: #ba9578;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(186, 149, 120, 0.2);
+    }
+    .app-nav-tools {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    @media (min-width: 640px) {
+      .app-nav-tools {
+        gap: 10px;
+      }
+    }
+    @media (max-width: 639px) {
+      .nav-hide-mobile { display: none !important; }
+      .nav-show-mobile { display: inline !important; }
+    }
+    @media (min-width: 640px) {
+      .nav-hide-mobile { display: inline !important; }
+      .nav-show-mobile { display: none !important; }
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-[#4d3626] selection:text-white">
@@ -125,31 +244,40 @@
     본문으로 바로가기
   </a>
 
-  <!-- 헤더 네비게이션 -->
-  <header class="sticky top-0 z-40 bg-[#09090b]/95 backdrop-blur-md border-b border-[#27272a]">
-    <div class="container-box h-16 flex items-center justify-between">
+  <!-- 상단 네비게이션 헤더 (통일된 빠른 이동 바) -->
+  <header class="app-nav-bar">
+    <div class="app-nav-inner">
       
       <!-- 로고 및 사이트명 -->
-      <a href="#" class="flex items-center gap-1.5 text-white font-mono font-bold text-sm sm:text-base tracking-tight hover:text-[#ba9578] transition-colors">
-        <span class="text-[#ba9578] font-bold">&gt;</span>
-        <span>신재원페이지</span>
+      <a href="/" class="app-brand" title="신재원페이지 홈으로">
+        <span class="app-brand-arrow">&gt;</span>
+        <span class="nav-hide-mobile">신재원페이지</span>
+        <span class="nav-show-mobile">신재원</span>
       </a>
 
-      <!-- 헤더 우측 도구 -->
-      <div class="flex items-center gap-2 sm:gap-3">
-        <!-- 과제 2, 3 바로가기 네비게이션 -->
-        <a href="/game.html" class="hidden md:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-mono text-zinc-300 hover:text-white bg-[#141418] hover:bg-zinc-800 border border-zinc-700 rounded transition-colors" title="과제 2 서부 러너 게임">
-          <span>🎮 서부러너</span>
+      <!-- 빠른 이동 탭 -->
+      <nav class="app-quick-nav" aria-label="빠른 이동">
+        <a href="/" class="quick-nav-item active" aria-current="page" title="메인 포트폴리오">
+          <span>🏠</span>
+          <span class="nav-hide-mobile">포트폴리오</span>
+          <span class="nav-show-mobile">홈</span>
         </a>
-        <a href="/studio.html" class="hidden md:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-mono text-zinc-300 hover:text-[#ba9578] bg-[#141418] hover:bg-zinc-800 border border-[#ba9578]/50 rounded transition-colors" title="과제 3 짤·카드 스튜디오">
-          <span>🎨 카드스튜디오</span>
+        <a href="/game.html" class="quick-nav-item" title="과제 2 서부 러너 게임">
+          <span>🎮</span>
+          <span>서부러너</span>
         </a>
+        <a href="/studio.html" class="quick-nav-item" title="과제 3 짤·카드 스튜디오">
+          <span>🎨</span>
+          <span>짤스튜디오</span>
+        </a>
+      </nav>
 
-        <!-- 공개 상태 뱃지 -->
-        <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded text-[10px] sm:text-[11px] font-mono bg-[#141418] text-zinc-300 border border-[#a27b5c]/40">
+      <!-- 헤더 우측 도구 -->
+      <div class="app-nav-tools">
+        <!-- 공개 상태 뱃지 (PC) -->
+        <span class="nav-hide-mobile inline-flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-mono bg-[#141418] text-zinc-300 border border-[#a27b5c]/40">
           <span class="w-1.5 h-1.5 rounded-full bg-[#ba9578]"></span>
-          <span class="hidden sm:inline">시크릿 창 무인증 열림</span>
-          <span class="sm:hidden">전체 공개</span>
+          <span>무인증 공개</span>
         </span>
 
         <!-- 움직임 줄이기 토글 스위치 -->
@@ -160,12 +288,11 @@
           title="페이지 내 애니메이션 전환 효과를 켜거나 끕니다"
           aria-pressed="false"
         >
-          <!-- Eye SVG -->
           <svg class="svg-icon text-[#ba9578]" id="motionIcon" viewBox="0 0 24 24">
             <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
             <circle cx="12" cy="12" r="3"/>
           </svg>
-          <span id="motionText">움직임</span>
+          <span id="motionText" class="nav-hide-mobile">움직임</span>
         </button>
 
         <!-- GitHub 저장소 링크 -->

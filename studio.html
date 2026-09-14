@@ -55,20 +55,123 @@
       padding: 16px;
     }
 
-    .app-header {
-      background: rgba(9, 9, 11, 0.95);
-      border-bottom: 1px solid var(--border-zinc);
-      backdrop-filter: blur(8px);
+    /* ========================================================
+       통일된 상단 빠른이동 네비게이션 헤더 (공통 디자인 시스템)
+       ======================================================== */
+    .app-nav-bar {
       position: sticky;
       top: 0;
       z-index: 50;
+      background: rgba(9, 9, 11, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid #27272a;
+      width: 100%;
     }
-    .header-inner {
+    .app-nav-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 12px;
+      height: 56px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 60px;
-      gap: 12px;
+      gap: 8px;
+    }
+    @media (min-width: 640px) {
+      .app-nav-inner {
+        padding: 0 20px;
+        height: 60px;
+        gap: 16px;
+      }
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #f4f4f5;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+      transition: color 0.15s ease;
+    }
+    @media (min-width: 640px) {
+      .app-brand {
+        font-size: 15px;
+      }
+    }
+    .app-brand:hover {
+      color: #ba9578;
+    }
+    .app-brand-arrow {
+      color: #ba9578;
+      font-weight: 800;
+    }
+    .app-quick-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    @media (min-width: 640px) {
+      .app-quick-nav {
+        gap: 8px;
+      }
+    }
+    .quick-nav-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      background: #141418;
+      border: 1px solid #27272a;
+      color: #a1a1aa;
+    }
+    @media (min-width: 640px) {
+      .quick-nav-item {
+        padding: 6px 12px;
+        font-size: 12px;
+        gap: 6px;
+      }
+    }
+    .quick-nav-item:hover {
+      background: #1f1f24;
+      border-color: #3f3f46;
+      color: #ffffff;
+    }
+    .quick-nav-item.active {
+      background: #2a221b;
+      border-color: #ba9578;
+      color: #ba9578;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(186, 149, 120, 0.2);
+    }
+    .app-nav-tools {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    @media (min-width: 640px) {
+      .app-nav-tools {
+        gap: 10px;
+      }
+    }
+    @media (max-width: 639px) {
+      .nav-hide-mobile { display: none !important; }
+      .nav-show-mobile { display: inline !important; }
+    }
+    @media (min-width: 640px) {
+      .nav-hide-mobile { display: inline !important; }
+      .nav-show-mobile { display: none !important; }
     }
 
     .btn {
@@ -441,20 +544,43 @@
 </head>
 <body>
 
-  <!-- 상단 네비게이션 헤더 -->
-  <header class="app-header">
-    <div class="container-box header-inner">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <a href="/" class="btn btn-sm" title="메인 포트폴리오로 이동">&larr; 포트폴리오</a>
-        <a href="/game" class="btn btn-sm" title="서부 러너 게임 이동">🎮 서부 러너</a>
-        <div style="color: #ba9578; font-weight: bold; font-family: 'JetBrains Mono', monospace; font-size: 13px;">
-          짤·카드 스튜디오
-        </div>
+  <!-- 상단 네비게이션 헤더 (통일된 빠른 이동 바) -->
+  <header class="app-nav-bar">
+    <div class="app-nav-inner">
+      
+      <!-- 로고 및 사이트명 -->
+      <a href="/" class="app-brand" title="신재원페이지 홈으로">
+        <span class="app-brand-arrow">&gt;</span>
+        <span class="nav-hide-mobile">신재원페이지</span>
+        <span class="nav-show-mobile">신재원</span>
+      </a>
+
+      <!-- 빠른 이동 탭 -->
+      <nav class="app-quick-nav" aria-label="빠른 이동">
+        <a href="/" class="quick-nav-item" title="메인 포트폴리오">
+          <span>🏠</span>
+          <span class="nav-hide-mobile">포트폴리오</span>
+          <span class="nav-show-mobile">홈</span>
+        </a>
+        <a href="/game.html" class="quick-nav-item" title="과제 2 서부 러너 게임">
+          <span>🎮</span>
+          <span>서부러너</span>
+        </a>
+        <a href="/studio.html" class="quick-nav-item active" aria-current="page" title="과제 3 짤·카드 스튜디오">
+          <span>🎨</span>
+          <span>짤스튜디오</span>
+        </a>
+      </nav>
+
+      <!-- 헤더 우측 도구 -->
+      <div class="app-nav-tools">
+        <a href="#gallery" class="quick-nav-item" style="border-color: #5a422d; color: #ba9578;" title="완성본 갤러리로 바로 이동">
+          <span>🖼️</span>
+          <span class="nav-hide-mobile">완성본 갤러리</span>
+          <span class="nav-show-mobile">갤러리</span>
+        </a>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <a href="#gallery" class="btn btn-sm btn-primary">완성본 갤러리</a>
-      </div>
     </div>
   </header>
 
