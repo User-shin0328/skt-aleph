@@ -137,6 +137,14 @@
 
       <!-- 헤더 우측 도구 -->
       <div class="flex items-center gap-2 sm:gap-3">
+        <!-- 과제 2, 3 바로가기 네비게이션 -->
+        <a href="/game.html" class="hidden md:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-mono text-zinc-300 hover:text-white bg-[#141418] hover:bg-zinc-800 border border-zinc-700 rounded transition-colors" title="과제 2 서부 러너 게임">
+          <span>🎮 서부러너</span>
+        </a>
+        <a href="/studio.html" class="hidden md:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-mono text-zinc-300 hover:text-[#ba9578] bg-[#141418] hover:bg-zinc-800 border border-[#ba9578]/50 rounded transition-colors" title="과제 3 짤·카드 스튜디오">
+          <span>🎨 카드스튜디오</span>
+        </a>
+
         <!-- 공개 상태 뱃지 -->
         <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded text-[10px] sm:text-[11px] font-mono bg-[#141418] text-zinc-300 border border-[#a27b5c]/40">
           <span class="w-1.5 h-1.5 rounded-full bg-[#ba9578]"></span>
@@ -210,7 +218,7 @@
       <div class="bg-[#09090b] border border-[#27272a] rounded-lg p-3.5 space-y-1">
         <div class="text-[11px] font-mono text-[#ba9578] font-medium">[시스템 목적]</div>
         <p class="text-xs sm:text-sm text-white leading-relaxed font-medium">
-          "이 페이지는 정보보안 및 네트워크 엔지니어링 역량을 확인하고자 하는 채용 담당자와 동료 개발자에게 기술적 강점과 실증 근거를 투명하게 공개하기 위해 구축된 웹 포트폴리오 시스템입니다."
+          "이 페이지는 정보보안 및 네트워크 엔지니어링 역량을 확인하고자 하는 채용 담당자에게 기술적 강점과 근거를 투명하게 공개하기 위해 구축된 웹 포트폴리오 입니다."
         </p>
       </div>
 
@@ -529,6 +537,34 @@
             <polygon points="5 3 19 12 5 21 5 3"/>
           </svg>
           <span>미니게임 플레이 시작하기</span>
+          <span>&rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 6. 과제 3: 짤·카드 스튜디오 실행 섹션 -->
+    <section class="card text-center space-y-4 bg-gradient-to-b from-[#141418] to-[#12161f] border border-[#ba9578]/50 shadow-2xl py-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#ba9578]/40 bg-[#8c674b]/15 text-xs font-mono font-bold text-[#ba9578] uppercase tracking-widest">
+        <span>TOOL</span>
+        <span class="text-zinc-600">•</span>
+        <span>MEME &amp; CARD STUDIO</span>
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-[#ba9578] font-mono tracking-tight">짤·카드 스튜디오</h2>
+      <p class="text-base sm:text-lg font-bold text-white font-mono">이미지 &amp; 문구 카드뉴스 제작 도구</p>
+      <p class="text-xs sm:text-sm text-[#a1a1aa] max-w-lg mx-auto leading-relaxed">
+        1:1 피드, 4:5 인스타그램, 9:16 스토리 비율을 완벽 지원하며,<br>
+        실시간 자동 줄바꿈과 템플릿 CRUD, 고해상도 PNG/JPEG 파일 다운로드를 제공합니다.
+      </p>
+      <div class="pt-3">
+        <a href="/studio.html" class="inline-flex items-center gap-3 px-8 py-3.5 bg-[#8c674b] hover:bg-[#a27b5c] text-white font-mono font-bold text-sm sm:text-base rounded-lg border border-[#ba9578] transition-all shadow-lg hover:scale-105 active:scale-95">
+          <!-- Edit/Palette Icon -->
+          <svg class="svg-icon" style="width:18px;height:18px;" viewBox="0 0 24 24">
+            <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+            <path d="M2 2l7.586 7.586"/>
+            <circle cx="11" cy="11" r="2"/>
+          </svg>
+          <span>짤·카드 스튜디오 바로가기</span>
           <span>&rarr;</span>
         </a>
       </div>
