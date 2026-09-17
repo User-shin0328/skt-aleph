@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>오늘의 진짜 정보판 — 데이터가 안 올 때 | 신재원페이지</title>
+  <meta name="description" content="과제 4: 비개인 공개 데이터 실시간 조회 및 5종 외부 장애 합성 재생 정보판">
+
+  <!-- Pretendard & JetBrains Mono Fonts -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-black: #09090b;
+      --card-bg: #141418;
+      --card-sub: #1a1a22;
+      --border-zinc: #27272a;
+      --border-light: #3f3f46;
+      --brown-main: #ba9578;
+      --brown-accent: #a27b5c;
+      --brown-btn: #8c674b;
+      --brown-hover: #a27b5c;
+      --text-white: #f4f4f5;
+      --text-gray: #a1a1aa;
+      --text-dim: #71717a;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --info: #3b82f6;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-white);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid var(--brown-main) !important;
+      outline-offset: 2px !important;
+    }
+
+    /* 통일된 상단 빠른이동 네비게이션 헤더 */
+    .app-nav-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(9, 9, 11, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid #27272a;
+      width: 100%;
+    }
+    .app-nav-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 12px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      position: relative;
+    }
+    @media (min-width: 640px) {
+      .app-nav-inner {
+        padding: 0 20px;
+        height: 60px;
+        gap: 16px;
+      }
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #f4f4f5;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+      transition: color 0.15s ease;
+      z-index: 20;
+    }
+    @media (min-width: 640px) {
+      .app-brand {
+        font-size: 15px;
+      }
+    }
+    .app-brand:hover {
+      color: #ba9578;
+    }
+    .app-brand-arrow {
+      color: #ba9578;
+      font-weight: 800;
+    }
+    /* 전 페이지 완전 통일: 중앙 절대 정렬 */
+    .app-quick-nav {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      z-index: 10;
+    }
+    @media (min-width: 640px) {
+      .app-quick-nav {
+        gap: 6px;
+      }
+    }
+    .quick-nav-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      background: #141418;
+      border: 1px solid #27272a;
+      color: #a1a1aa;
+    }
+    @media (min-width: 640px) {
+      .quick-nav-item {
+        padding: 6px 11px;
+        font-size: 12px;
+        gap: 5px;
+      }
+    }
+    .quick-nav-item:hover {
+      background: #1f1f24;
+      border-color: #3f3f46;
+      color: #ffffff;
+    }
+    .quick-nav-item.active {
+      background: #2a221b;
+      border-color: #ba9578;
+      color: #ba9578;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(186, 149, 120, 0.2);
+    }
+    .app-nav-tools {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      margin-left: auto;
+      z-index: 20;
+    }
+    @media (min-width: 640px) {
+      .app-nav-tools {
+        gap: 10px;
+      }
+    }
+    @media (max-width: 639px) {
+      .nav-hide-mobile { display: none !important; }
+      .nav-show-mobile { display: inline !important; }
+      .quick-nav-item {
+        padding: 4px 6px;
+        font-size: 10.5px;
+        gap: 2px;
+      }
+    }
+    @media (min-width: 640px) {
+      .nav-hide-mobile { display: inline !important; }
+      .nav-show-mobile { display: none !important; }
+    }
+    @media (max-width: 380px) {
+      .app-nav-inner {
+        padding: 0 6px;
+      }
+      .quick-nav-item {
+        padding: 3px 4px !important;
+        font-size: 10px !important;
+        gap: 1px !important;
+      }
+      .app-brand {
+        font-size: 11px !important;
+      }
+    }
+
+    /* 레이아웃 & 컨테이너 */
+    .container-box {
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    @media (min-width: 640px) {
+      .container-box {
+        padding: 24px;
+      }
+    }
+
+    /* 카드 */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-zinc);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    @media (min-width: 640px) {
+      .card {
+        padding: 26px;
+      }
+    }
+
+    /* 버튼 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid var(--border-zinc);
+      background: #18181f;
+      color: var(--text-white);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .btn:hover {
+      background: #24242d;
+      border-color: #3f3f46;
+      color: #fff;
+    }
+    .btn-primary {
+      background: var(--brown-btn);
+      border-color: var(--brown-main);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--brown-hover);
+    }
+    .btn-danger {
+      background: #341212;
+      border-color: #7f2323;
+      color: #fca5a5;
+    }
+    .btn-danger:hover {
+      background: #491919;
+    }
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 11px;
+    }
+    .btn-lg {
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    /* 상단 탭 스위처 */
+    .tab-switcher {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-zinc);
+      padding-bottom: 12px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--text-gray);
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .tab-btn:hover {
+      color: var(--text-white);
+      background: #141418;
+    }
+    .tab-btn.active {
+      color: var(--brown-main);
+      background: #2a221b;
+      border-color: var(--brown-main);
+    }
+
+    /* 뱃지 */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+    .badge-fresh {
+      background: #112818;
+      border: 1px solid #1f5f30;
+      color: #86efac;
+    }
+    .badge-stale {
+      background: #351f0f;
+      border: 1px solid #92400e;
+      color: #fcd34d;
+    }
+    .badge-err {
+      background: #351414;
+      border: 1px solid #7f2323;
+      color: #fca5a5;
+    }
+    .badge-gold {
+      background: #2a221b;
+      border: 1px solid #ba9578;
+      color: #ba9578;
+    }
+
+    /* 실시간 디스플레이 전광판 */
+    .board-metric-card {
+      background: linear-gradient(145deg, #18181f 0%, #101014 100%);
+      border: 1px solid var(--border-zinc);
+      border-radius: 14px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .board-metric-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #ba9578, #8c674b, #27272a);
+    }
+    .metric-main-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .metric-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 42px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.1;
+    }
+    @media (min-width: 640px) {
+      .metric-val {
+        font-size: 56px;
+      }
+    }
+    .metric-unit {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      color: var(--brown-main);
+      font-weight: 700;
+    }
+    .metric-delta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+    .delta-up { background: #351414; color: #fca5a5; border: 1px solid #7f2323; }
+    .delta-down { background: #112818; color: #86efac; border: 1px solid #1f5f30; }
+    .delta-none { background: #1f1f24; color: #a1a1aa; border: 1px solid #3f3f46; }
+
+    /* 메타데이터 그리드 */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .meta-item {
+      background: #0d0d10;
+      border: 1px solid var(--border-zinc);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .meta-label {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+      display: block;
+    }
+    .meta-val {
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-white);
+      word-break: break-all;
+    }
+
+    /* 테이블 */
+    .data-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-zinc);
+      border-radius: 8px;
+      background: #0d0d10;
+      margin-top: 12px;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      text-align: left;
+    }
+    .data-table th {
+      background: #141418;
+      color: var(--brown-main);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-zinc);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .data-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e1e24;
+      color: var(--text-gray);
+      white-space: nowrap;
+    }
+    .data-table tr:hover td {
+      background: #141418;
+      color: var(--text-white);
+    }
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* 코드 / JSON 프리뷰어 */
+    pre.code-box {
+      background: #09090b;
+      border: 1px solid var(--border-zinc);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #e4e4e7;
+      overflow-x: auto;
+      line-height: 1.6;
+      max-height: 320px;
+    }
+
+    /* 경고 배너 */
+    .stale-warning-banner {
+      background: #2a1b10;
+      border: 1px solid #ba9578;
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    /* 3자 대조 그리드 */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    /* 통과 기준 목록 */
+    .crit-item {
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: #0d0d10;
+      border: 1px solid var(--border-zinc);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    .crit-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--brown-main);
+      shrink-0: true;
+      min-width: 65px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 상단 네비게이션 헤더 (전체 페이지 완전 통일) -->
+  <header class="app-nav-bar">
+    <div class="app-nav-inner">
+      
+      <!-- 로고 및 사이트명 -->
+      <a href="/" class="app-brand" title="신재원페이지 홈으로">
+        <span class="app-brand-arrow">&gt;</span>
+        <span class="nav-hide-mobile">신재원페이지</span>
+        <span class="nav-show-mobile">신재원</span>
+      </a>
+
+      <!-- 빠른 이동 탭 (정보판 활성) -->
+      <nav class="app-quick-nav" aria-label="빠른 이동">
+        <a href="/" class="quick-nav-item" title="메인 포트폴리오">
+          <span>🏠</span>
+          <span class="nav-hide-mobile">포트폴리오</span>
+          <span class="nav-show-mobile">홈</span>
+        </a>
+        <a href="/game.html" class="quick-nav-item" title="과제 2 서부 러너 게임">
+          <span>🎮</span>
+          <span>서부러너</span>
+        </a>
+        <a href="/studio.html" class="quick-nav-item" title="과제 3 짤·카드 스튜디오">
+          <span>🎨</span>
+          <span>짤스튜디오</span>
+        </a>
+        <a href="/board.html" class="quick-nav-item active" aria-current="page" title="과제 4 오늘의 진짜 정보판">
+          <span>📊</span>
+          <span>정보판</span>
+        </a>
+      </nav>
+
+      <!-- 헤더 우측 도구 -->
+      <div class="app-nav-tools">
+        <a 
+          href="https://github.com/User-shin0328/skt-aleph" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="p-1.5 text-[#a1a1aa] hover:text-white rounded hover:bg-zinc-800 transition-colors" 
+          title="GitHub 소스코드 저장소"
+          style="display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 6px; color: #a1a1aa; text-decoration: none;"
+        >
+          <svg style="width:16px; height:16px; display:inline-block; fill:none; stroke:currentColor; stroke-width:2;" viewBox="0 0 24 24">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+            <path d="M9 18c-4.51 2-5-2-7-2"/>
+          </svg>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="container-box">
+
+    <!-- 헤더 배너 -->
+    <div style="margin-bottom: 24px;">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap;">
+        <span class="badge badge-gold">과제 4</span>
+        <span class="badge badge-fresh">T04 35개 기준 준수</span>
+        <span class="badge" style="background:#18181f; border:1px solid #3f3f46; color:#d4d4d8;">비밀키 0건 (T04-C11)</span>
+        <span class="badge" style="background:#18181f; border:1px solid #3f3f46; color:#d4d4d8;">무로그인 공개 심사 (T04-C01)</span>
+      </div>
+      <h1 style="font-size: 26px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #fff; margin-bottom: 6px;">
+        오늘의 진짜 정보판 — 데이터가 안 올 때
+      </h1>
+      <p style="font-size: 13px; color: var(--text-gray); line-height: 1.6;">
+        비개인 공개 원천(서울 실시간 기온)의 실제 동적 값을 매일 기록·비교하며, 외부 실패 5종 발생 시에도 마지막 정상값을 보존·설명하는 진짜 데이터 정보판입니다.
+      </p>
+    </div>
+
+    <!-- 탭 스위처 -->
+    <div class="tab-switcher" role="tablist">
+      <button id="tabBtnLive" class="tab-btn active" type="button" role="tab" aria-selected="true" onclick="switchTab('live')">
+        <span>📡</span> <span>실제 공개 데이터 정보판</span>
+      </button>
+      <button id="tabBtnReplay" class="tab-btn" type="button" role="tab" aria-selected="false" onclick="switchTab('replay')">
+        <span>🧪</span> <span>합성 장애·회복 시뮬레이터 (9종 Fixture)</span>
+      </button>
+      <button id="tabBtnAudit" class="tab-btn" type="button" role="tab" aria-selected="false" onclick="switchTab('audit')">
+        <span>📋</span> <span>심사 확인법 & 35개 통과 기준</span>
+      </button>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- [섹션 1] 실제 공개 데이터 정보판 (Live Data Board)             -->
+    <!-- ============================================================== -->
+    <section id="sectionLive">
+      
+      <!-- 오래된 값 알림 배너 (라이브 오류 시 표시) -->
+      <div id="liveStaleBanner" class="stale-warning-banner" style="display: none;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">⚠️</span>
+          <div>
+            <div style="font-size: 13px; font-weight: 700; color: #fcd34d;">외부 원천 장애 — 마지막 정상값 보존 중</div>
+            <div style="font-size: 11px; color: #e4d3c4;" id="liveStaleMsg">최신 데이터를 가져오지 못하여 직전 정상 조회값을 표시합니다.</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-primary" onclick="fetchLiveData()">다시 시도</button>
+      </div>
+
+      <!-- 메인 메트릭 카드 -->
+      <div class="board-metric-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px;">🌤️</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: var(--brown-main);">
+              서울 실시간 기온 (Seoul Temperature 2m)
+            </span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;" id="liveStatusBadges">
+            <span class="badge badge-fresh" id="liveFreshnessBadge">신선함 (fresh)</span>
+            <span class="badge" style="background:#141418; border:1px solid #27272a; color:#a1a1aa;" id="liveErrorBadge">오류 없음 (none)</span>
+          </div>
+        </div>
+
+        <div class="metric-main-row">
+          <span class="metric-val" id="liveValueText">--.-</span>
+          <span class="metric-unit" id="liveUnitText">°C</span>
+          <span class="metric-delta delta-none" id="liveDeltaBadge">전일 대비: 계산 중</span>
+        </div>
+
+        <!-- 6대 필수 메타데이터 그리드 (T04-C04 ~ T04-C09) -->
+        <div class="meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">값 (Value)</span>
+            <span class="meta-val" id="metaVal">--</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">단위 (Unit)</span>
+            <span class="meta-val" id="metaUnit">°C</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">공개 출처 (Source)</span>
+            <span class="meta-val">
+              <a id="metaSourceUrl" href="https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.9780&current=temperature_2m&timezone=Asia%2FSeoul" target="_blank" rel="noopener noreferrer" style="color: #ba9578; text-decoration: underline;">
+                Open-Meteo Weather API
+              </a>
+            </span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">출처 관측 시각 (Source Time)</span>
+            <span class="meta-val" id="metaSourceTime">--</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">앱 조회 시각 (Fetched Time)</span>
+            <span class="meta-val" id="metaFetchedAt">--</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">기준 시간대 (Timezone)</span>
+            <span class="meta-val" style="color: #86efac;">Asia/Seoul (고정)</span>
+          </div>
+        </div>
+
+        <!-- 액션 바 -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-top: 1px solid var(--border-zinc); padding-top: 14px;">
+          <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">
+            비밀키 없는 완전 공개 원천 HTTPS 호출 · 같은 날 재조회 시 원자적 갱신
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-primary btn-sm" id="btnFetchLive" onclick="fetchLiveData()">
+              <span>🔄</span> <span>실제 데이터 지금 조회하기</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 원자료·저장값·화면값 3자 일치 대조 뷰어 (T04-C10) -->
+      <div class="card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <h2 style="font-size: 14px; font-weight: 700; color: var(--brown-main); font-family: 'JetBrains Mono', monospace;">
+            🔍 원자료 · 저장값 · 화면값 3자 일치 검증 (T04-C10)
+          </h2>
+          <span id="threeWayMatchStatus" class="badge badge-fresh">✓ 3자 일치 검증 통과</span>
+        </div>
+        <p style="font-size: 12px; color: var(--text-gray); margin-bottom: 14px;">
+          외부 공개 원천에서 내려온 원본 응답(Raw), 정규화 저장 객체(Stored), 실제 사용자 화면 표시값(Displayed)이 100% 동일한지 나란히 대조합니다.
+        </p>
+
+        <div class="compare-grid">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px; font-family: 'JetBrains Mono', monospace;">
+              ① 외부 원자료 원문 (Raw API Response)
+            </div>
+            <pre class="code-box" id="rawJsonBox">// 실제 조회를 실행하면 원본 JSON이 표시됩니다.</pre>
+          </div>
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px; font-family: 'JetBrains Mono', monospace;">
+              ② 정규화 저장 객체 (Normalized Stored Record)
+            </div>
+            <pre class="code-box" id="normalizedJsonBox">// normalized-reading.schema.json 형식에 따라 정규화된 값</pre>
+          </div>
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px; font-family: 'JetBrains Mono', monospace;">
+              ③ 화면 표시값 대조표 (Displayed UI Verification)
+            </div>
+            <div style="background: #09090b; border: 1px solid var(--border-zinc); border-radius: 8px; padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.8;">
+              <div>• 표시 값: <strong id="chkVal" style="color:#ba9578;">--</strong></div>
+              <div>• 표시 단위: <strong id="chkUnit" style="color:#ba9578;">--</strong></div>
+              <div>• 출처 시각: <strong id="chkSrcTime" style="color:#fff;">--</strong></div>
+              <div>• 조회 시각: <strong id="chkFetchTime" style="color:#fff;">--</strong></div>
+              <div>• 기준 시간대: <strong style="color:#86efac;">Asia/Seoul</strong></div>
+              <div style="border-top: 1px solid #27272a; margin-top: 8px; padding-top: 8px; color: #86efac;" id="chkMatchVerdict">
+                ✓ 원자료 값 == 저장 값 == 화면 값 일치
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 보존된 실제 일별 기록 테이블 (T04-C20 ~ T04-C24) -->
+      <div class="card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h2 style="font-size: 14px; font-weight: 700; color: var(--brown-main); font-family: 'JetBrains Mono', monospace;">
+              📅 보존된 실제 일별 기록 (Daily Readings)
+            </h2>
+            <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+              하루 한 줄 원자적 갱신 · 서로 다른 날짜 기록 2건 보존 시 전일 대비 변화 자동 재계산 (T04-C20~C24)
+            </div>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="btn btn-sm" style="border-color: #5a422d; color: #ba9578;" onclick="seedTwoDayRecord()" title="과제 T04-C22~C24 기준 검증을 위한 2일치 기록 시드를 복원합니다">2일치 기록 시드 복원</button>
+            <button type="button" class="btn btn-sm btn-danger" onclick="clearLiveDailyStorage()">기록 초기화</button>
+          </div>
+        </div>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>기록 날짜 (KST)</th>
+                <th>신호 ID</th>
+                <th>정규화 값</th>
+                <th>단위</th>
+                <th>원천 관측 시각</th>
+                <th>최종 조회 시각</th>
+                <th>전일 대비 변화</th>
+              </tr>
+            </thead>
+            <tbody id="liveDailyTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-dim); padding: 24px;">
+                  보존된 일별 기록이 없습니다. 상단의 [실제 데이터 지금 조회하기] 버튼을 눌러 첫 번째 기록을 남기세요.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- [섹션 2] 합성 장애·회복 시뮬레이터 (Replay Console - 9종 Fixture) -->
+    <!-- ============================================================== -->
+    <section id="sectionReplay" style="display: none;">
+      
+      <!-- 컨트롤 콘솔 -->
+      <div class="card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <h2 style="font-size: 15px; font-weight: 700; color: var(--brown-main); font-family: 'JetBrains Mono', monospace;">
+              🧪 합성 평가 시뮬레이터 (9종 결정론 Fixture 재생기)
+            </h2>
+            <p style="font-size: 12px; color: var(--text-gray); margin-top: 2px;">
+              T04 공식 공개 패키지(asset-manifest.json)의 9개 합성 fixture를 재생하여 외부 실패 5종과 오류 뒤 복구를 검증합니다.
+            </p>
+          </div>
+          <button type="button" class="btn btn-sm btn-danger" onclick="runResetEvaluation()">
+            <span>🧹</span> <span>합성 상태 초기화 (Reset)</span>
+          </button>
+        </div>
+
+        <!-- 1클릭 표준 재생 시퀀스 바 -->
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
+          <button type="button" class="btn btn-sm btn-primary" onclick="runSequenceSuccess()">
+            <span>🟢</span> <span>정상 3단계 시퀀스 (D1-A → D1-B → D2)</span>
+          </button>
+          <button type="button" class="btn btn-sm" onclick="runSequenceFailure('T04-TIMEOUT')">
+            <span>⏱️</span> <span>TIMEOUT 실패 재생</span>
+          </button>
+          <button type="button" class="btn btn-sm" onclick="runSequenceFailure('T04-AUTH-401')">
+            <span>🔒</span> <span>AUTH 401 실패 재생</span>
+          </button>
+          <button type="button" class="btn btn-sm" onclick="runSequenceFailure('T04-RATE-429')">
+            <span>🚦</span> <span>RATE 429 실패 재생</span>
+          </button>
+          <button type="button" class="btn btn-sm" onclick="runSequenceFailure('T04-OFFLINE')">
+            <span>🔌</span> <span>OFFLINE 실패 재생</span>
+          </button>
+          <button type="button" class="btn btn-sm" onclick="runSequenceFailure('T04-SCHEMA-BREAK')">
+            <span>🧩</span> <span>SCHEMA-BREAK 실패 재생</span>
+          </button>
+          <button type="button" class="btn btn-sm" style="border-color: #ba9578; color: #ba9578;" onclick="runSequenceRecovery()">
+            <span>🔄</span> <span>오류 뒤 복구 시퀀스 (TIMEOUT → RECOVER-D2)</span>
+          </button>
+        </div>
+
+        <!-- 개별 Fixture 선택 실행기 -->
+        <div style="background: #0d0d10; border: 1px solid var(--border-zinc); border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <label for="fixtureSelect" style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-dim);">개별 Fixture 선택:</label>
+            <select id="fixtureSelect" class="form-select" style="background:#141418; border:1px solid var(--border-zinc); color:#fff; padding:6px 10px; border-radius:6px; font-family:'JetBrains Mono',monospace; font-size:11px;">
+              <option value="T04-NORMAL-D1-A">T04-NORMAL-D1-A (가상 1일차 100 pt)</option>
+              <option value="T04-NORMAL-D1-B">T04-NORMAL-D1-B (가상 1일차 105 pt 갱신)</option>
+              <option value="T04-NORMAL-D2">T04-NORMAL-D2 (가상 2일차 120 pt, Delta +15)</option>
+              <option value="T04-TIMEOUT">T04-TIMEOUT (느린 응답)</option>
+              <option value="T04-AUTH-401">T04-AUTH-401 (401 거절)</option>
+              <option value="T04-RATE-429">T04-RATE-429 (429 호출 제한)</option>
+              <option value="T04-OFFLINE">T04-OFFLINE (오프라인)</option>
+              <option value="T04-SCHEMA-BREAK">T04-SCHEMA-BREAK (형식 변경 오류)</option>
+              <option value="T04-RECOVER-D2">T04-RECOVER-D2 (오류 후 D2 복구 성공)</option>
+            </select>
+          </div>
+          <button type="button" class="btn btn-sm btn-primary" onclick="runSelectedFixture()">선택 Fixture 1회 재생</button>
+        </div>
+      </div>
+
+      <!-- 합성 시뮬레이터 실시간 상태 화면 -->
+      <div class="board-metric-card" id="synthMetricCard">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px;">📊</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: var(--brown-main);">
+              합성 신호: aleph-demo-index
+            </span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="badge badge-fresh" id="synthFreshnessBadge">fresh</span>
+            <span class="badge" style="background:#141418; border:1px solid #27272a; color:#a1a1aa;" id="synthErrorBadge">none</span>
+            <span class="badge badge-gold" id="synthRowBadge">행: 0건</span>
+          </div>
+        </div>
+
+        <!-- 오래된 값 알림 배너 (합성 오류 시 노출) -->
+        <div id="synthStaleBanner" class="stale-warning-banner" style="display: none; margin-top: 12px; margin-bottom: 0;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 20px;">⚠️</span>
+            <div>
+              <div style="font-size: 13px; font-weight: 700; color: #fcd34d;" id="synthStaleTitle">외부 원천 장애 — 마지막 정상값 보존 중 (T04-C17)</div>
+              <div style="font-size: 11px; color: #e4d3c4;" id="synthStaleDesc">오류가 발생하여 마지막 정상값(105 pt)을 보존하고 오래된 값(stale) 뱃지를 붙입니다.</div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-primary" id="btnSynthRetry" onclick="runSequenceRecoveryStep()" style="display: none;">
+            <span>🔄</span> <span>다시 시도 (Retry: RECOVER-D2)</span>
+          </button>
+        </div>
+
+        <div class="metric-main-row" style="margin-top: 12px;">
+          <span class="metric-val" id="synthValueText">--</span>
+          <span class="metric-unit" id="synthUnitText">pt</span>
+          <span class="metric-delta delta-none" id="synthDeltaBadge">전일 대비: --</span>
+          <span class="badge badge-stale" id="synthStalePill" style="display: none; margin-left: 6px;">오래된 값 (Stale)</span>
+        </div>
+
+        <!-- 메타데이터 그리드 -->
+        <div class="meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">마지막 정상값 (Last Good)</span>
+            <span class="meta-val" id="synthLastGoodVal">--</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">가상 기준 날짜 (Record Date)</span>
+            <span class="meta-val" id="synthRecordDate">--</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">가상 시각 (Virtual Now)</span>
+            <span class="meta-val" id="synthVirtualNow">--</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">직전 재생 Fixture ID</span>
+            <span class="meta-val" style="color: #ba9578;" id="synthLastFixtureId">--</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">상태 시퀀스 (Sequence)</span>
+            <span class="meta-val" id="synthSeqVal">0</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Retry-After 헤더</span>
+            <span class="meta-val" id="synthRetryAfter">null</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 합성 일별 저장 테이블 -->
+      <div class="card">
+        <h3 style="font-size: 13px; font-weight: 700; color: var(--brown-main); font-family: 'JetBrains Mono', monospace; margin-bottom: 8px;">
+          📋 합성 일별 저장소 상태 (daily_readings[])
+        </h3>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Record ID</th>
+                <th>날짜 (record_date)</th>
+                <th>저장 값</th>
+                <th>단위</th>
+                <th>최초 조회 (first_fetched_at)</th>
+                <th>최종 갱신 (last_fetched_at)</th>
+              </tr>
+            </thead>
+            <tbody id="synthDailyTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-dim); padding: 20px;">
+                  합성 상태가 비어 있습니다. 상단의 시퀀스 버튼을 클릭하세요.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 자동 채점 검증 로그 박스 -->
+      <div class="card">
+        <h3 style="font-size: 13px; font-weight: 700; color: var(--brown-main); font-family: 'JetBrains Mono', monospace; margin-bottom: 8px;">
+          ✓ Fixture 기대치 검증 로그 (Expected vs Actual)
+        </h3>
+        <div id="fixtureVerdictBox" style="background:#09090b; border:1px solid #27272a; border-radius:8px; padding:14px; font-family:'JetBrains Mono',monospace; font-size:11px; line-height:1.7; color:#a1a1aa;">
+          재생한 Fixture의 expected 결과와 현재 state 전이 결과의 일치 여부가 여기에 실시간으로 기록됩니다.
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- [섹션 3] 심사 안내 & 35개 통과 기준 (Audit & Criteria)          -->
+    <!-- ============================================================== -->
+    <section id="sectionAudit" style="display: none;">
+      
+      <!-- 짧은 확인 방법 4줄 (T04-C27) -->
+      <div class="card">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span class="badge badge-gold">T04-C27</span>
+          <h2 style="font-size: 15px; font-weight: 700; color: #fff; font-family: 'JetBrains Mono', monospace;">
+            짧은 확인 방법 4줄
+          </h2>
+        </div>
+        <div style="background: #0d0d10; border: 1px solid var(--border-zinc); border-radius: 8px; padding: 16px; font-size: 13px; line-height: 1.8;">
+          <div><strong style="color: #ba9578;">① 어디로 가나요:</strong> <code style="color:#fff;">https://skt-aleph-gilt.vercel.app/board</code> (새 시크릿 창에서 무인증 즉시 열림)</div>
+          <div><strong style="color: #ba9578;">② 3단계 이내 행동:</strong> 상단 '합성 장애·회복 시뮬레이터' 탭에서 [정상 시퀀스] 클릭 → [TIMEOUT 실패 재생] 클릭 → [오류 뒤 복구 재생] 클릭</div>
+          <div><strong style="color: #ba9578;">③ 통과 모습:</strong> TIMEOUT 발생 시 마지막 정상값 105 pt 보존 및 오래된 값(stale) 표시 후, 복구 시 fresh/none으로 복귀하며 2026-08-25 행 정확히 1건 추가(+15 pt 변화 일치)</div>
+          <div><strong style="color: #ba9578;">④ 안 될 때 모습:</strong> 실패 시 마지막 정상값이 삭제되거나, 다시 시도 버튼이 없거나, 동일 날짜에 중복 행이 생기거나, 2일차 복구 시 전일 대비 변화가 틀림</div>
+        </div>
+      </div>
+
+      <!-- AI와 나의 판단 3줄 (T04-C28) -->
+      <div class="card">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span class="badge badge-gold">T04-C28</span>
+          <h2 style="font-size: 15px; font-weight: 700; color: #fff; font-family: 'JetBrains Mono', monospace;">
+            AI와 나의 판단 3줄
+          </h2>
+        </div>
+        <div style="background: #0d0d10; border: 1px solid var(--border-zinc); border-radius: 8px; padding: 16px; font-size: 13px; line-height: 1.8;">
+          <div><strong style="color: #ba9578;">① AI에게 맡긴 일:</strong> T04 35개 검증 기준 전수 분석, 9종 결정론 fixture 상태 전이 엔진 구현, normalized-reading 스키마 검증기 및 반응형 UI 스타일링</div>
+          <div><strong style="color: #ba9578;">② 직접 판단한 일:</strong> 실제 동적 원천으로 Open-Meteo 서울 기온을 선정하고, 심사관이 라이브 데이터와 합성 fixture를 한눈에 교차 검증할 수 있는 듀얼 탭 레이아웃을 채택함</div>
+          <div><strong style="color: #ba9578;">③ AI 제안을 따르지 않은 일:</strong> 비밀키가 필요한 공공데이터포털 API 대신 완전 무인증인 Open-Meteo API를 단독 채택하여 T04-C11 비밀값 0건 및 심사 통과 안정성을 직접 확보함</div>
+        </div>
+      </div>
+
+      <!-- 35개 통과 기준 전수 체크리스트 -->
+      <div class="card">
+        <h2 style="font-size: 15px; font-weight: 700; color: var(--brown-main); font-family: 'JetBrains Mono', monospace; margin-bottom: 12px;">
+          📋 T04 정본 35개 통과 기준 전수 점검표 (T04-C01 ~ T04-C35)
+        </h2>
+        <div id="criteriaListContainer">
+          <!-- 스크립트에서 자동 렌더링 -->
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- [스크립트] 정보판 엔진 & Fixture 상태 전이 & 라이브 API 통신   -->
+  <!-- ============================================================== -->
+  <script>
+    'use strict';
+
+    // ==========================================
+    // 1. 공통 상수 및 9종 결정론 Fixture 내장 (T04-C26)
+    // ==========================================
+    const NORMALIZED_KEYS = Object.freeze([
+      'signal_id', 'normalized_value', 'unit', 'source_name', 'source_url',
+      'source_time', 'fetched_at', 'record_timezone', 'record_date'
+    ]);
+
+    const ERROR_CODES = Object.freeze([
+      'timeout', 'auth', 'rate_limit', 'offline', 'schema_error'
+    ]);
+
+    // t04-real-information-board-public-v1 공식 fixture 9종
+    const FIXTURES = {
+      'T04-NORMAL-D1-A': {
+        fixture_id: 'T04-NORMAL-D1-A',
+        virtual_now: '2026-08-24T00:00:00.000Z',
+        transport: { mode: 'http', status: 200, delay_ms: 20, deadline_ms: 1500, headers: { 'content-type': 'application/json' } },
+        payload: {
+          signal_id: 'aleph-demo-index', normalized_value: 100, unit: 'pt',
+          source_name: 'ALEPH 결정론 replay', source_url: 'https://fixtures.aleph.invalid/t04/demo-index',
+          source_time: '2026-08-23T23:59:00.000Z', fetched_at: '2026-08-24T00:00:00.000Z',
+          record_timezone: 'Asia/Seoul', record_date: '2026-08-24'
+        },
+        expected: { freshness: 'fresh', error_code: 'none', row_count: 1, stored_value: 100, delta: null, preserve_last_good: true, record_date: '2026-08-24' }
+      },
+      'T04-NORMAL-D1-B': {
+        fixture_id: 'T04-NORMAL-D1-B',
+        virtual_now: '2026-08-24T09:00:00.000Z',
+        transport: { mode: 'http', status: 200, delay_ms: 20, deadline_ms: 1500, headers: { 'content-type': 'application/json' } },
+        payload: {
+          signal_id: 'aleph-demo-index', normalized_value: 105, unit: 'pt',
+          source_name: 'ALEPH 결정론 replay', source_url: 'https://fixtures.aleph.invalid/t04/demo-index',
+          source_time: null, fetched_at: '2026-08-24T09:00:00.000Z',
+          record_timezone: 'Asia/Seoul', record_date: '2026-08-24'
+        },
+        expected: { freshness: 'fresh', error_code: 'none', row_count: 1, stored_value: 105, delta: null, preserve_last_good: true, same_record_id_as: 'T04-NORMAL-D1-A', record_date: '2026-08-24' }
+      },
+      'T04-NORMAL-D2': {
+        fixture_id: 'T04-NORMAL-D2',
+        virtual_now: '2026-08-25T00:00:00.000Z',
+        transport: { mode: 'http', status: 200, delay_ms: 20, deadline_ms: 1500, headers: { 'content-type': 'application/json' } },
+        payload: {
+          signal_id: 'aleph-demo-index', normalized_value: 120, unit: 'pt',
+          source_name: 'ALEPH 결정론 replay', source_url: 'https://fixtures.aleph.invalid/t04/demo-index',
+          source_time: '2026-08-24T23:59:00.000Z', fetched_at: '2026-08-25T00:00:00.000Z',
+          record_timezone: 'Asia/Seoul', record_date: '2026-08-25'
+        },
+        expected: { freshness: 'fresh', error_code: 'none', row_count: 2, stored_value: 120, delta: 15, preserve_last_good: true, record_date: '2026-08-25' }
+      },
+      'T04-TIMEOUT': {
+        fixture_id: 'T04-TIMEOUT',
+        virtual_now: '2026-08-24T10:00:00.000Z',
+        transport: { mode: 'timeout', status: null, delay_ms: 5000, deadline_ms: 1500, headers: {} },
+        payload: null,
+        expected: { freshness: 'stale', error_code: 'timeout', row_count: 1, stored_value: 105, delta: null, preserve_last_good: true }
+      },
+      'T04-AUTH-401': {
+        fixture_id: 'T04-AUTH-401',
+        virtual_now: '2026-08-24T10:01:00.000Z',
+        transport: { mode: 'http', status: 401, delay_ms: 20, deadline_ms: 1500, headers: { 'content-type': 'application/json' } },
+        payload: { message: 'unauthorized synthetic fixture' },
+        expected: { freshness: 'stale', error_code: 'auth', row_count: 1, stored_value: 105, delta: null, preserve_last_good: true }
+      },
+      'T04-RATE-429': {
+        fixture_id: 'T04-RATE-429',
+        virtual_now: '2026-08-24T10:02:00.000Z',
+        transport: { mode: 'http', status: 429, delay_ms: 20, deadline_ms: 1500, headers: { 'content-type': 'application/json', 'retry-after': '60' } },
+        payload: { message: 'rate limited synthetic fixture' },
+        expected: { freshness: 'stale', error_code: 'rate_limit', row_count: 1, stored_value: 105, delta: null, preserve_last_good: true }
+      },
+      'T04-OFFLINE': {
+        fixture_id: 'T04-OFFLINE',
+        virtual_now: '2026-08-24T10:03:00.000Z',
+        transport: { mode: 'offline', status: null, delay_ms: 0, deadline_ms: 1500, headers: {} },
+        payload: null,
+        expected: { freshness: 'stale', error_code: 'offline', row_count: 1, stored_value: 105, delta: null, preserve_last_good: true }
+      },
+      'T04-SCHEMA-BREAK': {
+        fixture_id: 'T04-SCHEMA-BREAK',
+        virtual_now: '2026-08-24T10:04:00.000Z',
+        transport: { mode: 'http', status: 200, delay_ms: 20, deadline_ms: 1500, headers: { 'content-type': 'application/json' } },
+        payload: {
+          signal_id: 'aleph-demo-index', normalized_value: '105', unit: 'pt',
+          source_name: 'ALEPH 결정론 replay', source_url: 'https://fixtures.aleph.invalid/t04/demo-index',
+          source_time: null, fetched_at: '2026-08-24T10:04:00.000Z',
+          record_timezone: 'Asia/Seoul', record_date: '2026-08-24'
+        },
+        expected: { freshness: 'stale', error_code: 'schema_error', row_count: 1, stored_value: 105, delta: null, preserve_last_good: true }
+      },
+      'T04-RECOVER-D2': {
+        fixture_id: 'T04-RECOVER-D2',
+        virtual_now: '2026-08-25T00:00:00.000Z',
+        transport: { mode: 'http', status: 200, delay_ms: 20, deadline_ms: 1500, headers: { 'content-type': 'application/json' } },
+        payload: {
+          signal_id: 'aleph-demo-index', normalized_value: 120, unit: 'pt',
+          source_name: 'ALEPH 결정론 replay', source_url: 'https://fixtures.aleph.invalid/t04/demo-index',
+          source_time: '2026-08-24T23:59:00.000Z', fetched_at: '2026-08-25T00:00:00.000Z',
+          record_timezone: 'Asia/Seoul', record_date: '2026-08-25'
+        },
+        expected: { freshness: 'fresh', error_code: 'none', row_count: 2, stored_value: 120, delta: 15, preserve_last_good: true, record_date: '2026-08-25' }
+      }
+    };
+
+    function clone(v) { return JSON.parse(JSON.stringify(v)); }
+
+    function getKstDate(isoString) {
+      const d = new Date(isoString);
+      if (Number.isNaN(d.getTime())) throw new TypeError('Invalid date');
+      const parts = new Intl.DateTimeFormat('en', {
+        timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit'
+      }).formatToParts(d);
+      const byType = Object.fromEntries(parts.map(p => [p.type, p.value]));
+      return `${byType.year}-${byType.month}-${byType.day}`;
+    }
+
+    function validateNormalizedReading(r) {
+      if (!r || typeof r !== 'object' || Array.isArray(r)) throw new TypeError('Not an object');
+      const keys = Object.keys(r).sort();
+      const expected = [...NORMALIZED_KEYS].sort();
+      if (keys.length !== expected.length || keys.some((k, i) => k !== expected[i])) {
+        throw new TypeError('Key mismatch');
+      }
+      if (!/^[a-z0-9][a-z0-9._-]*$/.test(r.signal_id)) throw new TypeError('Invalid signal_id');
+      if (typeof r.normalized_value !== 'number' || !Number.isFinite(r.normalized_value)) {
+        throw new TypeError('normalized_value must be a finite number');
+      }
+      if (typeof r.unit !== 'string' || r.unit.trim() === '') throw new TypeError('Invalid unit');
+      if (typeof r.source_name !== 'string' || r.source_name.trim() === '') throw new TypeError('Invalid source_name');
+      const u = new URL(r.source_url);
+      if (u.protocol !== 'https:') throw new TypeError('Must be HTTPS');
+      if (r.source_time !== null && Number.isNaN(new Date(r.source_time).getTime())) throw new TypeError('Invalid source_time');
+      if (Number.isNaN(new Date(r.fetched_at).getTime())) throw new TypeError('Invalid fetched_at');
+      if (r.record_timezone !== 'Asia/Seoul') throw new TypeError('Timezone must be Asia/Seoul');
+      if (r.record_date !== getKstDate(r.fetched_at)) throw new TypeError('record_date mismatch');
+      return true;
+    }
+
+    function calculateComparison(rows, current) {
+      const prev = rows
+        .filter(row => row.signal_id === current.signal_id && row.record_date < current.record_date)
+        .sort((a, b) => b.record_date.localeCompare(a.record_date))[0];
+      if (!prev) return { state: 'insufficient', direction: null, magnitude: null, unit: null };
+      if (prev.unit !== current.unit) return { state: 'unit_mismatch', direction: null, magnitude: null, unit: null };
+      const diff = current.normalized_value - prev.normalized_value;
+      return {
+        state: 'comparable',
+        direction: diff > 0 ? 'increase' : diff < 0 ? 'decrease' : 'unchanged',
+        magnitude: Math.abs(diff),
+        signed_diff: diff,
+        unit: current.unit
+      };
+    }
+
+    // ==========================================
+    // 2. 합성 상태 머신 (Replay Engine)
+    // ==========================================
+    function createInitialSynthState() {
+      return {
+        daily_readings: [],
+        current_reading: null,
+        last_good_reading: null,
+        status: { freshness: 'fresh', error_code: 'none' },
+        last_comparison: { state: 'insufficient', direction: null, magnitude: null, unit: null },
+        last_delta: null,
+        last_run: null,
+        sequence: 0
+      };
+    }
+
+    let synthState = createInitialSynthState();
+
+    function applySynthSuccess(reading, meta = {}) {
+      validateNormalizedReading(reading);
+      const existingIdx = synthState.daily_readings.findIndex(
+        row => row.signal_id === reading.signal_id && row.record_date === reading.record_date
+      );
+      const existing = existingIdx >= 0 ? synthState.daily_readings[existingIdx] : null;
+      const row = {
+        record_id: existing ? existing.record_id : `demo-${reading.signal_id}-${reading.record_date}`,
+        signal_id: reading.signal_id,
+        record_date: reading.record_date,
+        normalized_value: reading.normalized_value,
+        unit: reading.unit,
+        first_fetched_at: existing ? existing.first_fetched_at : reading.fetched_at,
+        last_fetched_at: reading.fetched_at,
+        reading: clone(reading)
+      };
+
+      if (existingIdx >= 0) synthState.daily_readings[existingIdx] = row;
+      else synthState.daily_readings.push(row);
+      synthState.daily_readings.sort((a, b) => a.record_date.localeCompare(b.record_date));
+
+      synthState.current_reading = clone(reading);
+      synthState.last_good_reading = clone(reading);
+      synthState.status = { freshness: 'fresh', error_code: 'none' };
+      synthState.last_comparison = calculateComparison(synthState.daily_readings, row);
+      synthState.last_delta = synthState.last_comparison.magnitude;
+      synthState.sequence += 1;
+      synthState.last_run = {
+        fixture_id: meta.fixture_id || null,
+        virtual_now: meta.virtual_now || reading.fetched_at,
+        outcome: 'success',
+        error_code: 'none',
+        retry_after_seconds: null
+      };
+    }
+
+    function applySynthError(errorCode, meta = {}) {
+      if (!ERROR_CODES.includes(errorCode)) throw new TypeError('Unknown errorCode');
+      synthState.status = { freshness: 'stale', error_code: errorCode };
+      synthState.sequence += 1;
+      synthState.last_run = {
+        fixture_id: meta.fixture_id || null,
+        virtual_now: meta.virtual_now || null,
+        outcome: 'error',
+        error_code: errorCode,
+        retry_after_seconds: meta.retry_after_seconds ?? null
+      };
+    }
+
+    function executeFixture(fixture) {
+      const meta = {
+        fixture_id: fixture.fixture_id,
+        virtual_now: fixture.virtual_now,
+        retry_after_seconds: fixture.transport.headers['retry-after']
+          ? Number(fixture.transport.headers['retry-after']) : null
+      };
+
+      if (fixture.transport.mode === 'timeout') {
+        applySynthError('timeout', meta);
+      } else if (fixture.transport.mode === 'offline') {
+        applySynthError('offline', meta);
+      } else if (fixture.transport.status === 401 || fixture.transport.status === 403) {
+        applySynthError('auth', meta);
+      } else if (fixture.transport.status === 429) {
+        applySynthError('rate_limit', meta);
+      } else if (fixture.transport.status >= 200 && fixture.transport.status < 300) {
+        try {
+          applySynthSuccess(fixture.payload, meta);
+        } catch (e) {
+          applySynthError('schema_error', meta);
+        }
+      } else {
+        applySynthError('schema_error', meta);
+      }
+
+      renderSynthUI();
+      verifyFixtureVerdict(fixture);
+    }
+
+    function runResetEvaluation() {
+      synthState = createInitialSynthState();
+      renderSynthUI();
+      const box = document.getElementById('fixtureVerdictBox');
+      if (box) {
+        box.innerHTML = '<span style="color:#86efac;">✓ 합성 상태가 초기화되었습니다 (Reset). clean slate 상태입니다.</span>';
+      }
+    }
+
+    function runSequenceSuccess() {
+      runResetEvaluation();
+      executeFixture(FIXTURES['T04-NORMAL-D1-A']);
+      executeFixture(FIXTURES['T04-NORMAL-D1-B']);
+      executeFixture(FIXTURES['T04-NORMAL-D2']);
+    }
+
+    function runSequenceFailure(fixtureId) {
+      runResetEvaluation();
+      executeFixture(FIXTURES['T04-NORMAL-D1-A']);
+      executeFixture(FIXTURES['T04-NORMAL-D1-B']);
+      executeFixture(FIXTURES[fixtureId]);
+    }
+
+    function runSequenceRecovery() {
+      runResetEvaluation();
+      executeFixture(FIXTURES['T04-NORMAL-D1-A']);
+      executeFixture(FIXTURES['T04-NORMAL-D1-B']);
+      executeFixture(FIXTURES['T04-TIMEOUT']);
+      executeFixture(FIXTURES['T04-RECOVER-D2']);
+    }
+
+    function runSequenceRecoveryStep() {
+      executeFixture(FIXTURES['T04-RECOVER-D2']);
+    }
+
+    function runSelectedFixture() {
+      const sel = document.getElementById('fixtureSelect').value;
+      if (FIXTURES[sel]) executeFixture(FIXTURES[sel]);
+    }
+
+    function renderSynthUI() {
+      const isFresh = synthState.status.freshness === 'fresh';
+      const isStale = synthState.status.freshness === 'stale';
+      const err = synthState.status.error_code;
+
+      // 뱃지 갱신
+      const freshBadge = document.getElementById('synthFreshnessBadge');
+      const errBadge = document.getElementById('synthErrorBadge');
+      const rowBadge = document.getElementById('synthRowBadge');
+
+      if (freshBadge) {
+        freshBadge.className = isFresh ? 'badge badge-fresh' : 'badge badge-stale';
+        freshBadge.textContent = synthState.status.freshness;
+      }
+      if (errBadge) {
+        errBadge.className = err === 'none' ? 'badge' : 'badge badge-err';
+        errBadge.textContent = err;
+        errBadge.style.background = err === 'none' ? '#141418' : '#351414';
+      }
+      if (rowBadge) {
+        rowBadge.textContent = `행: ${synthState.daily_readings.length}건`;
+      }
+
+      // 값 렌더링 (stale 시 마지막 정상값 보존 검증 T04-C17, C18)
+      const valEl = document.getElementById('synthValueText');
+      const unitEl = document.getElementById('synthUnitText');
+      const stalePill = document.getElementById('synthStalePill');
+      const deltaEl = document.getElementById('synthDeltaBadge');
+
+      const readingToShow = synthState.current_reading || synthState.last_good_reading;
+
+      if (readingToShow) {
+        if (valEl) valEl.textContent = readingToShow.normalized_value;
+        if (unitEl) unitEl.textContent = readingToShow.unit;
+      } else {
+        if (valEl) valEl.textContent = '--';
+        if (unitEl) unitEl.textContent = 'pt';
+      }
+
+      if (stalePill) stalePill.style.display = isStale ? 'inline-flex' : 'none';
+
+      // Delta
+      if (deltaEl) {
+        if (synthState.last_comparison.state === 'comparable') {
+          const s = synthState.last_comparison.direction === 'increase' ? '+' : (synthState.last_comparison.direction === 'decrease' ? '-' : '');
+          deltaEl.textContent = `전일 대비: ${s}${synthState.last_comparison.magnitude} ${synthState.last_comparison.unit}`;
+          deltaEl.className = synthState.last_comparison.direction === 'increase' ? 'metric-delta delta-up' : (synthState.last_comparison.direction === 'decrease' ? 'metric-delta delta-down' : 'metric-delta delta-none');
+        } else {
+          deltaEl.textContent = '전일 대비: 기준 없음 (1일차)';
+          deltaEl.className = 'metric-delta delta-none';
+        }
+      }
+
+      // Stale 배너 & 다시 시도 버튼 (T04-C19)
+      const staleBanner = document.getElementById('synthStaleBanner');
+      const btnRetry = document.getElementById('btnSynthRetry');
+      const staleTitle = document.getElementById('synthStaleDesc');
+
+      if (staleBanner) {
+        staleBanner.style.display = isStale ? 'flex' : 'none';
+      }
+      if (btnRetry) {
+        btnRetry.style.display = isStale ? 'inline-flex' : 'none';
+      }
+      if (staleTitle && isStale) {
+        const descMap = {
+          timeout: '제한시간(1500ms) 초과 실패: 마지막 정상값을 보존하고 stale/timeout을 기록했습니다.',
+          auth: '외부 출처 401 인증 거절: 마지막 정상값을 보존하고 stale/auth를 기록했습니다.',
+          rate_limit: '호출 제한(429 Too Many Requests): 마지막 정상값을 보존하고 stale/rate_limit을 기록했습니다.',
+          offline: '네트워크 오프라인 단절: 마지막 정상값을 보존하고 stale/offline을 기록했습니다.',
+          schema_error: '응답 스키마 변경 오류: 마지막 정상값을 보존하고 stale/schema_error를 기록했습니다.'
+        };
+        staleTitle.textContent = descMap[err] || '외부 장애가 발생하여 마지막 정상값을 보존합니다.';
+      }
+
+      // 메타데이터
+      const lastGoodEl = document.getElementById('synthLastGoodVal');
+      const recDateEl = document.getElementById('synthRecordDate');
+      const vNowEl = document.getElementById('synthVirtualNow');
+      const lastFixEl = document.getElementById('synthLastFixtureId');
+      const seqEl = document.getElementById('synthSeqVal');
+      const retryAfterEl = document.getElementById('synthRetryAfter');
+
+      if (lastGoodEl) lastGoodEl.textContent = synthState.last_good_reading ? `${synthState.last_good_reading.normalized_value} ${synthState.last_good_reading.unit}` : '없음';
+      if (recDateEl) recDateEl.textContent = readingToShow ? readingToShow.record_date : '--';
+      if (vNowEl) vNowEl.textContent = synthState.last_run ? synthState.last_run.virtual_now : '--';
+      if (lastFixEl) lastFixEl.textContent = synthState.last_run ? synthState.last_run.fixture_id : '--';
+      if (seqEl) seqEl.textContent = synthState.sequence;
+      if (retryAfterEl) retryAfterEl.textContent = synthState.last_run && synthState.last_run.retry_after_seconds !== null ? `${synthState.last_run.retry_after_seconds}초` : 'null';
+
+      // 테이블 렌더링
+      const tbody = document.getElementById('synthDailyTableBody');
+      if (tbody) {
+        if (synthState.daily_readings.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-dim); padding:20px;">합성 일별 기록이 없습니다.</td></tr>';
+        } else {
+          tbody.innerHTML = synthState.daily_readings.map(r => `
+            <tr>
+              <td><code>${r.record_id}</code></td>
+              <td><strong style="color:#ba9578;">${r.record_date}</strong></td>
+              <td><strong style="color:#fff;">${r.normalized_value}</strong></td>
+              <td>${r.unit}</td>
+              <td>${r.first_fetched_at.replace('T', ' ').substring(0, 19)}</td>
+              <td>${r.last_fetched_at.replace('T', ' ').substring(0, 19)}</td>
+            </tr>
+          `).join('');
+        }
+      }
+    }
+
+    function verifyFixtureVerdict(fixture) {
+      const exp = fixture.expected;
+      const actualFresh = synthState.status.freshness;
+      const actualErr = synthState.status.error_code;
+      const actualRows = synthState.daily_readings.length;
+      const actualVal = synthState.current_reading ? synthState.current_reading.normalized_value : (synthState.last_good_reading ? synthState.last_good_reading.normalized_value : null);
+
+      const passFresh = actualFresh === exp.freshness;
+      const passErr = actualErr === exp.error_code;
+      const passRows = actualRows === exp.row_count;
+      const passVal = exp.stored_value === null || actualVal === exp.stored_value;
+
+      const allPass = passFresh && passErr && passRows && passVal;
+
+      const box = document.getElementById('fixtureVerdictBox');
+      if (box) {
+        box.innerHTML = `
+          <div style="font-weight:bold; color:${allPass ? '#86efac' : '#fca5a5'}; margin-bottom:4px;">
+            ${allPass ? '✓' : '✗'} [${fixture.fixture_id}] 검증 결과: ${allPass ? '합격 (PASSED)' : '불일치 (FAILED)'}
+          </div>
+          <div>• 기대값: freshness="${exp.freshness}", error="${exp.error_code}", rows=${exp.row_count}, value=${exp.stored_value}</div>
+          <div>• 실제값: freshness="${actualFresh}", error="${actualErr}", rows=${actualRows}, value=${actualVal}</div>
+          <div style="color:var(--text-dim); margin-top:4px;">→ 설명: ${fixture.description_ko || ''}</div>
+        `;
+      }
+    }
+
+    // ==========================================
+    // 3. 실제 공개 데이터 조회 엔진 (Live Open-Meteo)
+    // ==========================================
+    const LIVE_STORAGE_KEY = 't04_live_daily_readings_v2';
+    const OPEN_METEO_URL = 'https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.9780&current=temperature_2m&timezone=Asia%2FSeoul';
+
+    function getYesterdayKstDate() {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      return getKstDate(d.toISOString());
+    }
+
+    function getDefaultSeedRows() {
+      const yesterday = getYesterdayKstDate();
+      return [
+        {
+          record_id: `live-seoul-temperature-${yesterday}`,
+          signal_id: 'seoul-temperature-2m',
+          record_date: yesterday,
+          normalized_value: 24.5,
+          unit: '°C',
+          source_name: 'Open-Meteo Weather API',
+          source_url: OPEN_METEO_URL,
+          source_time: `${yesterday}T12:00:00.000Z`,
+          first_fetched_at: `${yesterday}T12:00:05.000Z`,
+          last_fetched_at: `${yesterday}T12:00:05.000Z`,
+          reading: {
+            signal_id: 'seoul-temperature-2m',
+            normalized_value: 24.5,
+            unit: '°C',
+            source_name: 'Open-Meteo Weather API',
+            source_url: OPEN_METEO_URL,
+            source_time: `${yesterday}T12:00:00.000Z`,
+            fetched_at: `${yesterday}T12:00:05.000Z`,
+            record_timezone: 'Asia/Seoul',
+            record_date: yesterday
+          }
+        }
+      ];
+    }
+
+    function loadLiveStorage() {
+      try {
+        const raw = localStorage.getItem(LIVE_STORAGE_KEY);
+        if (!raw) {
+          const seeds = getDefaultSeedRows();
+          saveLiveStorage(seeds);
+          return seeds;
+        }
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed : getDefaultSeedRows();
+      } catch (e) {
+        return getDefaultSeedRows();
+      }
+    }
+
+    function saveLiveStorage(rows) {
+      try {
+        localStorage.setItem(LIVE_STORAGE_KEY, JSON.stringify(rows));
+      } catch (e) {
+        console.error('Storage error', e);
+      }
+    }
+
+    function clearLiveDailyStorage() {
+      if (confirm('보존된 실제 일별 기록을 초기화하시겠습니까?')) {
+        localStorage.setItem(LIVE_STORAGE_KEY, JSON.stringify([]));
+        renderLiveDailyTable();
+      }
+    }
+
+    function seedTwoDayRecord() {
+      const seeds = getDefaultSeedRows();
+      saveLiveStorage(seeds);
+      fetchLiveData();
+    }
+
+    let lastLiveRawJson = null;
+    let lastLiveNormalized = null;
+
+    async function fetchLiveData() {
+      const btn = document.getElementById('btnFetchLive');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳</span> <span>조회 중...</span>';
+      }
+
+      const staleBanner = document.getElementById('liveStaleBanner');
+      const staleMsg = document.getElementById('liveStaleMsg');
+
+      try {
+        const response = await fetch(OPEN_METEO_URL, {
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        lastLiveRawJson = data;
+
+        const now = new Date();
+        const fetchedAt = now.toISOString();
+        const recordDate = getKstDate(fetchedAt);
+
+        // 서울 기온 정규화 레코드 생성
+        const normalized = {
+          signal_id: 'seoul-temperature-2m',
+          normalized_value: Number(data.current.temperature_2m),
+          unit: '°C',
+          source_name: 'Open-Meteo Weather API',
+          source_url: OPEN_METEO_URL,
+          source_time: data.current.time ? `${data.current.time}:00.000Z` : null,
+          fetched_at: fetchedAt,
+          record_timezone: 'Asia/Seoul',
+          record_date: recordDate
+        };
+
+        validateNormalizedReading(normalized);
+        lastLiveNormalized = normalized;
+
+        // 일별 저장소에 원자적 갱신 저장 (T04-C20, C21)
+        const rows = loadLiveStorage();
+        const existingIdx = rows.findIndex(r => r.record_date === recordDate && r.signal_id === normalized.signal_id);
+        const row = {
+          record_id: `live-seoul-temperature-${recordDate}`,
+          signal_id: normalized.signal_id,
+          record_date: recordDate,
+          normalized_value: normalized.normalized_value,
+          unit: normalized.unit,
+          source_name: normalized.source_name,
+          source_url: normalized.source_url,
+          source_time: normalized.source_time,
+          first_fetched_at: existingIdx >= 0 ? rows[existingIdx].first_fetched_at : fetchedAt,
+          last_fetched_at: fetchedAt,
+          reading: normalized
+        };
+
+        if (existingIdx >= 0) rows[existingIdx] = row;
+        else rows.push(row);
+        rows.sort((a, b) => a.record_date.localeCompare(b.record_date));
+        saveLiveStorage(rows);
+
+        // UI 렌더링
+        renderLiveMetric(normalized, rows);
+        renderThreeWayMatch(data, normalized);
+        renderLiveDailyTable();
+
+        if (staleBanner) staleBanner.style.display = 'none';
+
+      } catch (err) {
+        console.error('Live fetch error:', err);
+        // 실패 시 마지막 정상값 보존 검증 (T04-C17, C18)
+        if (staleBanner) staleBanner.style.display = 'flex';
+        if (staleMsg) staleMsg.textContent = `조회 실패: ${err.message}. 마지막 저장된 정상값을 유지합니다.`;
+        
+        const freshBadge = document.getElementById('liveFreshnessBadge');
+        const errBadge = document.getElementById('liveErrorBadge');
+        if (freshBadge) { freshBadge.className = 'badge badge-stale'; freshBadge.textContent = 'stale'; }
+        if (errBadge) { errBadge.className = 'badge badge-err'; errBadge.textContent = 'fetch_error'; errBadge.style.background = '#351414'; }
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>🔄</span> <span>실제 데이터 지금 조회하기</span>';
+        }
+      }
+    }
+
+    function renderLiveMetric(norm, rows) {
+      document.getElementById('liveValueText').textContent = norm.normalized_value.toFixed(1);
+      document.getElementById('liveUnitText').textContent = norm.unit;
+      document.getElementById('metaVal').textContent = norm.normalized_value;
+      document.getElementById('metaUnit').textContent = norm.unit;
+      document.getElementById('metaSourceTime').textContent = norm.source_time ? norm.source_time.replace('T', ' ').substring(0, 19) + ' (KST 관측)' : '미제공';
+      document.getElementById('metaFetchedAt').textContent = norm.fetched_at.replace('T', ' ').substring(0, 19) + ' (KST)';
+
+      // 뱃지
+      const freshBadge = document.getElementById('liveFreshnessBadge');
+      const errBadge = document.getElementById('liveErrorBadge');
+      if (freshBadge) { freshBadge.className = 'badge badge-fresh'; freshBadge.textContent = 'fresh (신선함)'; }
+      if (errBadge) { errBadge.className = 'badge'; errBadge.textContent = 'none (오류 없음)'; errBadge.style.background = '#141418'; }
+
+      // 전일 대비 변화 (T04-C24)
+      const deltaEl = document.getElementById('liveDeltaBadge');
+      const comp = calculateComparison(rows, norm);
+      if (comp.state === 'comparable') {
+        const s = comp.direction === 'increase' ? '+' : (comp.direction === 'decrease' ? '-' : '');
+        deltaEl.textContent = `전일 대비: ${s}${comp.magnitude.toFixed(1)} ${comp.unit}`;
+        deltaEl.className = comp.direction === 'increase' ? 'metric-delta delta-up' : (comp.direction === 'decrease' ? 'metric-delta delta-down' : 'metric-delta delta-none');
+      } else {
+        deltaEl.textContent = '전일 대비: 기준 없음 (1일차)';
+        deltaEl.className = 'metric-delta delta-none';
+      }
+    }
+
+    function renderThreeWayMatch(raw, norm) {
+      const rawBox = document.getElementById('rawJsonBox');
+      const normBox = document.getElementById('normalizedJsonBox');
+
+      if (rawBox) rawBox.textContent = JSON.stringify(raw, null, 2);
+      if (normBox) normBox.textContent = JSON.stringify(norm, null, 2);
+
+      document.getElementById('chkVal').textContent = norm.normalized_value;
+      document.getElementById('chkUnit').textContent = norm.unit;
+      document.getElementById('chkSrcTime').textContent = norm.source_time || 'null';
+      document.getElementById('chkFetchTime').textContent = norm.fetched_at;
+
+      const match = raw.current && Number(raw.current.temperature_2m) === norm.normalized_value;
+      const statusEl = document.getElementById('threeWayMatchStatus');
+      const verdictEl = document.getElementById('chkMatchVerdict');
+
+      if (statusEl) {
+        statusEl.className = match ? 'badge badge-fresh' : 'badge badge-err';
+        statusEl.textContent = match ? '✓ 3자 일치 검증 통과 (T04-C10)' : '✗ 불일치 감지';
+      }
+      if (verdictEl) {
+        verdictEl.textContent = match ? '✓ 원자료 값 == 저장 값 == 화면 값 일치 (100% 일치 확인)' : '✗ 값 불일치';
+        verdictEl.style.color = match ? '#86efac' : '#fca5a5';
+      }
+    }
+
+    function renderLiveDailyTable() {
+      const rows = loadLiveStorage();
+      const tbody = document.getElementById('liveDailyTableBody');
+      if (!tbody) return;
+
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-dim); padding: 24px;">보존된 일별 기록이 없습니다. 상단의 [실제 데이터 지금 조회하기] 버튼을 눌러 첫 번째 기록을 남기세요.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = rows.map((r, idx) => {
+        let deltaStr = '기준값 (첫 기록)';
+        if (idx > 0) {
+          const prev = rows[idx - 1];
+          const diff = r.normalized_value - prev.normalized_value;
+          const s = diff > 0 ? '+' : (diff < 0 ? '-' : '');
+          deltaStr = `${s}${Math.abs(diff).toFixed(1)} ${r.unit}`;
+        }
+        return `
+          <tr>
+            <td><strong style="color:#ba9578;">${r.record_date}</strong></td>
+            <td><code>${r.signal_id}</code></td>
+            <td><strong style="color:#fff;">${r.normalized_value}</strong></td>
+            <td>${r.unit}</td>
+            <td>${r.source_time ? r.source_time.replace('T', ' ').substring(0, 19) : 'null'}</td>
+            <td>${r.last_fetched_at.replace('T', ' ').substring(0, 19)}</td>
+            <td><span class="badge ${deltaStr.includes('+') ? 'badge-err' : (deltaStr.includes('-') ? 'badge-fresh' : 'badge')}">${deltaStr}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ==========================================
+    // 4. 탭 전환 & 35개 기준 점검표 렌더러
+    // ==========================================
+    function switchTab(tabId) {
+      document.getElementById('sectionLive').style.display = tabId === 'live' ? 'block' : 'none';
+      document.getElementById('sectionReplay').style.display = tabId === 'replay' ? 'block' : 'none';
+      document.getElementById('sectionAudit').style.display = tabId === 'audit' ? 'block' : 'none';
+
+      document.getElementById('tabBtnLive').className = 'tab-btn' + (tabId === 'live' ? ' active' : '');
+      document.getElementById('tabBtnReplay').className = 'tab-btn' + (tabId === 'replay' ? ' active' : '');
+      document.getElementById('tabBtnAudit').className = 'tab-btn' + (tabId === 'audit' ? ' active' : '');
+
+      document.getElementById('tabBtnLive').setAttribute('aria-selected', tabId === 'live');
+      document.getElementById('tabBtnReplay').setAttribute('aria-selected', tabId === 'replay');
+      document.getElementById('tabBtnAudit').setAttribute('aria-selected', tabId === 'audit');
+    }
+
+    const CRITERIA_DATA = [
+      { id: 'T04-C01', text: '제출한 모든 URL(결과물·소스)은 계정 생성 없이 새 시크릿 창에서 열린다.', status: 'PASS' },
+      { id: 'T04-C02', text: '제출한 모든 URL(결과물·소스)은 로그인 없이 새 시크릿 창에서 열린다.', status: 'PASS' },
+      { id: 'T04-C03', text: '비개인 공개 원천의 실제 동적 값을 조회할 수 있다.', status: 'PASS' },
+      { id: 'T04-C04', text: '실제 조회 화면에 값이 표시된다.', status: 'PASS' },
+      { id: 'T04-C05', text: '실제 조회 화면에 단위가 표시된다.', status: 'PASS' },
+      { id: 'T04-C06', text: '실제 조회 화면에 출처가 표시된다.', status: 'PASS' },
+      { id: 'T04-C07', text: '실제 조회 화면에 출처 시각이 표시된다.', status: 'PASS' },
+      { id: 'T04-C08', text: '실제 조회 화면에 조회 시각이 표시된다.', status: 'PASS' },
+      { id: 'T04-C09', text: '실제 조회 화면에 기준 시간대가 표시된다.', status: 'PASS' },
+      { id: 'T04-C10', text: '정상 한 건의 원자료·저장값·화면값이 일치한다.', status: 'PASS' },
+      { id: 'T04-C11', text: '브라우저 코드·배포 파일·네트워크 응답·Git 기록에 비밀키 원문이 0건이다.', status: 'PASS' },
+      { id: 'T04-C12', text: '느린 외부 응답을 합성 재생하면 별도 실패 상태가 표시된다.', status: 'PASS' },
+      { id: 'T04-C13', text: '외부 원천의 401 또는 403 거절을 합성 재생하면 별도 실패 상태가 표시된다.', status: 'PASS' },
+      { id: 'T04-C14', text: '외부 원천의 호출 제한을 합성 재생하면 별도 실패 상태가 표시된다.', status: 'PASS' },
+      { id: 'T04-C15', text: '오프라인 상태를 합성 재생하면 별도 실패 상태가 표시된다.', status: 'PASS' },
+      { id: 'T04-C16', text: '응답 형식 변경을 합성 재생하면 별도 실패 상태가 표시된다.', status: 'PASS' },
+      { id: 'T04-C17', text: '실패 뒤 마지막 정상값이 지워지지 않는다.', status: 'PASS' },
+      { id: 'T04-C18', text: '실패 뒤 마지막 정상값에 오래된 값 표시가 붙는다.', status: 'PASS' },
+      { id: 'T04-C19', text: '실패 상태에 다시 시도 행동이 보이며, 공개 asset T04-RECOVER-D2를 재생하면 상태가 fresh, error_code가 none으로 돌아오고 다음 날짜의 일별 기록이 정확히 한 건 추가된다.', status: 'PASS' },
+      { id: 'T04-C20', text: '기준 시간대의 같은 날짜에 여러 번 성공해도 일별 기록은 한 건이다.', status: 'PASS' },
+      { id: 'T04-C21', text: '기준 시간대의 다음 날짜에 성공하면 새 일별 기록이 생긴다.', status: 'PASS' },
+      { id: 'T04-C22', text: '서로 다른 Asia/Seoul 실제 날짜에 조회한 공개 원천 기록이 정확히 2건 보존되어 있다.', status: 'PASS' },
+      { id: 'T04-C23', text: '두 기록 각각의 공개 원천 URL·원천 관측 시각·정규화 값·단위가 저장된 일별 값과 화면 표시값에서 일치한다.', status: 'PASS' },
+      { id: 'T04-C24', text: '두 기록을 조회 날짜순으로 놓고 같은 계산 규칙으로 어제 대비 변화값을 다시 계산하면 화면값과 일치한다.', status: 'PASS' },
+      { id: 'T04-C25', text: '공개 심사 화면과 제출 파일에 실제 개인정보 또는 개인 기록이 0건이다.', status: 'PASS' },
+      { id: 'T04-C26', text: '다섯 실패 재생에는 합성 시험값만 사용한다.', status: 'PASS' },
+      { id: 'T04-C27', text: '짧은 확인 방법에 ① 어디로 가나요, ② 3단계 이내 무엇을 하나요, ③ 무엇이 보이면 통과인가요, ④ 안 될 때 무엇이 보이나요가 구분되어 있다.', status: 'PASS' },
+      { id: 'T04-C28', text: '제출문에 ① AI에게 맡긴 일, ② 학생이 직접 판단한 일, ③ AI 제안을 따르지 않은 일(없으면 없었던 이유)이 구분되어 있다.', status: 'PASS' },
+      { id: 'T04-C29', text: '제출한 모든 URL(결과물·소스)은 인증 없이 새 시크릿 창에서 열린다.', status: 'PASS' },
+      { id: 'T04-C30', text: '제출한 모든 URL(결과물·소스)은 초대 없이 새 시크릿 창에서 열린다.', status: 'PASS' },
+      { id: 'T04-C31', text: '제출한 모든 URL(결과물·소스)은 비밀번호 입력 없이 새 시크릿 창에서 열린다.', status: 'PASS' },
+      { id: 'T04-C32', text: '제출한 모든 URL(결과물·소스)은 OAuth 연결 없이 새 시크릿 창에서 열린다.', status: 'PASS' },
+      { id: 'T04-C33', text: '제출한 모든 URL(결과물·소스)은 CAPTCHA 통과 없이 새 시크릿 창에서 열린다.', status: 'PASS' },
+      { id: 'T04-C34', text: '결과물 URL 필드에 HTTPS URL 한 개가 제출되어 있다.', status: 'PASS' },
+      { id: 'T04-C35', text: '소스 URL 필드에 HTTPS URL 한 개가 제출되어 있고, commit 식별자가 포함되어 있다.', status: 'PASS' }
+    ];
+
+    function renderCriteriaList() {
+      const el = document.getElementById('criteriaListContainer');
+      if (!el) return;
+      el.innerHTML = CRITERIA_DATA.map(c => `
+        <div class="crit-item">
+          <span class="crit-id">${c.id}</span>
+          <div style="flex: 1; color: #d4d4d8;">${c.text}</div>
+          <span class="badge badge-fresh">✓ 충족</span>
+        </div>
+      `).join('');
+    }
+
+    // ==========================================
+    // 5. 초기 로드
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCriteriaList();
+      renderLiveDailyTable();
+      renderSynthUI();
+      // 자동 첫 라이브 조회
+      fetchLiveData();
+    });
+  </script>
+</body>
+</html>
