@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>오늘의 날씨 | 신재원페이지</title>
-  <meta name="description" content="과제 4: 서울 실시간 기온 및 일별 기록 날씨 정보판">
+  <title>오늘의 날씨 & 환율 | 신재원페이지</title>
+  <meta name="description" content="과제 4: 서울 실시간 기온 및 미국·일본·중국 실시간 환율 정보판">
 
   <!-- Pretendard & JetBrains Mono Fonts -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
@@ -470,10 +470,10 @@
           <span>🎨</span>
           <span>짤스튜디오</span>
         </a>
-        <a href="/board.html" class="quick-nav-item active" aria-current="page" title="과제 4 오늘의 날씨">
+        <a href="/board.html" class="quick-nav-item active" aria-current="page" title="과제 4 오늘의 날씨 & 환율">
           <span>🌤️</span>
-          <span class="nav-hide-mobile">오늘의 날씨</span>
-          <span class="nav-show-mobile">날씨</span>
+          <span class="nav-hide-mobile">날씨 & 환율</span>
+          <span class="nav-show-mobile">날씨·환율</span>
         </a>
       </nav>
 
@@ -505,7 +505,7 @@
         <span class="badge badge-gold">과제 4</span>
       </div>
       <h1 style="font-size: 26px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #fff; margin-bottom: 6px;">
-        오늘의 날씨
+        오늘의 날씨 & 환율
       </h1>
     </div>
 
@@ -559,6 +559,104 @@
           <button type="button" class="btn btn-primary btn-sm" id="btnFetchLive" onclick="fetchLiveData()">
             <span>🔄</span> <span>실제 데이터 지금 조회하기</span>
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 실시간 주요 환율 카드 (미국 · 일본 · 중국) -->
+    <div class="card">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 18px;">💱</span>
+          <h2 style="font-size: 15px; font-weight: 700; color: var(--brown-main); font-family: 'JetBrains Mono', monospace; margin: 0;">
+            실시간 주요 환율 (미국 · 일본 · 중국)
+          </h2>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;" id="fxFetchedAt">
+            조회 시각: 조회 중...
+          </div>
+          <button type="button" class="btn btn-sm" style="padding: 3px 8px; font-size: 11px;" onclick="fetchExchangeRates()" title="환율 새로고침">
+            <span>🔄</span> <span>환율 갱신</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3개국 환율 그리드 -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+        
+        <!-- 미국 USD -->
+        <div style="background: #0d0d10; border: 1px solid var(--border-zinc); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 22px;">🇺🇸</span>
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: #fff; font-family: 'JetBrains Mono', monospace;">미국 (USD)</div>
+                <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">1 달러 ($)</div>
+              </div>
+            </div>
+            <span class="badge" style="background: #1e1b18; border-color: #5a422d; color: #ba9578;">USD / KRW</span>
+          </div>
+          <div style="margin-top: 6px; display: flex; align-items: baseline; gap: 4px;">
+            <span style="font-size: 28px; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace;" id="fxUsdRate">--</span>
+            <span style="font-size: 14px; font-weight: 600; color: var(--brown-main); font-family: 'JetBrains Mono', monospace;">원</span>
+          </div>
+          <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">
+            1 USD = <strong id="fxUsdSub" style="color: #e4d3c4;">--</strong> 원
+          </div>
+        </div>
+
+        <!-- 일본 JPY -->
+        <div style="background: #0d0d10; border: 1px solid var(--border-zinc); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 22px;">🇯🇵</span>
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: #fff; font-family: 'JetBrains Mono', monospace;">일본 (JPY)</div>
+                <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">100 엔 (¥)</div>
+              </div>
+            </div>
+            <span class="badge" style="background: #1e1b18; border-color: #5a422d; color: #ba9578;">100 JPY / KRW</span>
+          </div>
+          <div style="margin-top: 6px; display: flex; align-items: baseline; gap: 4px;">
+            <span style="font-size: 28px; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace;" id="fxJpyRate">--</span>
+            <span style="font-size: 14px; font-weight: 600; color: var(--brown-main); font-family: 'JetBrains Mono', monospace;">원</span>
+          </div>
+          <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">
+            100 JPY = <strong id="fxJpySub" style="color: #e4d3c4;">--</strong> 원
+          </div>
+        </div>
+
+        <!-- 중국 CNY -->
+        <div style="background: #0d0d10; border: 1px solid var(--border-zinc); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 22px;">🇨🇳</span>
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: #fff; font-family: 'JetBrains Mono', monospace;">중국 (CNY)</div>
+                <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">1 위안 (¥)</div>
+              </div>
+            </div>
+            <span class="badge" style="background: #1e1b18; border-color: #5a422d; color: #ba9578;">CNY / KRW</span>
+          </div>
+          <div style="margin-top: 6px; display: flex; align-items: baseline; gap: 4px;">
+            <span style="font-size: 28px; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace;" id="fxCnyRate">--</span>
+            <span style="font-size: 14px; font-weight: 600; color: var(--brown-main); font-family: 'JetBrains Mono', monospace;">원</span>
+          </div>
+          <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">
+            1 CNY = <strong id="fxCnySub" style="color: #e4d3c4;">--</strong> 원
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 하단 출처 표기 -->
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; border-top: 1px solid var(--border-zinc); padding-top: 12px; margin-top: 16px;">
+        <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">
+          출처: <a href="https://www.exchangerate-api.com" target="_blank" rel="noopener noreferrer" style="color: #ba9578; text-decoration: underline;">ExchangeRate-API</a> (공개 실시간 원천)
+        </div>
+        <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">
+          * 일본(JPY) 환율은 국내 외환시장 기준에 따라 100엔(¥) 단위로 환산되어 표시됩니다.
         </div>
       </div>
     </div>
@@ -752,6 +850,9 @@
         btn.innerHTML = '<span>⏳</span> <span>조회 중...</span>';
       }
 
+      // 환율도 동시에 최신으로 갱신
+      fetchExchangeRates();
+
       const staleBanner = document.getElementById('liveStaleBanner');
       const staleMsg = document.getElementById('liveStaleMsg');
 
@@ -880,11 +981,111 @@
     }
 
     // ==========================================
-    // 4. 초기화 및 자동 조회
+    // 4. 실시간 환율 통신 및 UI 렌더링 (미국, 일본, 중국)
+    // ==========================================
+    const FX_API_URL = 'https://open.er-api.com/v6/latest/USD';
+    const FX_CACHE_KEY = 'skt_live_board_fx_cache_v1';
+
+    async function fetchExchangeRates() {
+      const fxTimeEl = document.getElementById('fxFetchedAt');
+      const usdEl = document.getElementById('fxUsdRate');
+      const usdSub = document.getElementById('fxUsdSub');
+      const jpyEl = document.getElementById('fxJpyRate');
+      const jpySub = document.getElementById('fxJpySub');
+      const cnyEl = document.getElementById('fxCnyRate');
+      const cnySub = document.getElementById('fxCnySub');
+
+      if (fxTimeEl && !fxTimeEl.textContent.includes('조회 중')) {
+        fxTimeEl.textContent = '조회 시각: 갱신 중...';
+      }
+
+      try {
+        const response = await fetch(FX_API_URL, {
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (data.result !== 'success' || !data.rates) {
+          throw new Error('Invalid FX response');
+        }
+
+        const krw = Number(data.rates.KRW);
+        const jpy = Number(data.rates.JPY);
+        const cny = Number(data.rates.CNY);
+
+        const usdToKrw = krw; // 1 USD in KRW
+        const jpy100ToKrw = (krw / jpy) * 100; // 100 JPY in KRW
+        const cnyToKrw = krw / cny; // 1 CNY in KRW
+
+        const now = new Date();
+        const kstTimeStr = now.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+
+        const fxRecord = {
+          usd: usdToKrw,
+          jpy100: jpy100ToKrw,
+          cny: cnyToKrw,
+          fetchedAt: kstTimeStr,
+          rawUtc: data.time_last_update_utc || now.toISOString()
+        };
+
+        try {
+          localStorage.setItem(FX_CACHE_KEY, JSON.stringify(fxRecord));
+        } catch (e) {
+          console.warn('FX cache save error:', e);
+        }
+
+        renderFxRates(fxRecord);
+
+      } catch (err) {
+        console.warn('FX fetch failed, attempting cached recovery:', err);
+        try {
+          const cached = localStorage.getItem(FX_CACHE_KEY);
+          if (cached) {
+            const fxRecord = JSON.parse(cached);
+            renderFxRates(fxRecord);
+            if (fxTimeEl) fxTimeEl.textContent = `조회 시각: ${fxRecord.fetchedAt} (보존값)`;
+            return;
+          }
+        } catch (e) {}
+
+        if (usdEl) usdEl.textContent = '조회 실패';
+        if (jpyEl) jpyEl.textContent = '조회 실패';
+        if (cnyEl) cnyEl.textContent = '조회 실패';
+        if (fxTimeEl) fxTimeEl.textContent = '조회 시각: 통신 오류';
+      }
+    }
+
+    function renderFxRates(rec) {
+      const fxTimeEl = document.getElementById('fxFetchedAt');
+      const usdEl = document.getElementById('fxUsdRate');
+      const usdSub = document.getElementById('fxUsdSub');
+      const jpyEl = document.getElementById('fxJpyRate');
+      const jpySub = document.getElementById('fxJpySub');
+      const cnyEl = document.getElementById('fxCnyRate');
+      const cnySub = document.getElementById('fxCnySub');
+
+      const formatNum = (n) => Number(n).toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      if (usdEl) usdEl.textContent = formatNum(rec.usd);
+      if (usdSub) usdSub.textContent = formatNum(rec.usd);
+
+      if (jpyEl) jpyEl.textContent = formatNum(rec.jpy100);
+      if (jpySub) jpySub.textContent = formatNum(rec.jpy100);
+
+      if (cnyEl) cnyEl.textContent = formatNum(rec.cny);
+      if (cnySub) cnySub.textContent = formatNum(rec.cny);
+
+      if (fxTimeEl) fxTimeEl.textContent = `조회 시각: ${rec.fetchedAt} (KST)`;
+    }
+
+    // ==========================================
+    // 5. 초기화 및 자동 조회
     // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
       renderLiveDailyTable();
       fetchLiveData();
+      fetchExchangeRates();
     });
   </script>
 </body>
