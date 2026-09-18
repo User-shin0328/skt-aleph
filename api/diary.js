@@ -43,14 +43,14 @@ function base64UrlDecode(str) {
   return Buffer.from(str, 'base64').toString('utf-8');
 }
 
-// JWT 서명 (유효기간: 24시간 = 86400초)
+// JWT 서명 (유효기간: 1시간 = 3600초)
 function signJwt(payload) {
   const header = { alg: 'HS256', typ: 'JWT' };
   const now = Math.floor(Date.now() / 1000);
   const fullPayload = {
     ...payload,
     iat: now,
-    exp: now + 86400 // 24시간
+    exp: now + 3600 // 1시간
   };
 
   const encodedHeader = base64UrlEncode(JSON.stringify(header));
@@ -493,12 +493,14 @@ module.exports = async function handler(req, res) {
 
       saveDatabase(db);
 
-      // 가입 성공 즉시 JWT 토큰 발급
+      // 가입 성공 즉시 JWT 토큰 발급 (1시간 유효)
       const token = signJwt({ username: cleanUsername, displayName: newUser.displayName });
+      const expiresAt = new Date(Date.now() + 3600 * 1000).toISOString();
       return res.status(201).json({
         success: true,
         message: '회원가입이 완료되었습니다.',
         token,
+        expiresAt,
         user: { username: cleanUsername, displayName: newUser.displayName }
       });
     } catch (e) {
@@ -531,12 +533,14 @@ module.exports = async function handler(req, res) {
         return res.status(401).json({ success: false, error: authFailMsg });
       }
 
-      // JWT 토큰 발급
+      // JWT 토큰 발급 (1시간 유효)
       const token = signJwt({ username: user.username, displayName: user.displayName });
+      const expiresAt = new Date(Date.now() + 3600 * 1000).toISOString();
       return res.status(200).json({
         success: true,
         message: '로그인되었습니다.',
         token,
+        expiresAt,
         user: { username: user.username, displayName: user.displayName }
       });
     } catch (e) {

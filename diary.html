@@ -1137,13 +1137,11 @@
         <div class="auth-user-tag">
           <span style="color: var(--brown-main);">👤</span>
           <span>로그인 계정: <strong id="authCurrentUsername" style="color: #ffedd5;">-</strong></span>
-          <span class="badge badge-success">인증됨 (Bearer JWT)</span>
-          <span class="badge badge-gold">PBKDF2 10만 회 솔트 해시</span>
         </div>
         <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
           <span>기준 시각: <span id="kstClock">로딩 중...</span> (Asia/Seoul)</span>
           <span>&bull;</span>
-          <span>세션 유효: <span id="tokenExpiryDisplay" class="token-timer-badge">24:00:00 남음</span></span>
+          <span>세션 유효: <span id="tokenExpiryDisplay" class="token-timer-badge">59:59 남음</span></span>
           <span>&bull;</span>
           <span id="dbStatusBadge" class="badge badge-success">🟢 서버 DB 연결됨</span>
         </div>
@@ -1168,12 +1166,12 @@
           <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
             <span style="font-size: 20px;">🔐</span>
             <h2 style="font-size: 18px; font-weight: 700; color: #ffedd5; font-family: 'JetBrains Mono', monospace;">
-              플랜두씨 다이어리 2 — 개인 자료 잠금 및 인증
+              로그인 화면
             </h2>
           </div>
           <p style="font-size: 12px; color: var(--text-gray); line-height: 1.5;">
             본 다이어리는 <strong>사용자 인증 시스템</strong>이 적용되어 로그인한 본인만의 계획·실행·돌아보기 자료를 안전하게 격리 보호합니다.<br>
-            비밀번호는 32바이트 고유 Salt와 PBKDF2(100,000회)로 단방향 암호화되며, 24시간 유효한 JWT 토큰으로 통신합니다.
+            비밀번호는 32바이트 고유 Salt와 PBKDF2(100,000회)로 단방향 암호화되며, 1시간 유효한 JWT 토큰으로 통신합니다.
           </p>
         </div>
         <span class="badge badge-warning" style="white-space: nowrap;">비로그인 상태</span>
@@ -1198,7 +1196,7 @@
               <input type="password" id="loginPassword" class="form-input" placeholder="비밀번호 입력" required autocomplete="current-password" />
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
-              <span style="font-size: 11px; color: var(--text-dim);">* 세션은 24시간 동안 유지됩니다.</span>
+              <span style="font-size: 11px; color: var(--text-dim);">* 세션은 1시간 동안 유지됩니다.</span>
               <button type="submit" class="btn btn-primary" style="padding: 9px 20px;">
                 <span>🔓</span> <span>로그인</span>
               </button>
@@ -2055,6 +2053,10 @@
       authUser = null;
     }
     let tokenExpiresAt = sessionStorage.getItem('pds_auth_expires') || null;
+    if (authToken && !tokenExpiresAt) {
+      tokenExpiresAt = new Date(Date.now() + 3600 * 1000).toISOString();
+      sessionStorage.setItem('pds_auth_expires', tokenExpiresAt);
+    }
     let tokenTimerInterval = null;
     let currentActiveTab = 'diary';
 
@@ -2144,16 +2146,18 @@
         regBtn.classList.remove('active');
         loginForm.style.display = 'flex';
         regForm.style.display = 'none';
+        if (loginForm) loginForm.reset();
       } else {
         loginBtn.classList.remove('active');
         regBtn.classList.add('active');
         loginForm.style.display = 'none';
         regForm.style.display = 'flex';
+        if (regForm) regForm.reset();
       }
     }
 
     // =========================================================================
-    // 세션 만료 타이머 관리 (24시간 카운트다운)
+    // 세션 만료 타이머 관리 (1시간 실시간 카운트다운)
     // =========================================================================
     function startTokenTimer() {
       stopTokenTimer();
@@ -2162,20 +2166,29 @@
 
       function updateTimerText() {
         const el = document.getElementById('tokenExpiryDisplay');
-        if (!el || !tokenExpiresAt) return;
+        if (!el) return;
+        if (!tokenExpiresAt) {
+          tokenExpiresAt = new Date(Date.now() + 3600 * 1000).toISOString();
+          sessionStorage.setItem('pds_auth_expires', tokenExpiresAt);
+        }
         const now = Date.now();
         const diff = new Date(tokenExpiresAt).getTime() - now;
         if (diff <= 0) {
           el.textContent = '세션 만료됨';
           el.style.color = '#ef4444';
           handleUserLogout(false);
-          alert('세션 유효시간(24시간)이 만료되어 자동으로 로그아웃되었습니다.');
+          alert('세션 유효시간(1시간)이 만료되어 자동으로 로그아웃되었습니다.');
           return;
         }
         const hours = Math.floor(diff / 3600000);
         const mins = Math.floor((diff % 3600000) / 60000);
         const secs = Math.floor((diff % 60000) / 1000);
-        el.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')} 남음`;
+        if (hours > 0) {
+          el.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')} 남음`;
+        } else {
+          el.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')} 남음`;
+        }
+        el.style.color = '';
       }
     }
 
@@ -2244,10 +2257,13 @@
 
         authToken = data.token;
         authUser = data.user;
-        tokenExpiresAt = data.expiresAt;
+        tokenExpiresAt = data.expiresAt || new Date(Date.now() + 3600 * 1000).toISOString();
         sessionStorage.setItem('pds_auth_token', authToken);
         sessionStorage.setItem('pds_auth_user', JSON.stringify(authUser));
         sessionStorage.setItem('pds_auth_expires', tokenExpiresAt);
+
+        const lf = document.getElementById('loginForm');
+        if (lf) lf.reset();
 
         updateAuthUI(true);
         showToast(`로그인 성공! 환영합니다, ${authUser.name || authUser.username}님.`, '🔓');
@@ -2272,10 +2288,15 @@
 
         authToken = data.token;
         authUser = data.user;
-        tokenExpiresAt = data.expiresAt;
+        tokenExpiresAt = data.expiresAt || new Date(Date.now() + 3600 * 1000).toISOString();
         sessionStorage.setItem('pds_auth_token', authToken);
         sessionStorage.setItem('pds_auth_user', JSON.stringify(authUser));
         sessionStorage.setItem('pds_auth_expires', tokenExpiresAt);
+
+        const lf = document.getElementById('loginForm');
+        if (lf) lf.reset();
+        const rf = document.getElementById('registerForm');
+        if (rf) rf.reset();
 
         updateAuthUI(true);
         showToast(`체험 계정(${username})으로 로그인되었습니다!`, '⚡');
@@ -2318,10 +2339,13 @@
 
         authToken = data.token;
         authUser = data.user;
-        tokenExpiresAt = data.expiresAt;
+        tokenExpiresAt = data.expiresAt || new Date(Date.now() + 3600 * 1000).toISOString();
         sessionStorage.setItem('pds_auth_token', authToken);
         sessionStorage.setItem('pds_auth_user', JSON.stringify(authUser));
         sessionStorage.setItem('pds_auth_expires', tokenExpiresAt);
+
+        const rf = document.getElementById('registerForm');
+        if (rf) rf.reset();
 
         updateAuthUI(true);
         showToast(`가입 완료! ${u}님의 플랜두씨 다이어리가 생성되었습니다.`, '✨');
@@ -2352,6 +2376,12 @@
       authToken = '';
       authUser = null;
       tokenExpiresAt = null;
+
+      const rf = document.getElementById('registerForm');
+      if (rf) rf.reset();
+      const lf = document.getElementById('loginForm');
+      if (lf) lf.reset();
+      switchAuthGateTab('login');
 
       updateAuthUI(false);
       showToast('안전하게 로그아웃되었으며 토큰이 폐기되었습니다.', '🚪');
