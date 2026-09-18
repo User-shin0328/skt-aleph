@@ -85,10 +85,10 @@ function getInitialDataset() {
       {
         id: 'todo-04',
         planId: 'plan-running-2026-h2',
-        title: '토요일 한강 12km 지속주 LSD 러닝',
+        title: '토요일 갑천 12km 지속주 LSD 러닝',
         dueDate: '2026-09-14', // 서울 KST 2026-09-18 기준 미완료 지연 건
         priority: '높음',
-        tags: ['#LSD', '#지구력', '#한강'],
+        tags: ['#LSD', '#지구력', '#갑천'],
         estimatedMinutes: 75,
         status: 'pending',
         completedAt: null,
@@ -148,7 +148,7 @@ function getInitialDataset() {
       id: 'retro-running-w3',
       planId: 'plan-running-2026-h2',
       period: '2026년 9월 3주차 종합 분석',
-      nextImprovementPoint: '주중 인터벌 훈련 전후 15분 동적 웜업/쿨다운 필수 배정 및 주말 LSD 러닝 일정 수요일 사전 리마인드',
+      nextImprovementPoint: '주중 인터벌 훈련 전후 15분 동적 웜업/쿨다운 필수 배정 및 주말 갑천 LSD 러닝 일정 수요일 사전 리마인드',
       updatedAt: '2026-09-18T09:00:00+09:00'
     }
   };
