@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PlanDoSeeDiaryDatabaseSchemaV2",
+  "description": "플랜두씨 다이어리 1 — 데이터베이스 표, 항목, 관계, 날짜 및 단위 규칙 계약 스키마 v2",
+  "type": "object",
+  "required": ["version", "rules", "tables"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "2.0.0"
+    },
+    "rules": {
+      "type": "object",
+      "required": ["timezone", "dateFormat", "timeFormat", "durationUnit", "idempotencyRule", "publicAccessRule"],
+      "properties": {
+        "timezone": {
+          "type": "string",
+          "const": "Asia/Seoul",
+          "description": "모든 날짜 및 시간 계산의 기준 시간대 (KST, UTC+09:00)"
+        },
+        "dateFormat": {
+          "type": "string",
+          "const": "YYYY-MM-DD",
+          "description": "마감일 및 일자 표기 표준 포맷"
+        },
+        "timeFormat": {
+          "type": "string",
+          "const": "YYYY-MM-DDTHH:mm",
+          "description": "실행 기록 시작/종료 시각 표준 ISO 포맷"
+        },
+        "durationUnit": {
+          "type": "string",
+          "const": "minute",
+          "description": "예상 시간 및 실제 소요 시간의 기본 계산 단위 (분, min)"
+        },
+        "idempotencyRule": {
+          "type": "string",
+          "const": "중복 방어 제약: 동일한 완료 요청 키(idempotencyKey) 및 할 일 상태 검증으로 연달아 두 번 요청 시 1회만 반영",
+          "description": "완료 중복 누적 방어 규약"
+        },
+        "publicAccessRule": {
+          "type": "string",
+          "const": "무로그인 공개: 인증 없이 열리며 남이 봐도 무방한 운동 및 계획 데이터만 저장",
+          "description": "공개 다이어리 보안 및 접근 규칙"
+        }
+      }
+    },
+    "tables": {
+      "type": "object",
+      "required": ["plans", "plan_history", "todos", "execution_logs", "retrospectives"],
+      "properties": {
+        "plans": {
+          "type": "object",
+          "description": "최상위 목표 및 기간을 정의하는 계획 테이블",
+          "required": ["id", "title", "startDate", "endDate", "priority", "successCriteria", "estimatedMinutes", "createdAt", "updatedAt"],
+          "properties": {
+            "id": { "type": "string", "pattern": "^plan-[0-9a-fA-F-]+$" },
+            "title": { "type": "string", "minLength": 2 },
+            "startDate": { "type": "string", "format": "date" },
+            "endDate": { "type": "string", "format": "date" },
+            "priority": { "type": "string", "enum": ["낮음", "보통", "높음", "아주높음"] },
+            "successCriteria": { "type": "string", "minLength": 5 },
+            "estimatedMinutes": { "type": "integer", "minimum": 1 },
+            "createdAt": { "type": "string", "format": "date-time" },
+            "updatedAt": { "type": "string", "format": "date-time" }
+          }
+        },
+        "plan_history": {
+          "type": "object",
+          "description": "계획 수정 시 이전 버전의 원본 데이터를 보존하는 계획 수정 이력 테이블",
+          "required": ["historyId", "planId", "version", "title", "startDate", "endDate", "priority", "successCriteria", "estimatedMinutes", "modifiedAt", "changeReason"],
+          "properties": {
+            "historyId": { "type": "string", "pattern": "^phist-[0-9a-fA-F-]+$" },
+            "planId": { "type": "string", "description": "plans.id 외래키 (Foreign Key)" },
+            "version": { "type": "integer", "minimum": 1 },
+            "title": { "type": "string" },
+            "startDate": { "type": "string", "format": "date" },
+            "endDate": { "type": "string", "format": "date" },
+            "priority": { "type": "string" },
+            "successCriteria": { "type": "string" },
+            "estimatedMinutes": { "type": "integer" },
+            "modifiedAt": { "type": "string", "format": "date-time" },
+            "changeReason": { "type": "string" }
+          }
+        },
+        "todos": {
+          "type": "object",
+          "description": "계획에 딸린 구체적인 할 일 테이블",
+          "required": ["id", "planId", "title", "dueDate", "priority", "tags", "estimatedMinutes", "status", "createdAt", "updatedAt"],
+          "properties": {
+            "id": { "type": "string", "pattern": "^todo-[0-9a-fA-F-]+$" },
+            "planId": { "type": "string", "description": "plans.id 외래키 (Foreign Key)" },
+            "title": { "type": "string", "minLength": 1 },
+            "dueDate": { "type": "string", "format": "date" },
+            "priority": { "type": "string", "enum": ["낮음", "보통", "높음", "아주높음"] },
+            "tags": { "type": "array", "items": { "type": "string" } },
+            "estimatedMinutes": { "type": "integer", "minimum": 1 },
+            "status": { "type": "string", "enum": ["pending", "completed"] },
+            "completedAt": { "type": ["string", "null"], "format": "date-time" },
+            "createdAt": { "type": "string", "format": "date-time" },
+            "updatedAt": { "type": "string", "format": "date-time" }
+          }
+        },
+        "execution_logs": {
+          "type": "object",
+          "description": "할 일에 매핑되어 실제로 수행된 시간 및 막힌 사유를 기록하는 실행 테이블",
+          "required": ["id", "todoId", "planId", "startedAt", "endedAt", "actualMinutes", "obstacleReason", "idempotencyKey", "recordedAt"],
+          "properties": {
+            "id": { "type": "string", "pattern": "^log-[0-9a-fA-F-]+$" },
+            "todoId": { "type": "string", "description": "todos.id 외래키 (Foreign Key)" },
+            "planId": { "type": "string", "description": "plans.id 외래키 (Foreign Key)" },
+            "startedAt": { "type": "string", "format": "date-time" },
+            "endedAt": { "type": "string", "format": "date-time" },
+            "actualMinutes": { "type": "integer", "minimum": 0 },
+            "obstacleReason": { "type": "string", "description": "막혔던 이유(없으면 빈 문자열 또는 없음 표기)" },
+            "idempotencyKey": { "type": "string", "description": "중복 방지 고유 키" },
+            "recordedAt": { "type": "string", "format": "date-time" }
+          }
+        },
+        "retrospectives": {
+          "type": "object",
+          "description": "주기적 실행 결과 집계 분석 및 다음 계획 피드백 테이블",
+          "required": ["id", "planId", "period", "totalTodos", "completedTodos", "overdueTodos", "blockedTodos", "totalEstimatedMin", "totalActualMin", "timeVarianceMin", "nextImprovementPoint", "createdAt"],
+          "properties": {
+            "id": { "type": "string", "pattern": "^retro-[0-9a-fA-F-]+$" },
+            "planId": { "type": "string", "description": "plans.id 외래키 (Foreign Key)" },
+            "period": { "type": "string" },
+            "totalTodos": { "type": "integer" },
+            "completedTodos": { "type": "integer" },
+            "overdueTodos": { "type": "integer" },
+            "blockedTodos": { "type": "integer" },
+            "totalEstimatedMin": { "type": "integer" },
+            "totalActualMin": { "type": "integer" },
+            "timeVarianceMin": { "type": "integer" },
+            "nextImprovementPoint": { "type": "string" },
+            "createdAt": { "type": "string", "format": "date-time" }
+          }
+        }
+      }
+    }
+  }
+}

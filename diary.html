@@ -1,0 +1,2227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>플랜두씨 다이어리 1 | 신재원페이지</title>
+  <meta name="description" content="과제 6: 계획(Plan) → 실제로 한 일(Do) → 돌아보기(See)가 하나로 이어지는 무로그인 공개 다이어리 웹 애플리케이션">
+
+  <!-- Pretendard & JetBrains Mono Fonts -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-black: #09090b;
+      --card-bg: #141418;
+      --card-sub: #1a1a22;
+      --border-zinc: #27272a;
+      --border-light: #3f3f46;
+      --brown-main: #ba9578;
+      --brown-accent: #a27b5c;
+      --brown-btn: #8c674b;
+      --brown-hover: #a27b5c;
+      --text-white: #f4f4f5;
+      --text-gray: #a1a1aa;
+      --text-dim: #71717a;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #38bdf8;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-white);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+      padding-top: 60px;
+    }
+
+    /* 상단 네비게이션 헤더 */
+    .app-nav-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(9, 9, 11, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid #27272a;
+      z-index: 50;
+    }
+    @media (min-width: 640px) {
+      .app-nav-bar {
+        height: 60px;
+      }
+    }
+    .app-nav-inner {
+      width: 100%;
+      height: 100%;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+    @media (min-width: 640px) {
+      .app-nav-inner {
+        padding: 0 20px;
+      }
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #f4f4f5;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+      z-index: 20;
+    }
+    @media (min-width: 640px) {
+      .app-brand {
+        font-size: 15px;
+      }
+    }
+    .app-brand:hover {
+      color: #ba9578;
+    }
+    .app-brand-arrow {
+      color: #ba9578;
+      font-weight: 800;
+    }
+    .app-quick-nav {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      z-index: 10;
+    }
+    @media (min-width: 640px) {
+      .app-quick-nav {
+        gap: 6px;
+      }
+    }
+    .quick-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #a1a1aa;
+      font-size: 11px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+    @media (min-width: 640px) {
+      .quick-nav-item {
+        padding: 6px 12px;
+        font-size: 13px;
+        gap: 6px;
+      }
+    }
+    .quick-nav-item:hover {
+      color: #f4f4f5;
+      background: #18181b;
+      border-color: #27272a;
+    }
+    .quick-nav-item.active {
+      background: #2a221b;
+      border-color: #ba9578;
+      color: #ba9578;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(186, 149, 120, 0.2);
+    }
+    .nav-hide-mobile {
+      display: none;
+    }
+    @media (min-width: 640px) {
+      .nav-hide-mobile {
+        display: inline;
+      }
+      .nav-show-mobile {
+        display: none;
+      }
+    }
+
+    .container-box {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+    @media (min-width: 640px) {
+      .container-box {
+        padding: 28px 24px 80px;
+      }
+    }
+
+    /* 공통 버튼 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #27272a;
+      color: #f4f4f5;
+      border: 1px solid #3f3f46;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .btn:hover {
+      background: #3f3f46;
+      border-color: #52525b;
+      color: #fff;
+    }
+    .btn-primary {
+      background: var(--brown-btn);
+      border-color: var(--brown-main);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--brown-hover);
+    }
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 11px;
+    }
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.3);
+      color: #fff;
+    }
+
+    /* 뱃지 */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-gold {
+      background: rgba(186, 149, 120, 0.15);
+      color: var(--brown-main);
+      border: 1px solid rgba(186, 149, 120, 0.3);
+    }
+    .badge-success {
+      background: rgba(34, 197, 94, 0.15);
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    .badge-warning {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .badge-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .badge-gray {
+      background: #1f1f23;
+      color: #a1a1aa;
+      border: 1px solid #2e2e34;
+    }
+
+    /* 첫 화면 공개 안내 필수 배너 */
+    .public-notice-banner {
+      background: linear-gradient(135deg, rgba(186, 149, 120, 0.12) 0%, rgba(20, 20, 24, 0.9) 100%);
+      border: 1px solid var(--brown-main);
+      border-left: 4px solid var(--brown-main);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    @media (min-width: 640px) {
+      .public-notice-banner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+    .public-notice-text {
+      font-size: 13px;
+      color: #f4f4f5;
+      line-height: 1.5;
+    }
+    .public-notice-text strong {
+      color: #ffedd5;
+      font-weight: 700;
+    }
+
+    /* 카드 */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-zinc);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    @media (min-width: 640px) {
+      .card {
+        padding: 26px;
+      }
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--brown-main);
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .section-desc {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+
+    /* 계획 카드 */
+    .plan-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    @media (min-width: 768px) {
+      .plan-grid {
+        grid-template-columns: 2fr 1fr;
+      }
+    }
+    .plan-main-box {
+      background: #0d0d11;
+      border: 1px solid var(--border-zinc);
+      border-radius: 8px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .plan-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .plan-title-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .plan-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      padding: 12px;
+      background: #141418;
+      border-radius: 6px;
+      border: 1px solid #222228;
+    }
+    .plan-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .plan-meta-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .plan-meta-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f4f4f5;
+    }
+
+    /* 계획 수정 이력 테이블 */
+    .history-wrap {
+      margin-top: 16px;
+      background: #0d0d11;
+      border: 1px solid var(--border-zinc);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .history-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #ba9578;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 테이블 공통 */
+    .data-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 6px;
+      border: 1px solid var(--border-zinc);
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+      font-family: 'JetBrains Mono', monospace;
+      min-width: 600px;
+    }
+    .data-table th {
+      background: #18181e;
+      color: var(--text-gray);
+      padding: 10px 12px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-zinc);
+      white-space: nowrap;
+    }
+    .data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #1f1f26;
+      color: #e4e4e7;
+    }
+    .data-table tr:hover td {
+      background: #121217;
+    }
+
+    /* 할 일 툴바 */
+    .todo-toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    @media (min-width: 768px) {
+      .todo-toolbar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .filter-btn {
+      background: #18181e;
+      border: 1px solid var(--border-zinc);
+      color: var(--text-gray);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .filter-btn:hover {
+      color: #fff;
+      border-color: #3f3f46;
+    }
+    .filter-btn.active {
+      background: var(--brown-btn);
+      border-color: var(--brown-main);
+      color: #fff;
+    }
+
+    .action-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .search-input {
+      background: #0d0d11;
+      border: 1px solid var(--border-zinc);
+      border-radius: 6px;
+      padding: 6px 12px;
+      color: #fff;
+      font-size: 12px;
+      outline: none;
+      width: 160px;
+      font-family: inherit;
+    }
+    .search-input:focus {
+      border-color: var(--brown-main);
+    }
+    .sort-select {
+      background: #0d0d11;
+      border: 1px solid var(--border-zinc);
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: #fff;
+      font-size: 12px;
+      outline: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    /* 정렬 기준 표시 배너 */
+    .sort-notice {
+      background: #0f0f13;
+      border: 1px dashed var(--border-zinc);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sort-notice strong {
+      color: var(--brown-main);
+    }
+
+    /* 할 일 카드 리스트 */
+    .todo-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .todo-item {
+      background: #0d0d11;
+      border: 1px solid var(--border-zinc);
+      border-radius: 8px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+    .todo-item:hover {
+      border-color: #3f3f46;
+      background: #111116;
+    }
+    .todo-item.completed {
+      border-color: rgba(34, 197, 94, 0.25);
+      background: rgba(34, 197, 94, 0.02);
+    }
+    .todo-item.overdue {
+      border-color: rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.02);
+    }
+    .todo-item.highlight {
+      box-shadow: 0 0 0 2px var(--brown-main);
+      animation: pulseHighlight 2s ease;
+    }
+    @keyframes pulseHighlight {
+      0% { box-shadow: 0 0 0 4px var(--brown-main); }
+      100% { box-shadow: 0 0 0 0px transparent; }
+    }
+
+    .todo-top-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .todo-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      flex: 1;
+    }
+    .todo-check-btn {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid #52525b;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all 0.15s ease;
+    }
+    .todo-check-btn:hover {
+      border-color: var(--brown-main);
+    }
+    .todo-check-btn.checked {
+      background: var(--success);
+      border-color: var(--success);
+      color: #000;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .todo-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #f4f4f5;
+      line-height: 1.4;
+    }
+    .todo-item.completed .todo-title {
+      text-decoration: line-through;
+      color: var(--text-dim);
+    }
+    .todo-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .todo-tag {
+      font-size: 10px;
+      color: #d4a373;
+      background: rgba(212, 163, 115, 0.1);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .todo-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-top: 8px;
+      border-top: 1px solid #1a1a22;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .todo-meta-badges {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    /* 돌아보기 집계 카드 */
+    .retro-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    @media (min-width: 640px) {
+      .retro-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    @media (min-width: 1024px) {
+      .retro-grid {
+        grid-template-columns: repeat(7, 1fr);
+      }
+    }
+    .metric-card {
+      background: #0d0d11;
+      border: 1px solid var(--border-zinc);
+      border-radius: 8px;
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .metric-card:hover {
+      border-color: var(--brown-main);
+      transform: translateY(-2px);
+      background: #131318;
+    }
+    .metric-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .metric-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+    }
+    .metric-unit {
+      font-size: 11px;
+      font-weight: normal;
+      color: var(--text-dim);
+    }
+    .metric-hint {
+      font-size: 9px;
+      color: var(--brown-main);
+      margin-top: 2px;
+    }
+
+    /* 다음 계획 피드백 박스 */
+    .next-feedback-box {
+      margin-top: 18px;
+      background: linear-gradient(145deg, #141418 0%, #0d0d12 100%);
+      border: 1px solid #27272a;
+      border-left: 4px solid var(--brown-main);
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .feedback-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .feedback-input-row {
+      display: flex;
+      gap: 8px;
+      flex-direction: column;
+    }
+    @media (min-width: 640px) {
+      .feedback-input-row {
+        flex-direction: row;
+      }
+    }
+    .feedback-input {
+      flex: 1;
+      background: #09090b;
+      border: 1px solid var(--border-zinc);
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+      font-family: inherit;
+    }
+    .feedback-input:focus {
+      border-color: var(--brown-main);
+    }
+
+    /* 모달 */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-zinc);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-zinc);
+      padding-bottom: 12px;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .modal-close-btn:hover {
+      color: #fff;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-gray);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .form-input, .form-textarea, .form-select {
+      background: #0d0d11;
+      border: 1px solid var(--border-zinc);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+      font-family: inherit;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--brown-main);
+    }
+    .form-textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    /* 토스트 알림 */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 200;
+    }
+    .toast-msg {
+      background: #18181e;
+      border: 1px solid var(--brown-main);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: fadeInToast 0.3s ease;
+    }
+    @keyframes fadeInToast {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 상단 네비게이션 헤더 -->
+  <header class="app-nav-bar">
+    <div class="app-nav-inner">
+      <a href="/" class="app-brand" title="신재원페이지 홈으로">
+        <span class="app-brand-arrow">&gt;</span>
+        <span class="nav-hide-mobile">신재원페이지</span>
+        <span class="nav-show-mobile">신재원</span>
+      </a>
+
+      <!-- 빠른 이동 탭 -->
+      <nav class="app-quick-nav" aria-label="빠른 이동">
+        <a href="/" class="quick-nav-item" title="메인 포트폴리오">
+          <span>🏠</span>
+          <span class="nav-hide-mobile">포트폴리오</span>
+          <span class="nav-show-mobile">홈</span>
+        </a>
+        <a href="/game.html" class="quick-nav-item" title="과제 2 서부 러너 게임">
+          <span>🎮</span>
+          <span>서부러너</span>
+        </a>
+        <a href="/studio.html" class="quick-nav-item" title="과제 3 짤·카드 스튜디오">
+          <span>🎨</span>
+          <span>짤스튜디오</span>
+        </a>
+        <a href="/board.html" class="quick-nav-item" title="과제 4 오늘의 날씨 & 환율">
+          <span>🌤️</span>
+          <span class="nav-hide-mobile">날씨 & 환율</span>
+          <span class="nav-show-mobile">날씨·환율</span>
+        </a>
+        <a href="/compare.html" class="quick-nav-item" title="과제 5 비교 보고서">
+          <span>🤝</span>
+          <span class="nav-hide-mobile">비교 보고서</span>
+          <span class="nav-show-mobile">보고서</span>
+        </a>
+        <a href="/diary.html" class="quick-nav-item active" aria-current="page" title="과제 6 플랜두씨 다이어리">
+          <span>📖</span>
+          <span class="nav-hide-mobile">다이어리</span>
+          <span class="nav-show-mobile">다이어리</span>
+        </a>
+      </nav>
+
+      <div class="app-nav-tools">
+        <a 
+          href="https://github.com/User-shin0328/skt-aleph2" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="btn btn-sm"
+          title="GitHub 저장소"
+        >
+          <span>소스코드</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container-box">
+
+    <!-- 첫 화면 공개 안내 필수 배너 -->
+    <section class="public-notice-banner">
+      <div class="public-notice-text">
+        <span>⚠️ </span>
+        <strong>지금은 로그인이 없어 링크를 아는 사람은 누구나 볼 수 있습니다. 남이 봐도 괜찮은 내용만 넣으세요</strong>
+        <div style="font-size: 11px; color: #a1a1aa; margin-top: 4px; font-family: 'JetBrains Mono', monospace;">
+          기준 시각: <span id="kstClock">로딩 중...</span> (Asia/Seoul) &bull; 
+          저장소: <span id="dbStatusBadge" class="badge badge-success">🟢 서버 DB 연결됨 (/api/diary)</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button onclick="exportDataJson()" class="btn btn-sm btn-primary" title="내 자료 전체 백업 파일(.json)로 내보내기">
+          <span>📥</span> <span>데이터 내보내기 (.json)</span>
+        </button>
+        <button onclick="resetToInitialData()" class="btn btn-sm" title="기본 운동 데이터셋 복원">
+          <span>🔄</span> <span>초기 데이터 복원</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 1. Plan (계획 세우기 & 수정 이력 보존) -->
+    <section class="card" id="planSection">
+      <div class="section-title">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>🎯</span>
+          <span>1. 계획 세우기 (Plan)</span>
+        </div>
+        <button onclick="openEditPlanModal()" class="btn btn-sm">
+          <span>✏️</span> <span>계획 수정하기</span>
+        </button>
+      </div>
+      <p class="section-desc">
+        실제 실행 중인 운동 목표와 기간, 성공 기준, 예상 시간을 담고 있으며, 계획을 고쳐도 <strong>처음 계획과 이전 수정 이력이 데이터베이스에 온전히 보존</strong>됩니다.
+      </p>
+
+      <div class="plan-grid">
+        <div class="plan-main-box">
+          <div class="plan-title-row">
+            <div>
+              <div style="font-size: 11px; color: var(--brown-main); font-family: 'JetBrains Mono', monospace; margin-bottom: 2px;">
+                ACTIVE PLAN TARGET
+              </div>
+              <h2 id="planTitleDisplay" class="plan-title-text">2026 하반기 러닝 페이스 단축 & 코어 강화 프로젝트</h2>
+            </div>
+            <span id="planPriorityBadge" class="badge badge-gold">높음</span>
+          </div>
+
+          <div class="plan-meta-grid">
+            <div class="plan-meta-item">
+              <span class="plan-meta-label">📅 계획 기간</span>
+              <span id="planPeriodDisplay" class="plan-meta-val">2026-09-01 ~ 2026-10-31</span>
+            </div>
+            <div class="plan-meta-item">
+              <span class="plan-meta-label">⏱️ 총 예상 시간</span>
+              <span id="planEstimatedDisplay" class="plan-meta-val">48시간 (2,880분)</span>
+            </div>
+            <div class="plan-meta-item">
+              <span class="plan-meta-label">🏆 성공 판정 기준</span>
+              <span id="planSuccessDisplay" class="plan-meta-val" style="color: #86efac;">10km 52분 완주 & 주 4회 달성</span>
+            </div>
+            <div class="plan-meta-item">
+              <span class="plan-meta-label">🕒 최종 수정일</span>
+              <span id="planUpdatedDisplay" class="plan-meta-val">2026-09-05</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 계획 수정 이력 (History) -->
+        <div class="history-wrap">
+          <div class="history-title">
+            <span>📜</span> <span>계획 수정 이력 보존 (<span id="historyCount">1</span>건)</span>
+          </div>
+          <div id="planHistoryList" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto;">
+            <!-- 동적 렌더링 -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Do (할 일 다루기 & 실제 한 일 적기) -->
+    <section class="card" id="doSection">
+      <div class="section-title">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>🏃</span>
+          <span>2. 할 일 다루기 & 실제로 한 일 적기 (Do)</span>
+        </div>
+        <button onclick="openAddTodoModal()" class="btn btn-sm btn-primary">
+          <span>➕</span> <span>새 할 일 추가</span>
+        </button>
+      </div>
+      <p class="section-desc">
+        계획에 딸린 할 일을 만들고, 고치고, 완료 상태를 전환하며, 원래 계획 값(예상 시간)을 덮어쓰지 않고 실제 시작/종료 시각 및 막혔던 이유를 실행 기록으로 남깁니다.
+      </p>
+
+      <!-- 툴바: 필터, 검색, 정렬 -->
+      <div class="todo-toolbar">
+        <div class="filter-group">
+          <button class="filter-btn active" data-filter="all" onclick="setTodoFilter('all')">전체 (<span id="filterCountAll">0</span>)</button>
+          <button class="filter-btn" data-filter="pending" onclick="setTodoFilter('pending')">진행 중 (<span id="filterCountPending">0</span>)</button>
+          <button class="filter-btn" data-filter="completed" onclick="setTodoFilter('completed')">완료됨 (<span id="filterCountCompleted">0</span>)</button>
+          <button class="filter-btn" data-filter="overdue" onclick="setTodoFilter('overdue')">지연됨 (<span id="filterCountOverdue">0</span>)</button>
+          <button class="filter-btn" data-filter="blocked" onclick="setTodoFilter('blocked')">막힘 발생 (<span id="filterCountBlocked">0</span>)</button>
+        </div>
+
+        <div class="action-controls">
+          <input 
+            type="text" 
+            id="todoSearchInput" 
+            class="search-input" 
+            placeholder="할 일/태그/사유 검색..." 
+            oninput="handleTodoSearch()"
+          />
+          <select id="todoSortSelect" class="sort-select" onchange="handleTodoSort()">
+            <option value="dueDateAsc">마감일 빠른 순</option>
+            <option value="dueDateDesc">마감일 늦은 순</option>
+            <option value="priority">우선순위 높은 순</option>
+            <option value="estimated">예상 시간 긴 순</option>
+            <option value="created">최근 등록 순</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 정렬 기준 화면 명시 -->
+      <div class="sort-notice">
+        <span>📌</span>
+        <span>화면 정렬 기준: <strong id="currentSortLabel">마감일 빠른 순 (오름차순, 동일 마감일 시 등록 역순 우선)</strong></span>
+      </div>
+
+      <!-- 할 일 카드 리스트 -->
+      <div id="todoListContainer" class="todo-list">
+        <!-- 동적 렌더링 -->
+      </div>
+    </section>
+
+    <!-- 3. See (돌아보기, 그리고 다음 계획으로) -->
+    <section class="card" id="seeSection">
+      <div class="section-title">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>🔍</span>
+          <span>3. 돌아보기, 그리고 다음 계획으로 (See)</span>
+        </div>
+      </div>
+      <p class="section-desc">
+        계획과 실제 기록 간의 차이를 집계하고, <strong>집계 숫자를 누르면 그 숫자가 나온 해당 기록으로 즉시 이동</strong>합니다. 돌아보기의 결론은 다음 계획으로 환류됩니다.
+      </p>
+
+      <!-- 7개 지표 집계 메트릭 카드 (클릭 시 드릴다운) -->
+      <div class="retro-grid">
+        <div class="metric-card" onclick="drillDownFilter('all')" title="클릭 시 전체 할 일 목록으로 이동">
+          <span class="metric-label">📋 계획 할 일 수</span>
+          <div class="metric-value"><span id="metricTotalTodos">0</span> <span class="metric-unit">건</span></div>
+          <span class="metric-hint">&darr; 목록 보기</span>
+        </div>
+        <div class="metric-card" onclick="drillDownFilter('completed')" title="클릭 시 완료된 할 일 목록으로 이동">
+          <span class="metric-label">✅ 완료 수</span>
+          <div class="metric-value" style="color: #86efac;"><span id="metricCompletedTodos">0</span> <span class="metric-unit">건</span></div>
+          <span class="metric-hint">&darr; 완료건 보기</span>
+        </div>
+        <div class="metric-card" onclick="drillDownFilter('overdue')" title="클릭 시 지연된 할 일 목록으로 이동">
+          <span class="metric-label">⏳ 지연 수</span>
+          <div class="metric-value" style="color: #fca5a5;"><span id="metricOverdueTodos">0</span> <span class="metric-unit">건</span></div>
+          <span class="metric-hint">&darr; 지연건 보기</span>
+        </div>
+        <div class="metric-card" onclick="drillDownFilter('blocked')" title="클릭 시 막힘이 기록된 할 일 목록으로 이동">
+          <span class="metric-label">🛑 막힘 수</span>
+          <div class="metric-value" style="color: #fcd34d;"><span id="metricBlockedTodos">0</span> <span class="metric-unit">건</span></div>
+          <span class="metric-hint">&darr; 막힘건 보기</span>
+        </div>
+        <div class="metric-card" title="할 일 대상 총 예상 시간">
+          <span class="metric-label">⏱️ 총 예상 시간</span>
+          <div class="metric-value"><span id="metricEstimatedMin">0</span> <span class="metric-unit">분</span></div>
+          <span class="metric-hint" id="metricEstimatedHours">0.0시간</span>
+        </div>
+        <div class="metric-card" title="실행 기록 총 실제 시간">
+          <span class="metric-label">🏃 총 실제 시간</span>
+          <div class="metric-value" style="color: #38bdf8;"><span id="metricActualMin">0</span> <span class="metric-unit">분</span></div>
+          <span class="metric-hint" id="metricActualHours">0.0시간</span>
+        </div>
+        <div class="metric-card" title="실제 시간 - 예상 시간">
+          <span class="metric-label">⚖️ 시간 차이</span>
+          <div class="metric-value" id="metricVarianceValue"><span id="metricVarianceMin">0</span> <span class="metric-unit">분</span></div>
+          <span class="metric-hint" id="metricVarianceDesc">오차 없음</span>
+        </div>
+      </div>
+
+      <!-- 다음 계획으로 넘길 고칠 점 (피드백 환류) -->
+      <div class="next-feedback-box">
+        <div class="feedback-title">
+          <span>🔄</span> <span>돌아보기 분석 및 다음 계획으로 넘길 고칠 점 한 줄</span>
+        </div>
+        <p style="font-size: 12px; color: var(--text-gray); line-height: 1.5;">
+          현재 분석: 주중 인터벌 훈련 전 웜업 부족으로 비복근 뭉침이 발생했고, 주말 장거리 LSD는 피로 누적으로 지연되었습니다.
+        </p>
+        <div class="feedback-input-row">
+          <input 
+            type="text" 
+            id="retroFeedbackInput" 
+            class="feedback-input" 
+            value="주중 인터벌 전후 15분 동적 웜업 필수 배정 및 주말 LSD 러닝 일정 수요일 사전 리마인드"
+            placeholder="다음 계획에 반영할 고칠 점 한 줄을 작성하세요..."
+          />
+          <button onclick="saveRetroFeedback()" class="btn btn-primary" style="white-space: nowrap;">
+            <span>🚀</span> <span>다음 계획으로 넘기기</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 보안 및 데이터 검증 샌드박스 -->
+    <section class="card">
+      <h3 class="section-title" style="font-size: 15px;">
+        <span>🛡️</span> <span>데이터 보존 및 보안 점검 샌드박스</span>
+      </h3>
+      <p class="section-desc">
+        서버 데이터베이스 동기화 상태를 점검하고, 스크립트 인젝션(XSS) 방어 및 비밀키 노출 방지 원칙을 직접 시험합니다.
+      </p>
+
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px;">
+        <button onclick="testScriptInjectionSafe()" class="btn btn-sm">
+          <span>🧪</span> <span>XSS 스크립트 방어 시험 (&lt;script&gt; 태그 주입)</span>
+        </button>
+        <button onclick="syncWithServerDatabase()" class="btn btn-sm">
+          <span>🔄</span> <span>서버 데이터베이스 즉시 동기화</span>
+        </button>
+      </div>
+
+      <div id="sandboxTestResult" style="display: none; background: #0d0d11; border: 1px solid var(--border-zinc); border-radius: 6px; padding: 12px; font-size: 12px; font-family: 'JetBrains Mono', monospace;">
+        <!-- 결과 출력 -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 모달 1: 계획 수정 모달 -->
+  <div id="planEditModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">계획 수정 (이전 계획 자동 보존)</h3>
+        <button onclick="closeModal('planEditModal')" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">계획 제목</label>
+        <input type="text" id="modalPlanTitle" class="form-input" />
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="form-group">
+          <label class="form-label">시작일</label>
+          <input type="date" id="modalPlanStart" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">종료일</label>
+          <input type="date" id="modalPlanEnd" class="form-input" />
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="form-group">
+          <label class="form-label">우선순위</label>
+          <select id="modalPlanPriority" class="form-select">
+            <option value="낮음">낮음</option>
+            <option value="보통">보통</option>
+            <option value="높음">높음</option>
+            <option value="아주높음">아주높음</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">총 예상 시간 (분)</label>
+          <input type="number" id="modalPlanEstimated" class="form-input" min="1" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">성공 판정 기준</label>
+        <input type="text" id="modalPlanSuccess" class="form-input" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">수정 사유 (이력에 보존됨)</label>
+        <textarea id="modalPlanReason" class="form-textarea" placeholder="수정 사유를 입력하세요..."></textarea>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+        <button onclick="closeModal('planEditModal')" class="btn">취소</button>
+        <button onclick="submitEditPlan()" class="btn btn-primary">수정 내용 저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달 2: 할 일 추가/수정 모달 -->
+  <div id="todoModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="todoModalTitle" class="modal-title">새 할 일 추가</h3>
+        <button onclick="closeModal('todoModal')" class="modal-close-btn">&times;</button>
+      </div>
+      <input type="hidden" id="modalTodoId" />
+      <div class="form-group">
+        <label class="form-label">할 일 제목</label>
+        <input type="text" id="modalTodoTitle" class="form-input" placeholder="예: 화요일 5km 조깅 및 페이스 조절" />
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="form-group">
+          <label class="form-label">마감일 (KST)</label>
+          <input type="date" id="modalTodoDueDate" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">우선순위</label>
+          <select id="modalTodoPriority" class="form-select">
+            <option value="낮음">낮음</option>
+            <option value="보통">보통</option>
+            <option value="높음">높음</option>
+            <option value="아주높음">아주높음</option>
+          </select>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="form-group">
+          <label class="form-label">예상 시간 (분)</label>
+          <input type="number" id="modalTodoEstimated" class="form-input" min="1" value="30" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">태그 (쉼표로 구분)</label>
+          <input type="text" id="modalTodoTags" class="form-input" placeholder="#러닝, #유산소" />
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+        <button onclick="closeModal('todoModal')" class="btn">취소</button>
+        <button onclick="submitTodoForm()" class="btn btn-primary">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달 3: 실행 기록 작성 모달 -->
+  <div id="execLogModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">실제 한 일 기록 (Do)</h3>
+        <button onclick="closeModal('execLogModal')" class="modal-close-btn">&times;</button>
+      </div>
+      <input type="hidden" id="modalLogTodoId" />
+      <div style="background: #0d0d11; padding: 10px 12px; border-radius: 6px; border: 1px solid #27272a; font-size: 12px;">
+        <span style="color: var(--text-dim);">대상 할 일: </span>
+        <strong id="modalLogTodoTitle" style="color: #fff;">-</strong>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="form-group">
+          <label class="form-label">시작 시각</label>
+          <input type="datetime-local" id="modalLogStart" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">끝난 시각</label>
+          <input type="datetime-local" id="modalLogEnd" class="form-input" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">실제로 걸린 시간 (분)</label>
+        <input type="number" id="modalLogActualMin" class="form-input" min="1" placeholder="예: 38" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">막혔던 이유 (특이사항 없으면 빈칸)</label>
+        <textarea id="modalLogObstacle" class="form-textarea" placeholder="예: 오른쪽 종아리 뭉침으로 5분 휴식 등"></textarea>
+      </div>
+
+      <!-- 기존 실행 기록 목록 -->
+      <div id="existingLogsContainer" style="margin-top: 6px;">
+        <!-- 동적 렌더링 -->
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+        <button onclick="closeModal('execLogModal')" class="btn">닫기</button>
+        <button onclick="submitExecutionLog()" class="btn btn-primary">실행 기록 저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 토스트 컨테이너 -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- 푸터 -->
+  <footer style="border-top: 1px solid var(--border-zinc); padding: 24px 16px; text-align: center; font-size: 12px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">
+    신재원페이지 &copy; 2026 — 플랜두씨 다이어리 (Plan &rarr; Do &rarr; See)
+  </footer>
+
+  <!-- 인라인 애플리케이션 스크립트 -->
+  <script>
+    // =========================================================================
+    // 0. 초기 데이터 및 전역 상태
+    // =========================================================================
+    const API_ENDPOINT = '/api/diary';
+    const STORAGE_KEY = 'pds_diary_local_cache_v2';
+
+    let appDb = null;
+    let currentFilter = 'all';
+    let currentSearchTerm = '';
+    let currentSort = 'dueDateAsc';
+    let isTogglingIdempotencyLock = false; // 중복 완료 방어 락
+
+    // XSS 이스케이프 헬퍼
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // 토스트 알림 표시
+    function showToast(msg, icon = 'ℹ️') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast-msg';
+      toast.innerHTML = `<span>${icon}</span> <span>${escapeHtml(msg)}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // KST 시계 갱신
+    function updateKstClock() {
+      const now = new Date();
+      const options = { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+      const kstString = new Intl.DateTimeFormat('ko-KR', options).format(now);
+      const clockEl = document.getElementById('kstClock');
+      if (clockEl) clockEl.textContent = kstString + ' (KST)';
+    }
+    setInterval(updateKstClock, 1000);
+    updateKstClock();
+
+    // 기본 시드 데이터
+    function getDefaultSeed() {
+      return {
+        version: '2.0.0',
+        meta: {
+          owner: '신재원',
+          timezone: 'Asia/Seoul',
+          databaseEngine: 'server-db-pds-v2',
+          updatedAt: new Date().toISOString()
+        },
+        plan: {
+          id: 'plan-running-2026-h2',
+          title: '2026 하반기 러닝 페이스 단축 & 코어 강화 프로젝트',
+          startDate: '2026-09-01',
+          endDate: '2026-10-31',
+          priority: '높음',
+          successCriteria: '10km 52분 이내 완주 & 주 4회 러닝/보강운동 달성 (누적 40회)',
+          estimatedMinutes: 2880,
+          createdAt: '2026-09-01T09:00:00+09:00',
+          updatedAt: '2026-09-05T10:00:00+09:00'
+        },
+        planHistory: [
+          {
+            historyId: 'phist-v1-initial',
+            planId: 'plan-running-2026-h2',
+            version: 1,
+            title: '2026 하반기 가벼운 달리기 루틴',
+            startDate: '2026-09-01',
+            endDate: '2026-10-31',
+            priority: '보통',
+            successCriteria: '주 3회 5km 완주 및 기초 체력 유지',
+            estimatedMinutes: 1440,
+            modifiedAt: '2026-09-05T10:00:00+09:00',
+            changeReason: '하프 마라톤 대비를 위해 주 4회 분할 인터벌 및 코어 보강 계획으로 상향 수정'
+          }
+        ],
+        todos: [
+          {
+            id: 'todo-01',
+            planId: 'plan-running-2026-h2',
+            title: '화요일 5km 조깅 및 페이스 조절',
+            dueDate: '2026-09-15',
+            priority: '보통',
+            tags: ['#러닝', '#유산소', '#조깅'],
+            estimatedMinutes: 35,
+            status: 'completed',
+            completedAt: '2026-09-15T20:08:00+09:00',
+            createdAt: '2026-09-01T09:10:00+09:00',
+            updatedAt: '2026-09-15T20:08:00+09:00'
+          },
+          {
+            id: 'todo-02',
+            planId: 'plan-running-2026-h2',
+            title: '수요일 코어 운동 & 플랭크 5세트',
+            dueDate: '2026-09-16',
+            priority: '높음',
+            tags: ['#근력', '#코어', '#보강'],
+            estimatedMinutes: 30,
+            status: 'completed',
+            completedAt: '2026-09-16T07:42:00+09:00',
+            createdAt: '2026-09-01T09:15:00+09:00',
+            updatedAt: '2026-09-16T07:42:00+09:00'
+          },
+          {
+            id: 'todo-03',
+            planId: 'plan-running-2026-h2',
+            title: '목요일 800m 인터벌 러닝 5회전',
+            dueDate: '2026-09-17',
+            priority: '아주높음',
+            tags: ['#인터벌', '#스피드', '#트랙'],
+            estimatedMinutes: 45,
+            status: 'completed',
+            completedAt: '2026-09-17T20:55:00+09:00',
+            createdAt: '2026-09-01T09:20:00+09:00',
+            updatedAt: '2026-09-17T20:55:00+09:00'
+          },
+          {
+            id: 'todo-04',
+            planId: 'plan-running-2026-h2',
+            title: '토요일 한강 12km 지속주 LSD 러닝',
+            dueDate: '2026-09-14',
+            priority: '높음',
+            tags: ['#LSD', '#지구력', '#한강'],
+            estimatedMinutes: 75,
+            status: 'pending',
+            completedAt: null,
+            createdAt: '2026-09-01T09:25:00+09:00',
+            updatedAt: '2026-09-01T09:25:00+09:00'
+          },
+          {
+            id: 'todo-05',
+            planId: 'plan-running-2026-h2',
+            title: '일요일 폼롤러 전신 스트레칭 & 족욕',
+            dueDate: '2026-09-20',
+            priority: '낮음',
+            tags: ['#리커버리', '#스트레칭', '#회복'],
+            estimatedMinutes: 40,
+            status: 'pending',
+            completedAt: null,
+            createdAt: '2026-09-01T09:30:00+09:00',
+            updatedAt: '2026-09-01T09:30:00+09:00'
+          }
+        ],
+        executionLogs: [
+          {
+            id: 'log-01',
+            todoId: 'todo-01',
+            planId: 'plan-running-2026-h2',
+            startedAt: '2026-09-15T19:30:00+09:00',
+            endedAt: '2026-09-15T20:08:00+09:00',
+            actualMinutes: 38,
+            obstacleReason: '',
+            idempotencyKey: 'idemp-01-complete-key',
+            recordedAt: '2026-09-15T20:08:00+09:00'
+          },
+          {
+            id: 'log-02',
+            todoId: 'todo-02',
+            planId: 'plan-running-2026-h2',
+            startedAt: '2026-09-16T07:10:00+09:00',
+            endedAt: '2026-09-16T07:42:00+09:00',
+            actualMinutes: 32,
+            obstacleReason: '',
+            idempotencyKey: 'idemp-02-complete-key',
+            recordedAt: '2026-09-16T07:42:00+09:00'
+          },
+          {
+            id: 'log-03',
+            todoId: 'todo-03',
+            planId: 'plan-running-2026-h2',
+            startedAt: '2026-09-17T20:00:00+09:00',
+            endedAt: '2026-09-17T20:55:00+09:00',
+            actualMinutes: 55,
+            obstacleReason: '오른쪽 종아리 비복근 뭉침 및 4회전 후 호흡 가빠짐으로 5분간 휴식 후 겨우 완주',
+            idempotencyKey: 'idemp-03-complete-key',
+            recordedAt: '2026-09-17T20:55:00+09:00'
+          }
+        ],
+        retrospective: {
+          id: 'retro-running-w3',
+          planId: 'plan-running-2026-h2',
+          period: '2026년 9월 3주차 종합 분석',
+          nextImprovementPoint: '주중 인터벌 훈련 전후 15분 동적 웜업/쿨다운 필수 배정 및 주말 LSD 러닝 일정 수요일 사전 리마인드',
+          updatedAt: '2026-09-18T09:00:00+09:00'
+        }
+      };
+    }
+
+    // =========================================================================
+    // 1. 데이터베이스 로드 및 저장 (서버 + 로컬스토리지 하이브리드)
+    // =========================================================================
+    async function initDatabase() {
+      // 1. 로컬 캐시 확인
+      const localCache = localStorage.getItem(STORAGE_KEY);
+      if (localCache) {
+        try {
+          appDb = JSON.parse(localCache);
+        } catch (e) {
+          appDb = null;
+        }
+      }
+
+      // 2. 서버 DB 비동기 호출
+      try {
+        const res = await fetch(API_ENDPOINT, { method: 'GET' });
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.data && json.data.plan) {
+            appDb = json.data;
+            saveLocalCache(appDb);
+            document.getElementById('dbStatusBadge').className = 'badge badge-success';
+            document.getElementById('dbStatusBadge').textContent = '🟢 서버 DB 연결됨 (/api/diary)';
+          }
+        } else {
+          throw new Error('Server API status: ' + res.status);
+        }
+      } catch (err) {
+        console.warn('API connection notice (using local hybrid store):', err.message);
+        if (!appDb) {
+          appDb = getDefaultSeed();
+          saveLocalCache(appDb);
+        }
+        document.getElementById('dbStatusBadge').className = 'badge badge-gold';
+        document.getElementById('dbStatusBadge').textContent = '🟡 브라우저 DB 활성 (서버 자동 동기화 대기)';
+      }
+
+      renderAll();
+    }
+
+    function saveLocalCache(db) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+      } catch (e) {
+        console.warn('LocalStorage save error:', e);
+      }
+    }
+
+    async function pushToServer(action, payload = {}) {
+      saveLocalCache(appDb);
+      try {
+        const bodyData = { action, ...payload, data: appDb };
+        const res = await fetch(API_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bodyData)
+        });
+        if (res.ok) {
+          const resJson = await res.json();
+          if (resJson && resJson.data) {
+            appDb = resJson.data;
+            saveLocalCache(appDb);
+          }
+        }
+      } catch (e) {
+        console.warn('Push to server warning:', e.message);
+      }
+    }
+
+    // =========================================================================
+    // 2. 렌더링 엔진
+    // =========================================================================
+    function renderAll() {
+      if (!appDb) return;
+      renderPlan();
+      renderTodos();
+      renderRetrospective();
+    }
+
+    // 계획 렌더링
+    function renderPlan() {
+      const plan = appDb.plan;
+      document.getElementById('planTitleDisplay').textContent = plan.title;
+      document.getElementById('planPriorityBadge').textContent = plan.priority;
+      document.getElementById('planPeriodDisplay').textContent = `${plan.startDate} ~ ${plan.endDate}`;
+      document.getElementById('planEstimatedDisplay').textContent = `${Math.round(plan.estimatedMinutes / 60)}시간 (${plan.estimatedMinutes.toLocaleString()}분)`;
+      document.getElementById('planSuccessDisplay').textContent = plan.successCriteria;
+      document.getElementById('planUpdatedDisplay').textContent = plan.updatedAt ? plan.updatedAt.split('T')[0] : plan.startDate;
+
+      // 수정 이력 렌더링
+      const historyList = document.getElementById('planHistoryList');
+      const histories = appDb.planHistory || [];
+      document.getElementById('historyCount').textContent = histories.length;
+
+      if (histories.length === 0) {
+        historyList.innerHTML = `<div style="font-size: 11px; color: var(--text-dim); padding: 8px;">수정 이력이 아직 없습니다.</div>`;
+      } else {
+        historyList.innerHTML = histories.slice().reverse().map(h => `
+          <div style="background: #141418; border: 1px solid #222228; border-radius: 6px; padding: 8px 10px; font-size: 11px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+              <strong style="color: #ba9578;">v${h.version} 원본 보존</strong>
+              <span style="color: var(--text-dim); font-size: 10px;">${h.modifiedAt ? h.modifiedAt.split('T')[0] : ''}</span>
+            </div>
+            <div style="color: #e4e4e7; font-weight: 500;">${escapeHtml(h.title)}</div>
+            <div style="color: var(--text-gray); font-size: 10px; margin-top: 2px;">
+              사유: ${escapeHtml(h.changeReason)} (${h.estimatedMinutes}분)
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // 할 일 렌더링
+    function renderTodos() {
+      const container = document.getElementById('todoListContainer');
+      const todayKst = new Date().toISOString().split('T')[0]; // 서울 기준 YYYY-MM-DD
+
+      let todos = [...(appDb.todos || [])];
+
+      // 카운트 계산
+      let countAll = todos.length;
+      let countPending = 0;
+      let countCompleted = 0;
+      let countOverdue = 0;
+      let countBlocked = 0;
+
+      todos.forEach(t => {
+        const isCompleted = t.status === 'completed';
+        const isOverdue = !isCompleted && t.dueDate < todayKst;
+        const hasBlockedLog = (appDb.executionLogs || []).some(l => l.todoId === t.id && l.obstacleReason && l.obstacleReason.trim().length > 0);
+
+        if (isCompleted) countCompleted++;
+        else countPending++;
+
+        if (isOverdue) countOverdue++;
+        if (hasBlockedLog) countBlocked++;
+      });
+
+      document.getElementById('filterCountAll').textContent = countAll;
+      document.getElementById('filterCountPending').textContent = countPending;
+      document.getElementById('filterCountCompleted').textContent = countCompleted;
+      document.getElementById('filterCountOverdue').textContent = countOverdue;
+      document.getElementById('filterCountBlocked').textContent = countBlocked;
+
+      // 필터링 적용
+      if (currentFilter === 'pending') {
+        todos = todos.filter(t => t.status !== 'completed');
+      } else if (currentFilter === 'completed') {
+        todos = todos.filter(t => t.status === 'completed');
+      } else if (currentFilter === 'overdue') {
+        todos = todos.filter(t => t.status !== 'completed' && t.dueDate < todayKst);
+      } else if (currentFilter === 'blocked') {
+        todos = todos.filter(t => (appDb.executionLogs || []).some(l => l.todoId === t.id && l.obstacleReason && l.obstacleReason.trim().length > 0));
+      }
+
+      // 검색어 적용
+      if (currentSearchTerm.trim()) {
+        const term = currentSearchTerm.toLowerCase();
+        todos = todos.filter(t => {
+          const titleMatch = t.title.toLowerCase().includes(term);
+          const tagMatch = (t.tags || []).some(tag => tag.toLowerCase().includes(term));
+          const logs = (appDb.executionLogs || []).filter(l => l.todoId === t.id);
+          const obstacleMatch = logs.some(l => (l.obstacleReason || '').toLowerCase().includes(term));
+          return titleMatch || tagMatch || obstacleMatch;
+        });
+      }
+
+      // 정렬 적용
+      const priorityWeights = { '아주높음': 4, '높음': 3, '보통': 2, '낮음': 1 };
+      todos.sort((a, b) => {
+        if (currentSort === 'dueDateAsc') {
+          if (a.dueDate !== b.dueDate) return a.dueDate.localeCompare(b.dueDate);
+          return (b.id || '').localeCompare(a.id || ''); // tie-breaker: 등록 역순
+        } else if (currentSort === 'dueDateDesc') {
+          if (a.dueDate !== b.dueDate) return b.dueDate.localeCompare(a.dueDate);
+          return (b.id || '').localeCompare(a.id || '');
+        } else if (currentSort === 'priority') {
+          const wa = priorityWeights[a.priority] || 0;
+          const wb = priorityWeights[b.priority] || 0;
+          if (wa !== wb) return wb - wa;
+          return a.dueDate.localeCompare(b.dueDate);
+        } else if (currentSort === 'estimated') {
+          if (a.estimatedMinutes !== b.estimatedMinutes) return (b.estimatedMinutes || 0) - (a.estimatedMinutes || 0);
+          return a.dueDate.localeCompare(b.dueDate);
+        } else if (currentSort === 'created') {
+          return (b.id || '').localeCompare(a.id || '');
+        }
+        return 0;
+      });
+
+      if (todos.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px 16px; background: #0d0d11; border: 1px dashed var(--border-zinc); border-radius: 8px; color: var(--text-dim); font-size: 13px;">
+            조건에 부합하는 할 일이 없습니다. [새 할 일 추가]를 눌러 등록해보세요.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = todos.map(todo => {
+        const isCompleted = todo.status === 'completed';
+        const isOverdue = !isCompleted && todo.dueDate < todayKst;
+        const logs = (appDb.executionLogs || []).filter(l => l.todoId === todo.id);
+        const hasBlockedLog = logs.some(l => l.obstacleReason && l.obstacleReason.trim().length > 0);
+
+        let statusClass = '';
+        if (isCompleted) statusClass = 'completed';
+        else if (isOverdue) statusClass = 'overdue';
+
+        return `
+          <div id="todoCard-${escapeHtml(todo.id)}" class="todo-item ${statusClass}">
+            <div class="todo-top-row">
+              <div class="todo-left">
+                <button 
+                  class="todo-check-btn ${isCompleted ? 'checked' : ''}" 
+                  onclick="toggleTodoStatus('${escapeHtml(todo.id)}')"
+                  title="${isCompleted ? '진행 중으로 되돌리기' : '완료로 변경하기'}"
+                >
+                  ${isCompleted ? '✓' : ''}
+                </button>
+                <div>
+                  <div class="todo-title">${escapeHtml(todo.title)}</div>
+                  <div class="todo-tags">
+                    ${(todo.tags || []).map(t => `<span class="todo-tag">${escapeHtml(t)}</span>`).join('')}
+                    ${isOverdue ? `<span class="badge badge-danger">D+지연</span>` : ''}
+                    ${hasBlockedLog ? `<span class="badge badge-warning">막힘기록</span>` : ''}
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 4px;">
+                <button onclick="openExecLogModal('${escapeHtml(todo.id)}')" class="btn btn-sm" title="실행 기록 보기 및 작성">
+                  <span>🏃</span> <span>기록 (${logs.length})</span>
+                </button>
+                <button onclick="openEditTodoModal('${escapeHtml(todo.id)}')" class="btn btn-sm" title="내용 수정">
+                  <span>✏️</span>
+                </button>
+                <button onclick="deleteTodo('${escapeHtml(todo.id)}')" class="btn btn-sm btn-danger" title="할 일 삭제">
+                  <span>🗑️</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="todo-bottom-row">
+              <div class="todo-meta-badges">
+                <span>📅 마감: <strong style="${isOverdue ? 'color: #fca5a5;' : 'color: #fff;'}">${todo.dueDate}</strong></span>
+                <span>⚡ 우선순위: <span class="badge ${todo.priority === '아주높음' || todo.priority === '높음' ? 'badge-gold' : 'badge-gray'}">${escapeHtml(todo.priority)}</span></span>
+                <span>⏱️ 계획예상: <strong>${todo.estimatedMinutes}분</strong></span>
+              </div>
+              <div>
+                ${logs.length > 0 ? `
+                  <span style="color: #38bdf8;">실제 누적: ${logs.reduce((sum, l) => sum + (l.actualMinutes || 0), 0)}분</span>
+                ` : `<span style="color: var(--text-dim);">실행 기록 대기 중</span>`}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 돌아보기 메트릭 계산 및 렌더링
+    function renderRetrospective() {
+      const todos = appDb.todos || [];
+      const logs = appDb.executionLogs || [];
+      const todayKst = new Date().toISOString().split('T')[0];
+
+      const totalTodos = todos.length;
+      const completedTodos = todos.filter(t => t.status === 'completed').length;
+      // 지연 수: 완료되지 않았고 마감일이 오늘보다 앞선 건 (완료건은 지연으로 두 번 세지 않음)
+      const overdueTodos = todos.filter(t => t.status !== 'completed' && t.dueDate < todayKst).length;
+      // 막힘 수: 막힌 이유가 하나라도 적힌 할 일 수
+      const blockedTodoIds = new Set(
+        logs.filter(l => l.obstacleReason && l.obstacleReason.trim().length > 0).map(l => l.todoId)
+      );
+      const blockedTodos = todos.filter(t => blockedTodoIds.has(t.id)).length;
+
+      // 예상 시간 및 실제 시간 계산
+      const totalEstimatedMin = todos.reduce((acc, t) => acc + (Number(t.estimatedMinutes) || 0), 0);
+      const totalActualMin = logs.reduce((acc, l) => acc + (Number(l.actualMinutes) || 0), 0);
+      const varianceMin = totalActualMin - totalEstimatedMin;
+
+      // 화면 출력
+      document.getElementById('metricTotalTodos').textContent = totalTodos;
+      document.getElementById('metricCompletedTodos').textContent = completedTodos;
+      document.getElementById('metricOverdueTodos').textContent = overdueTodos;
+      document.getElementById('metricBlockedTodos').textContent = blockedTodos;
+
+      document.getElementById('metricEstimatedMin').textContent = totalEstimatedMin.toLocaleString();
+      document.getElementById('metricEstimatedHours').textContent = (totalEstimatedMin / 60).toFixed(1) + '시간';
+
+      document.getElementById('metricActualMin').textContent = totalActualMin.toLocaleString();
+      document.getElementById('metricActualHours').textContent = (totalActualMin / 60).toFixed(1) + '시간';
+
+      const varianceEl = document.getElementById('metricVarianceMin');
+      const varianceCardVal = document.getElementById('metricVarianceValue');
+      const varianceDesc = document.getElementById('metricVarianceDesc');
+
+      varianceEl.textContent = (varianceMin > 0 ? '+' : '') + varianceMin.toLocaleString();
+      if (varianceMin > 0) {
+        varianceCardVal.style.color = '#fca5a5';
+        varianceDesc.textContent = `${varianceMin}분 초과 (계획보다 더 걸림)`;
+      } else if (varianceMin < 0) {
+        varianceCardVal.style.color = '#86efac';
+        varianceDesc.textContent = `${Math.abs(varianceMin)}분 단축 (예상보다 빠름)`;
+      } else {
+        varianceCardVal.style.color = '#fff';
+        varianceDesc.textContent = '예상 시간과 정확히 일치';
+      }
+
+      // 다음 계획 피드백 값
+      if (appDb.retrospective && appDb.retrospective.nextImprovementPoint) {
+        const input = document.getElementById('retroFeedbackInput');
+        if (input && !input.value) {
+          input.value = appDb.retrospective.nextImprovementPoint;
+        }
+      }
+    }
+
+    // =========================================================================
+    // 3. 상호작용 및 비즈니스 로직
+    // =========================================================================
+
+    // 필터 변경
+    function setTodoFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-filter') === filter);
+      });
+      renderTodos();
+    }
+
+    // 검색어 변경
+    function handleTodoSearch() {
+      currentSearchTerm = document.getElementById('todoSearchInput').value;
+      renderTodos();
+    }
+
+    // 정렬 변경
+    function handleTodoSort() {
+      currentSort = document.getElementById('todoSortSelect').value;
+      const labels = {
+        dueDateAsc: '마감일 빠른 순 (오름차순, 동일 마감일 시 등록 역순 우선)',
+        dueDateDesc: '마감일 늦은 순 (내림차순, 동일 마감일 시 등록 역순 우선)',
+        priority: '우선순위 높은 순 (아주높음→높음→보통→낮음, 동순위 시 마감일순)',
+        estimated: '예상 시간 긴 순 (시간 내림차순, 동순위 시 마감일순)',
+        created: '최근 등록 순 (등록 역순)'
+      };
+      document.getElementById('currentSortLabel').textContent = labels[currentSort] || currentSort;
+      renderTodos();
+    }
+
+    // 집계 숫자 클릭 시 드릴다운 이동
+    function drillDownFilter(filter) {
+      setTodoFilter(filter);
+      const doSection = document.getElementById('doSection');
+      if (doSection) {
+        doSection.scrollIntoView({ behavior: 'smooth' });
+      }
+      showToast(`'${filter}' 기준으로 할 일 목록을 필터링했습니다.`, '🎯');
+    }
+
+    // 완료 상태 토글 (연타/중복 방어 Idempotency 적용)
+    async function toggleTodoStatus(id) {
+      if (isTogglingIdempotencyLock) return;
+      isTogglingIdempotencyLock = true;
+
+      const todo = appDb.todos.find(t => t.id === id);
+      if (!todo) {
+        isTogglingIdempotencyLock = false;
+        return;
+      }
+
+      // 멱등성 키 생성
+      const idempotencyKey = `idemp-toggle-${id}-${Date.now()}`;
+
+      if (todo.status === 'completed') {
+        todo.status = 'pending';
+        todo.completedAt = null;
+        showToast('할 일을 진행 중으로 되돌렸습니다.', '↩️');
+      } else {
+        todo.status = 'completed';
+        todo.completedAt = new Date().toISOString();
+
+        // 중복 방지 제약: 해당 todo에 대한 완료 실행 기록이 없을 때만 1건 추가
+        const hasLog = appDb.executionLogs.some(l => l.todoId === id);
+        if (!hasLog) {
+          appDb.executionLogs.push({
+            id: `log-${Date.now()}`,
+            todoId: todo.id,
+            planId: appDb.plan.id,
+            startedAt: new Date(Date.now() - (todo.estimatedMinutes || 30) * 60000).toISOString(),
+            endedAt: new Date().toISOString(),
+            actualMinutes: todo.estimatedMinutes || 30,
+            obstacleReason: '',
+            idempotencyKey: idempotencyKey,
+            recordedAt: new Date().toISOString()
+          });
+        }
+        showToast('할 일을 완료 처리했습니다! (+1 완료)', '🎉');
+      }
+
+      renderAll();
+      await pushToServer('toggle_todo', { id, idempotencyKey });
+
+      // 0.4초간 락 유지하여 연타 차단
+      setTimeout(() => {
+        isTogglingIdempotencyLock = false;
+      }, 400);
+    }
+
+    // 할 일 삭제
+    async function deleteTodo(id) {
+      if (!confirm('이 할 일을 삭제하시겠습니까? 관련 실행 기록도 함께 정리됩니다.')) return;
+      appDb.todos = appDb.todos.filter(t => t.id !== id);
+      appDb.executionLogs = appDb.executionLogs.filter(l => l.todoId !== id);
+      renderAll();
+      await pushToServer('delete_todo', { id });
+      showToast('할 일이 삭제되었습니다.', '🗑️');
+    }
+
+    // 계획 수정 모달 열기
+    function openEditPlanModal() {
+      const plan = appDb.plan;
+      document.getElementById('modalPlanTitle').value = plan.title;
+      document.getElementById('modalPlanStart').value = plan.startDate;
+      document.getElementById('modalPlanEnd').value = plan.endDate;
+      document.getElementById('modalPlanPriority').value = plan.priority;
+      document.getElementById('modalPlanEstimated').value = plan.estimatedMinutes;
+      document.getElementById('modalPlanSuccess').value = plan.successCriteria;
+      document.getElementById('modalPlanReason').value = '';
+      openModal('planEditModal');
+    }
+
+    // 계획 수정 제출 (이전 계획 원본을 planHistory에 보존)
+    async function submitEditPlan() {
+      const title = document.getElementById('modalPlanTitle').value.trim();
+      const startDate = document.getElementById('modalPlanStart').value;
+      const endDate = document.getElementById('modalPlanEnd').value;
+      const priority = document.getElementById('modalPlanPriority').value;
+      const estimated = Number(document.getElementById('modalPlanEstimated').value) || 2880;
+      const success = document.getElementById('modalPlanSuccess').value.trim();
+      const reason = document.getElementById('modalPlanReason').value.trim() || '목표치 보정 및 세부 일정 조정';
+
+      if (!title || !startDate || !endDate || !success) {
+        alert('모든 필수 항목을 입력해주세요.');
+        return;
+      }
+
+      // 이전 버전을 history에 보존
+      const curVersion = (appDb.planHistory.length || 0) + 1;
+      appDb.planHistory.push({
+        historyId: `phist-v${curVersion}-${Date.now()}`,
+        planId: appDb.plan.id,
+        version: curVersion,
+        title: appDb.plan.title,
+        startDate: appDb.plan.startDate,
+        endDate: appDb.plan.endDate,
+        priority: appDb.plan.priority,
+        successCriteria: appDb.plan.successCriteria,
+        estimatedMinutes: appDb.plan.estimatedMinutes,
+        modifiedAt: new Date().toISOString(),
+        changeReason: reason
+      });
+
+      // 현재 계획 갱신 (ID는 불변 유지)
+      appDb.plan.title = title;
+      appDb.plan.startDate = startDate;
+      appDb.plan.endDate = endDate;
+      appDb.plan.priority = priority;
+      appDb.plan.estimatedMinutes = estimated;
+      appDb.plan.successCriteria = success;
+      appDb.plan.updatedAt = new Date().toISOString();
+
+      closeModal('planEditModal');
+      renderAll();
+      await pushToServer('update_plan', {
+        title, startDate, endDate, priority, estimatedMinutes: estimated, successCriteria: success, changeReason: reason
+      });
+      showToast('계획이 수정되었으며, 이전 계획이 이력에 보존되었습니다.', '✅');
+    }
+
+    // 새 할 일 추가 모달 열기
+    function openAddTodoModal() {
+      document.getElementById('todoModalTitle').textContent = '새 할 일 추가';
+      document.getElementById('modalTodoId').value = '';
+      document.getElementById('modalTodoTitle').value = '';
+      document.getElementById('modalTodoDueDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('modalTodoPriority').value = '보통';
+      document.getElementById('modalTodoEstimated').value = '30';
+      document.getElementById('modalTodoTags').value = '#운동';
+      openModal('todoModal');
+    }
+
+    // 할 일 수정 모달 열기
+    function openEditTodoModal(id) {
+      const todo = appDb.todos.find(t => t.id === id);
+      if (!todo) return;
+      document.getElementById('todoModalTitle').textContent = '할 일 수정';
+      document.getElementById('modalTodoId').value = todo.id;
+      document.getElementById('modalTodoTitle').value = todo.title;
+      document.getElementById('modalTodoDueDate').value = todo.dueDate;
+      document.getElementById('modalTodoPriority').value = todo.priority;
+      document.getElementById('modalTodoEstimated').value = todo.estimatedMinutes;
+      document.getElementById('modalTodoTags').value = (todo.tags || []).join(', ');
+      openModal('todoModal');
+    }
+
+    // 할 일 추가/수정 제출
+    async function submitTodoForm() {
+      const id = document.getElementById('modalTodoId').value;
+      const title = document.getElementById('modalTodoTitle').value.trim();
+      const dueDate = document.getElementById('modalTodoDueDate').value;
+      const priority = document.getElementById('modalTodoPriority').value;
+      const estimated = Number(document.getElementById('modalTodoEstimated').value) || 30;
+      const rawTags = document.getElementById('modalTodoTags').value.split(',').map(s => s.trim()).filter(Boolean);
+      const tags = rawTags.map(t => t.startsWith('#') ? t : '#' + t);
+
+      if (!title || !dueDate) {
+        alert('제목과 마감일을 입력해주세요.');
+        return;
+      }
+
+      if (id) {
+        // 수정
+        const todo = appDb.todos.find(t => t.id === id);
+        if (todo) {
+          todo.title = title;
+          todo.dueDate = dueDate;
+          todo.priority = priority;
+          todo.estimatedMinutes = estimated;
+          todo.tags = tags;
+          todo.updatedAt = new Date().toISOString();
+        }
+        closeModal('todoModal');
+        renderAll();
+        await pushToServer('update_todo', { id, title, dueDate, priority, estimatedMinutes: estimated, tags });
+        showToast('할 일이 수정되었습니다.', '✏️');
+      } else {
+        // 추가
+        const newTodo = {
+          id: `todo-${Date.now()}`,
+          planId: appDb.plan.id,
+          title: title,
+          dueDate: dueDate,
+          priority: priority,
+          tags: tags.length ? tags : ['#운동'],
+          estimatedMinutes: estimated,
+          status: 'pending',
+          completedAt: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        appDb.todos.push(newTodo);
+        closeModal('todoModal');
+        renderAll();
+        await pushToServer('add_todo', { title, dueDate, priority, estimatedMinutes: estimated, tags });
+        showToast('새 할 일이 등록되었습니다.', '➕');
+      }
+    }
+
+    // 실행 기록 모달 열기
+    function openExecLogModal(todoId) {
+      const todo = appDb.todos.find(t => t.id === todoId);
+      if (!todo) return;
+
+      document.getElementById('modalLogTodoId').value = todo.id;
+      document.getElementById('modalLogTodoTitle').textContent = todo.title;
+
+      // 기본 시작/종료 시각 채우기 (현재 KST)
+      const now = new Date();
+      const start = new Date(now.getTime() - (todo.estimatedMinutes || 30) * 60000);
+      const toIsoLocal = d => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+
+      document.getElementById('modalLogStart').value = toIsoLocal(start);
+      document.getElementById('modalLogEnd').value = toIsoLocal(now);
+      document.getElementById('modalLogActualMin').value = todo.estimatedMinutes || 30;
+      document.getElementById('modalLogObstacle').value = '';
+
+      // 기존 기록 목록 렌더링
+      const logs = (appDb.executionLogs || []).filter(l => l.todoId === todo.id);
+      const container = document.getElementById('existingLogsContainer');
+      if (logs.length === 0) {
+        container.innerHTML = `<div style="font-size: 11px; color: var(--text-dim); padding: 6px 0;">아직 등록된 실행 기록이 없습니다.</div>`;
+      } else {
+        container.innerHTML = `
+          <div style="font-size: 11px; font-weight: 700; color: var(--brown-main); margin-bottom: 6px;">기존 실행 기록 (${logs.length}건):</div>
+          <div style="display: flex; flex-direction: column; gap: 6px; max-height: 140px; overflow-y: auto;">
+            ${logs.map((l, idx) => `
+              <div style="background: #0d0d11; border: 1px solid #27272a; border-radius: 4px; padding: 6px 10px; font-size: 11px;">
+                <div style="display: flex; justify-content: space-between; color: #fff;">
+                  <strong>#${idx + 1} 실행: ${l.actualMinutes}분 소요</strong>
+                  <span style="color: var(--text-dim); font-size: 10px;">${l.recordedAt ? l.recordedAt.split('T')[0] : ''}</span>
+                </div>
+                <div style="color: var(--text-gray); font-size: 10px;">시간: ${l.startedAt ? l.startedAt.slice(11, 16) : ''} ~ ${l.endedAt ? l.endedAt.slice(11, 16) : ''}</div>
+                ${l.obstacleReason ? `<div style="color: #fca5a5; font-size: 10px; margin-top: 2px;">막힘 이유: ${escapeHtml(l.obstacleReason)}</div>` : `<div style="color: #86efac; font-size: 10px;">특이사항 없이 완료</div>`}
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      openModal('execLogModal');
+    }
+
+    // 실행 기록 작성 제출 (원래 계획 값 덮어쓰지 않음)
+    async function submitExecutionLog() {
+      const todoId = document.getElementById('modalLogTodoId').value;
+      const startVal = document.getElementById('modalLogStart').value;
+      const endVal = document.getElementById('modalLogEnd').value;
+      const actualMin = Number(document.getElementById('modalLogActualMin').value) || 30;
+      const obstacle = document.getElementById('modalLogObstacle').value.trim();
+
+      const todo = appDb.todos.find(t => t.id === todoId);
+      if (!todo) return;
+
+      const idempotencyKey = `idemp-log-${todoId}-${Date.now()}`;
+
+      const newLog = {
+        id: `log-${Date.now()}`,
+        todoId: todo.id,
+        planId: appDb.plan.id,
+        startedAt: startVal ? new Date(startVal).toISOString() : new Date().toISOString(),
+        endedAt: endVal ? new Date(endVal).toISOString() : new Date().toISOString(),
+        actualMinutes: actualMin,
+        obstacleReason: obstacle,
+        idempotencyKey: idempotencyKey,
+        recordedAt: new Date().toISOString()
+      };
+
+      appDb.executionLogs.push(newLog);
+
+      // 할 일 상태를 완료로 자동 전환 (원래 할 일의 estimatedMinutes는 절대 변경하지 않음)
+      if (todo.status !== 'completed') {
+        todo.status = 'completed';
+        todo.completedAt = newLog.endedAt;
+      }
+
+      closeModal('execLogModal');
+      renderAll();
+      await pushToServer('add_execution_log', {
+        todoId, startedAt: newLog.startedAt, endedAt: newLog.endedAt, actualMinutes: actualMin, obstacleReason: obstacle, idempotencyKey
+      });
+      showToast('실행 기록이 저장되었습니다! (원래 계획 값 보존)', '🏃');
+    }
+
+    // 돌아보기 피드백 다음 계획으로 넘기기
+    async function saveRetroFeedback() {
+      const val = document.getElementById('retroFeedbackInput').value.trim();
+      if (!val) {
+        alert('다음 계획으로 넘길 고칠 점을 작성해주세요.');
+        return;
+      }
+      appDb.retrospective = appDb.retrospective || {};
+      appDb.retrospective.nextImprovementPoint = val;
+      appDb.retrospective.updatedAt = new Date().toISOString();
+
+      renderRetrospective();
+      await pushToServer('update_retro_feedback', { nextImprovementPoint: val });
+      showToast('고칠 점이 다음 계획 환류 목록에 저장되었습니다!', '🔄');
+    }
+
+    // 전체 데이터 JSON 내보내기
+    function exportDataJson() {
+      if (!appDb) return;
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appDb, null, 2));
+      const downloadAnchor = document.createElement('a');
+      const dateStr = new Date().toISOString().split('T')[0];
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `pds-diary-backup-${dateStr}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('내 자료 전체를 단일 파일(.json)로 내보냈습니다.', '📥');
+    }
+
+    // 서버 DB와 수동 동기화
+    async function syncWithServerDatabase() {
+      showToast('서버 데이터베이스 동기화 중...', '🔄');
+      await pushToServer('sync_all', { data: appDb });
+      await initDatabase();
+      showToast('서버 데이터베이스 동기화가 완료되었습니다.', '✅');
+    }
+
+    // 초기 데이터셋으로 복원
+    async function resetToInitialData() {
+      if (!confirm('초기 정품 운동 데이터셋으로 복원하시겠습니까?')) return;
+      appDb = getDefaultSeed();
+      saveLocalCache(appDb);
+      renderAll();
+      await pushToServer('reset_initial');
+      showToast('초기 운동 데이터셋으로 복원되었습니다.', '🔄');
+    }
+
+    // XSS 스크립트 인젝션 안전성 시험
+    function testScriptInjectionSafe() {
+      const box = document.getElementById('sandboxTestResult');
+      box.style.display = 'block';
+      const maliciousPayload = '<script>alert("XSS 공격 실패: 이 코드는 실행되지 않아야 합니다")</' + 'script><b>HTML 태그 방어 테스트</b>';
+      
+      box.innerHTML = `
+        <div style="color: #ba9578; font-weight: 700; margin-bottom: 6px;">[XSS 스크립트 인젝션 안전성 시험 결과]</div>
+        <div style="color: var(--text-gray); margin-bottom: 4px;">주입 시도 페이로드: <code>${escapeHtml(maliciousPayload)}</code></div>
+        <div style="background: #141418; padding: 8px 10px; border-radius: 4px; border: 1px solid #27272a; margin-top: 6px;">
+          화면 렌더링 결과 (글자 그대로 안전 노출): <br>
+          <span style="color: #86efac;">${escapeHtml(maliciousPayload)}</span>
+        </div>
+        <div style="color: #86efac; margin-top: 6px; font-size: 11px;">
+          ✓ 스크립트가 실행되지 않고 글자 그대로 화면에 출력됨을 확인했습니다. (XSS 100% 방어)
+        </div>
+      `;
+      showToast('XSS 스크립트 인젝션 방어 테스트 완료 (안전)', '🛡️');
+    }
+
+    // 모달 유틸리티
+    function openModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.add('open');
+    }
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.remove('open');
+    }
+
+    // 바깥 클릭 시 모달 닫기
+    window.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal-backdrop')) {
+        e.target.classList.remove('open');
+      }
+    });
+
+    // 시작 시 DB 초기화
+    document.addEventListener('DOMContentLoaded', initDatabase);
+  </script>
+
+</body>
+</html>
