@@ -1,0 +1,8 @@
+# Large model files and test scratch
+test/
+vm/
+team/
+*.gguf
+*.bin
+*.code-workspace
+.DS_Store

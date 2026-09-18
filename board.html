@@ -475,6 +475,11 @@
           <span class="nav-hide-mobile">날씨 & 환율</span>
           <span class="nav-show-mobile">날씨·환율</span>
         </a>
+        <a href="/compare.html" class="quick-nav-item" title="과제 5 비교 보고서">
+          <span>🤝</span>
+          <span class="nav-hide-mobile">비교 보고서</span>
+          <span class="nav-show-mobile">보고서</span>
+        </a>
       </nav>
 
       <!-- 헤더 우측 도구 -->
@@ -648,6 +653,93 @@
           </div>
         </div>
 
+      </div>
+
+      <!-- 실시간 환율 변환 계산기 (과제 5 개선 기능) -->
+      <div style="margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border-zinc);" id="fxCalculatorSection">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 16px;">🧮</span>
+            <span style="font-size: 13px; font-weight: 700; color: #fff; font-family: 'JetBrains Mono', monospace;">
+              실시간 환율 변환 계산기
+            </span>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-sm" onclick="setQuickAmount(10000)">1만</button>
+            <button type="button" class="btn btn-sm" onclick="setQuickAmount(50000)">5만</button>
+            <button type="button" class="btn btn-sm" onclick="setQuickAmount(100000)">10만</button>
+            <button type="button" class="btn btn-sm" onclick="setQuickAmount(1000000)">100만</button>
+            <button type="button" class="btn btn-sm" onclick="resetCalculator()" style="color: #a1a1aa;">초기화</button>
+          </div>
+        </div>
+
+        <!-- 입력부 및 결과 그리드 -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; align-items: stretch;">
+          
+          <!-- 기준 금액 입력 -->
+          <div style="background: #0d0d10; border: 1px solid var(--border-zinc); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label for="calcAmountInput" style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">
+                원화(KRW) 금액 입력
+              </label>
+              <span id="calcInputValidMsg" style="font-size: 11px; color: #86efac; font-family: 'JetBrains Mono', monospace;">정상</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <input 
+                type="text" 
+                id="calcAmountInput" 
+                value="100,000" 
+                placeholder="금액 입력"
+                oninput="onCalcInputChange(this.value)"
+                style="width: 100%; background: #141418; border: 1px solid var(--border-zinc); border-radius: 6px; padding: 8px 10px; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; outline: none;"
+              />
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--brown-main); font-weight: 600;">원</span>
+            </div>
+          </div>
+
+          <!-- 환산 결과 1: USD -->
+          <div style="background: #0d0d10; border: 1px solid var(--border-zinc); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; margin-bottom: 4px;">
+              🇺🇸 미국 달러 (USD)
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 4px;">
+              <span style="font-size: 20px; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace;" id="calcResultUsd">--</span>
+              <span style="font-size: 12px; color: var(--brown-main); font-family: 'JetBrains Mono', monospace;">$</span>
+            </div>
+            <div style="font-size: 10px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; margin-top: 4px;">
+              1 USD 기준 환산
+            </div>
+          </div>
+
+          <!-- 환산 결과 2: JPY -->
+          <div style="background: #0d0d10; border: 1px solid var(--border-zinc); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; margin-bottom: 4px;">
+              🇯🇵 일본 엔화 (JPY)
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 4px;">
+              <span style="font-size: 20px; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace;" id="calcResultJpy">--</span>
+              <span style="font-size: 12px; color: var(--brown-main); font-family: 'JetBrains Mono', monospace;">¥</span>
+            </div>
+            <div style="font-size: 10px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; margin-top: 4px;">
+              100 JPY 환율 수식 적용
+            </div>
+          </div>
+
+          <!-- 환산 결과 3: CNY -->
+          <div style="background: #0d0d10; border: 1px solid var(--border-zinc); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; margin-bottom: 4px;">
+              🇨🇳 중국 위안화 (CNY)
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 4px;">
+              <span style="font-size: 20px; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace;" id="calcResultCny">--</span>
+              <span style="font-size: 12px; color: var(--brown-main); font-family: 'JetBrains Mono', monospace;">¥</span>
+            </div>
+            <div style="font-size: 10px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; margin-top: 4px;">
+              1 CNY 기준 환산
+            </div>
+          </div>
+
+        </div>
       </div>
 
       <!-- 하단 출처 표기 -->
@@ -1057,6 +1149,7 @@
     }
 
     function renderFxRates(rec) {
+      currentFxRecord = rec;
       const fxTimeEl = document.getElementById('fxFetchedAt');
       const usdEl = document.getElementById('fxUsdRate');
       const usdSub = document.getElementById('fxUsdSub');
@@ -1077,6 +1170,103 @@
       if (cnySub) cnySub.textContent = formatNum(rec.cny);
 
       if (fxTimeEl) fxTimeEl.textContent = `조회 시각: ${rec.fetchedAt} (KST)`;
+
+      // 환율 계산기 표시 자동 업데이트
+      updateCalculatorDisplay();
+    }
+
+    // ==========================================
+    // 4-1. 실시간 환율 계산기 로직 (과제 5 개선 기능)
+    // ==========================================
+    let currentFxRecord = null;
+
+    function calculateExchange(krwAmount, fxRec) {
+      if (!fxRec || !fxRec.usd || !fxRec.jpy100 || !fxRec.cny) {
+        return { valid: false, error: '환율 데이터 로드 중', usd: '0.00', jpy: '0.00', cny: '0.00' };
+      }
+
+      const cleaned = String(krwAmount).replace(/,/g, '').trim();
+      if (cleaned === '' || cleaned === '0') {
+        return { valid: true, error: null, usd: '0.00', jpy: '0.00', cny: '0.00', rawKrw: 0 };
+      }
+
+      const num = Number(cleaned);
+      if (Number.isNaN(num)) {
+        return { valid: false, error: '유효한 숫자를 입력해주세요.', usd: '0.00', jpy: '0.00', cny: '0.00' };
+      }
+
+      if (num < 0) {
+        return { valid: false, error: '금액은 0보다 커야 합니다.', usd: '0.00', jpy: '0.00', cny: '0.00' };
+      }
+
+      const usdVal = num / fxRec.usd;
+      const jpyVal = (num / fxRec.jpy100) * 100;
+      const cnyVal = num / fxRec.cny;
+
+      const fmt = (n) => Number(n).toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      return {
+        valid: true,
+        error: null,
+        usd: fmt(usdVal),
+        jpy: fmt(jpyVal),
+        cny: fmt(cnyVal),
+        rawKrw: num
+      };
+    }
+
+    function updateCalculatorDisplay() {
+      const inputEl = document.getElementById('calcAmountInput');
+      if (inputEl) {
+        onCalcInputChange(inputEl.value);
+      }
+    }
+
+    function onCalcInputChange(rawVal) {
+      const usdEl = document.getElementById('calcResultUsd');
+      const jpyEl = document.getElementById('calcResultJpy');
+      const cnyEl = document.getElementById('calcResultCny');
+      const msgEl = document.getElementById('calcInputValidMsg');
+
+      let fxRec = currentFxRecord;
+      if (!fxRec) {
+        try {
+          const cached = localStorage.getItem(FX_CACHE_KEY);
+          if (cached) fxRec = JSON.parse(cached);
+        } catch (e) {}
+      }
+
+      const res = calculateExchange(rawVal, fxRec);
+
+      if (usdEl) usdEl.textContent = res.usd;
+      if (jpyEl) jpyEl.textContent = res.jpy;
+      if (cnyEl) cnyEl.textContent = res.cny;
+
+      if (msgEl) {
+        if (res.valid) {
+          msgEl.textContent = '정상';
+          msgEl.style.color = '#86efac';
+        } else {
+          msgEl.textContent = res.error || '오류';
+          msgEl.style.color = '#fca5a5';
+        }
+      }
+    }
+
+    function setQuickAmount(amt) {
+      const inputEl = document.getElementById('calcAmountInput');
+      if (inputEl) {
+        inputEl.value = Number(amt).toLocaleString('ko-KR');
+        onCalcInputChange(inputEl.value);
+      }
+    }
+
+    function resetCalculator() {
+      const inputEl = document.getElementById('calcAmountInput');
+      if (inputEl) {
+        inputEl.value = '0';
+        onCalcInputChange('0');
+      }
     }
 
     // ==========================================
@@ -1086,6 +1276,8 @@
       renderLiveDailyTable();
       fetchLiveData();
       fetchExchangeRates();
+      // 초기 계산기 구동
+      updateCalculatorDisplay();
     });
   </script>
 </body>

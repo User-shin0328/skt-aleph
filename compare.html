@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>과제 5: 대화가 끊겨도 이어지는 프로젝트 — 인수인계 비교 보고서 | 신재원페이지</title>
+  <meta name="description" content="과제 5: 두 AI 세션의 7칸 인수인계 기반 협업 및 블라인드 성능 비교 보고서">
+
+  <!-- Pretendard & JetBrains Mono Fonts -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-black: #09090b;
+      --card-bg: #141418;
+      --card-sub: #1a1a22;
+      --border-zinc: #27272a;
+      --border-light: #3f3f46;
+      --brown-main: #ba9578;
+      --brown-accent: #a27b5c;
+      --brown-btn: #8c674b;
+      --brown-hover: #a27b5c;
+      --text-white: #f4f4f5;
+      --text-gray: #a1a1aa;
+      --text-dim: #71717a;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-white);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+      padding-top: 60px;
+    }
+
+    /* 상단 네비게이션 헤더 */
+    .app-nav-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(9, 9, 11, 0.9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid #27272a;
+      z-index: 50;
+    }
+    @media (min-width: 640px) {
+      .app-nav-bar {
+        height: 60px;
+      }
+    }
+    .app-nav-inner {
+      width: 100%;
+      height: 100%;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+    @media (min-width: 640px) {
+      .app-nav-inner {
+        padding: 0 20px;
+      }
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #f4f4f5;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+      z-index: 20;
+    }
+    @media (min-width: 640px) {
+      .app-brand {
+        font-size: 15px;
+      }
+    }
+    .app-brand:hover {
+      color: #ba9578;
+    }
+    .app-brand-arrow {
+      color: #ba9578;
+      font-weight: 800;
+    }
+    .app-quick-nav {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      z-index: 10;
+    }
+    @media (min-width: 640px) {
+      .app-quick-nav {
+        gap: 6px;
+      }
+    }
+    .quick-nav-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 4px 6px;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      border-radius: 6px;
+      text-decoration: none;
+      white-space: nowrap;
+      background: #141418;
+      border: 1px solid #27272a;
+      color: #a1a1aa;
+      transition: all 0.15s ease;
+    }
+    @media (min-width: 640px) {
+      .quick-nav-item {
+        padding: 5px 10px;
+        font-size: 12px;
+        gap: 5px;
+      }
+    }
+    .quick-nav-item:hover {
+      background: #1f1f24;
+      border-color: #3f3f46;
+      color: #ffffff;
+    }
+    .quick-nav-item.active {
+      background: #2a221b;
+      border-color: #ba9578;
+      color: #ba9578;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(186, 149, 120, 0.2);
+    }
+    .nav-hide-mobile {
+      display: none;
+    }
+    @media (min-width: 640px) {
+      .nav-hide-mobile {
+        display: inline;
+      }
+      .nav-show-mobile {
+        display: none;
+      }
+    }
+
+    .container-box {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px;
+    }
+    @media (min-width: 640px) {
+      .container-box {
+        padding: 30px 24px;
+      }
+    }
+
+    /* 카드 */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-zinc);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    @media (min-width: 640px) {
+      .card {
+        padding: 26px;
+      }
+    }
+
+    /* 버튼 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid var(--border-zinc);
+      background: #18181f;
+      color: var(--text-white);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .btn:hover {
+      background: #24242d;
+      border-color: #3f3f46;
+      color: #fff;
+    }
+    .btn-primary {
+      background: var(--brown-btn);
+      border-color: var(--brown-main);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--brown-hover);
+    }
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: 11px;
+    }
+
+    /* 뱃지 */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+    .badge-gold {
+      background: #2a221b;
+      border: 1px solid #ba9578;
+      color: #ba9578;
+    }
+    .badge-success {
+      background: #112818;
+      border: 1px solid #1f5f30;
+      color: #86efac;
+    }
+    .badge-gray {
+      background: #18181f;
+      border: 1px solid #27272a;
+      color: #a1a1aa;
+    }
+
+    /* 테이블 */
+    .data-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-zinc);
+      border-radius: 8px;
+      background: #0d0d10;
+      margin-top: 12px;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .data-table th, .data-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1f1f24;
+      white-space: nowrap;
+    }
+    .data-table th {
+      background-color: #141418;
+      color: #a1a1aa;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    .data-table tr:hover td {
+      background-color: #121217;
+    }
+
+    /* 타임라인 */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      padding-left: 24px;
+      margin-top: 16px;
+    }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      bottom: 8px;
+      left: 7px;
+      width: 2px;
+      background: #27272a;
+    }
+    .timeline-item {
+      position: relative;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -24px;
+      top: 4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #18181f;
+      border: 2px solid var(--brown-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 코드 블록 */
+    .code-box {
+      background: #0d0d10;
+      border: 1px solid var(--border-zinc);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #e4d3c4;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 상단 네비게이션 헤더 -->
+  <header class="app-nav-bar">
+    <div class="app-nav-inner">
+      <a href="/" class="app-brand" title="신재원페이지 홈으로">
+        <span class="app-brand-arrow">&gt;</span>
+        <span class="nav-hide-mobile">신재원페이지</span>
+        <span class="nav-show-mobile">신재원</span>
+      </a>
+
+      <!-- 빠른 이동 탭 -->
+      <nav class="app-quick-nav" aria-label="빠른 이동">
+        <a href="/" class="quick-nav-item" title="메인 포트폴리오">
+          <span>🏠</span>
+          <span class="nav-hide-mobile">포트폴리오</span>
+          <span class="nav-show-mobile">홈</span>
+        </a>
+        <a href="/game.html" class="quick-nav-item" title="과제 2 서부 러너 게임">
+          <span>🎮</span>
+          <span>서부러너</span>
+        </a>
+        <a href="/studio.html" class="quick-nav-item" title="과제 3 짤·카드 스튜디오">
+          <span>🎨</span>
+          <span>짤스튜디오</span>
+        </a>
+        <a href="/board.html" class="quick-nav-item" title="과제 4 오늘의 날씨 & 환율">
+          <span>🌤️</span>
+          <span class="nav-hide-mobile">날씨 & 환율</span>
+          <span class="nav-show-mobile">날씨·환율</span>
+        </a>
+        <a href="/compare.html" class="quick-nav-item active" aria-current="page" title="과제 5 비교 보고서">
+          <span>🤝</span>
+          <span class="nav-hide-mobile">비교 보고서</span>
+          <span class="nav-show-mobile">보고서</span>
+        </a>
+      </nav>
+
+      <div class="app-nav-tools">
+        <a 
+          href="https://github.com/User-shin0328/skt-aleph2" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="btn btn-sm"
+          title="GitHub 저장소"
+        >
+          <span>소스코드</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container-box">
+
+    <!-- 헤더 배너 -->
+    <div style="margin-bottom: 28px;">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+        <span class="badge badge-gold">과제 5</span>
+        <span class="badge badge-success">무로그인 공개 비교 보고서</span>
+        <span class="badge badge-gray">인수인계 7칸 완주</span>
+      </div>
+      <h1 style="font-size: 26px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #fff; margin-bottom: 8px;">
+        대화가 끊겨도 이어지는 프로젝트
+      </h1>
+      <p style="font-size: 14px; color: var(--text-gray); max-width: 800px; line-height: 1.6;">
+        과제 4의 실시간 환율 계산기 기능을 두 AI 세션이 차례로 이어서 완성하였습니다.
+        첫 번째 AI의 대화 전문 없이, 저장소와 7칸 인수인계 문서(HANDOFF.md)만으로 두 번째 AI가 작업을 완벽히 재개하여 10개 검사를 모두 통과시킨 실증 보고서입니다.
+      </p>
+    </div>
+
+    <!-- 섹션 1: 순차 진행 타임라인 -->
+    <div class="card">
+      <h2 style="font-size: 16px; font-weight: 700; color: var(--brown-main); font-family: 'JetBrains Mono', monospace; margin-bottom: 6px;">
+        1. 순차 진행 타임라인 (T05-C07)
+      </h2>
+      <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 16px;">
+        AI A 시작 &rarr; AI A 종료·인수인계 &rarr; AI B 시작 &rarr; AI B 완료 순서를 엄격히 준수하여 기록되었습니다.
+      </p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--brown-main);">STAGE 1 · 사전 검사 및 상한선 고정 (T05-C01 ~ T05-C06)</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 2px;">작업 착수 전 고정 검사 10개 및 공통 상한 확정</div>
+          <div style="font-size: 12px; color: var(--text-gray); margin-top: 4px;">
+            과제 4 '실시간 환율 변환 계산기'를 개선 대상으로 선정하고, ID/입력/기대값이 명시된 고정 검사 10개 확정. 공통 사용 상한: 시간 60분, 호출 수 15회 설정.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--brown-main);">STAGE 2 · AI A 작업 및 중단 (T05-C08, T05-C09)</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 2px;">도구 A 스캐폴딩 및 5개 검사 통과 후 세션 중단</div>
+          <div style="font-size: 12px; color: var(--text-gray); margin-top: 4px;">
+            기본 계산기 UI 마크업 및 원화&rarr;외화 계산 수식 구현(TEST-01~05 통과). 계획된 시점에서 작업을 멈추고 버전 커밋 생성 및 7칸 인수인계서(HANDOFF.md) 작성.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--brown-main);">STAGE 3 · AI B 인계 및 작업 재개 (T05-C13, T05-C14)</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 2px;">대화 전문 없이 저장소와 인수인계 문서만으로 착수</div>
+          <div style="font-size: 12px; color: var(--text-gray); margin-top: 4px;">
+            새 세션에서 AI A의 대화 로그 일체 없이 HANDOFF.md와 Git 버전만을 수신하여 작업 착수. 누락 검토 결과 7항목 완벽 재현 확인.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--brown-main);">STAGE 4 · AI B 기능 완성 및 10개 검사 완주 (T05-C16 ~ T05-C20)</div>
+          <div style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 2px;">남은 결함 5개 전원 해결 및 10/10 PASS 달성</div>
+          <div style="font-size: 12px; color: var(--text-gray); margin-top: 4px;">
+            0원 처리, 음수 입력 경고, 문자 차단, 빠른 금액 프리셋 버튼, 오프라인 캐시 계산을 완성하여 10개 고정 검사 100% 통과 완료.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 섹션 2: 블라인드 측정 비교표 -->
+    <div class="card">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+        <div>
+          <h2 style="font-size: 16px; font-weight: 700; color: var(--brown-main); font-family: 'JetBrains Mono', monospace;">
+            2. 이름을 가린 측정 비교표 (T05-C23 ~ T05-C28)
+          </h2>
+          <p style="font-size: 12px; color: var(--text-dim);">
+            공정한 판정을 위해 모델명을 가리고 실제 측정값으로만 비교합니다.
+          </p>
+        </div>
+        <span class="badge badge-gold">블라인드 평가</span>
+      </div>
+
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>비교 지표 항목</th>
+              <th>도구 A [블라인드]</th>
+              <th>도구 B [블라인드]</th>
+              <th>공통 상한 / 기준</th>
+              <th>판정</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>실제 작업시간 (T05-C23)</strong></td>
+              <td>32분</td>
+              <td>24분</td>
+              <td>60분 이하</td>
+              <td><span class="badge badge-success">상한 준수</span></td>
+            </tr>
+            <tr>
+              <td><strong>실제 요청/호출 수 (T05-C24)</strong></td>
+              <td>8회</td>
+              <td>5회</td>
+              <td>15회 이하</td>
+              <td><span class="badge badge-success">상한 준수</span></td>
+            </tr>
+            <tr>
+              <td><strong>오류 발생 회차 (T05-C25)</strong></td>
+              <td>2회 (계산식 예외)</td>
+              <td>1회 (경계값 검증)</td>
+              <td>FAIL 발생 실행 회차</td>
+              <td><span class="badge badge-gray">측정 완료</span></td>
+            </tr>
+            <tr>
+              <td><strong>고정 검사 통과 수 (T05-C27)</strong></td>
+              <td>5 / 10 건</td>
+              <td><strong>10 / 10 건</strong></td>
+              <td>10건 고정</td>
+              <td><span class="badge badge-success">100% 완주</span></td>
+            </tr>
+            <tr>
+              <td><strong>고정 검사 변경 여부 (T05-C18~20)</strong></td>
+              <td>삭제 0, 완화 0, 변경 0</td>
+              <td>삭제 0, 완화 0, 변경 0</td>
+              <td>기준 변경 금지</td>
+              <td><span class="badge badge-success">무변경 준수</span></td>
+            </tr>
+            <tr>
+              <td><strong>코드 라인 변동 (T05-C26)</strong></td>
+              <td>+98줄 (기본 구조)</td>
+              <td>+62줄 (예외 방어)</td>
+              <td>Git Commit 기준</td>
+              <td><span class="badge badge-gray">재작업 최소화</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 섹션 3: 10개 고정 검사표 -->
+    <div class="card">
+      <h2 style="font-size: 16px; font-weight: 700; color: var(--brown-main); font-family: 'JetBrains Mono', monospace; margin-bottom: 6px;">
+        3. 고정 검사 10개 명세 및 최종 결과 (T05-C01 ~ T05-C04)
+      </h2>
+      <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 14px;">
+        작업 착수 전에 확정한 10개 검사의 입력 및 관찰 가능한 기대값과 두 AI의 단계별 결과입니다.
+      </p>
+
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>검사 목적</th>
+              <th>입력 조건</th>
+              <th>관찰 가능한 기대값</th>
+              <th>도구 A</th>
+              <th>도구 B</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color: #ba9578;">T05-TEST-01</strong></td>
+              <td>기본 UI 렌더링</td>
+              <td>페이지 로드 시</td>
+              <td>계산기 입력창 및 3개국 환산 영역 정상 출력</td>
+              <td><span class="badge badge-success">PASS</span></td>
+              <td><span class="badge badge-success">PASS</span></td>
+            </tr>
+            <tr>
+              <td><strong style="color: #ba9578;">T05-TEST-02</strong></td>
+              <td>USD 환산 정확도</td>
+              <td>원화 1,000,000원 입력</td>
+              <td>1,000,000 / USD환율 소수점 2자리 표시</td>
+              <td><span class="badge badge-success">PASS</span></td>
+              <td><span class="badge badge-success">PASS</span></td>
+            </tr>
+            <tr>
+              <td><strong style="color: #ba9578;">T05-TEST-03</strong></td>
+              <td>JPY 100엔 환산식</td>
+              <td>원화 100,000원 입력</td>
+              <td>(100,000 / 100엔환율) * 100 수식 적용</td>
+              <td><span class="badge badge-success">PASS</span></td>
+              <td><span class="badge badge-success">PASS</span></td>
+            </tr>
+            <tr>
+              <td><strong style="color: #ba9578;">T05-TEST-04</strong></td>
+              <td>CNY 환산 정확도</td>
+              <td>원화 100,000원 입력</td>
+              <td>100,000 / CNY환율 소수점 2자리 표시</td>
+              <td><span class="badge badge-success">PASS</span></td>
+              <td><span class="badge badge-success">PASS</span></td>
+            </tr>
+            <tr>
+              <td><strong style="color: #ba9578;">T05-TEST-05</strong></td>
+              <td>빠른 금액 버튼</td>
+              <td>100만 버튼 클릭</td>
+              <td>입력창 1,000,000 자동 입력 및 즉시 계산</td>
+              <td><span class="badge badge-success">PASS</span></td>
+              <td><span class="badge badge-success">PASS</span></td>
+            </tr>
+            <tr>
+              <td><strong style="color: #ba9578;">T05-TEST-06</strong></td>
+              <td>0원 입력 안전성</td>
+              <td>금액 '0' 입력</td>
+              <td>USD, JPY, CNY 결과 모두 '0.00' 안전 출력</td>
+              <td><span style="color: #fca5a5;">FAIL</span></td>
+              <td><span class="badge badge-success">PASS</span></td>
+            </tr>
+            <tr>
+              <td><strong style="color: #ba9578;">T05-TEST-07</strong></td>
+              <td>음수 입력 방어</td>
+              <td>금액 '-50000' 입력</td>
+              <td>'금액은 0보다 커야 합니다' 경고 및 차단</td>
+              <td><span style="color: #fca5a5;">FAIL</span></td>
+              <td><span class="badge badge-success">PASS</span></td>
+            </tr>
+            <tr>
+              <td><strong style="color: #ba9578;">T05-TEST-08</strong></td>
+              <td>문자열 입력 방어</td>
+              <td>'abc#$%' 입력</td>
+              <td>'유효한 숫자를 입력해주세요' 경고 및 차단</td>
+              <td><span style="color: #fca5a5;">FAIL</span></td>
+              <td><span class="badge badge-success">PASS</span></td>
+            </tr>
+            <tr>
+              <td><strong style="color: #ba9578;">T05-TEST-09</strong></td>
+              <td>초기화 버튼 동작</td>
+              <td>[초기화] 클릭</td>
+              <td>입력창 0 리셋 및 환산 결과 0.00 초기화</td>
+              <td><span style="color: #fca5a5;">FAIL</span></td>
+              <td><span class="badge badge-success">PASS</span></td>
+            </tr>
+            <tr>
+              <td><strong style="color: #ba9578;">T05-TEST-10</strong></td>
+              <td>오프라인 캐시 연동</td>
+              <td>API 단절 시 5만 입력</td>
+              <td>localStorage 보존 환율로 정상 계산 수행</td>
+              <td><span style="color: #fca5a5;">FAIL</span></td>
+              <td><span class="badge badge-success">PASS</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 섹션 4: 7칸 인수인계 문서 -->
+    <div class="card">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+        <div>
+          <h2 style="font-size: 16px; font-weight: 700; color: var(--brown-main); font-family: 'JetBrains Mono', monospace;">
+            4. 7칸 인수인계 문서 전문 (T05-C10)
+          </h2>
+          <p style="font-size: 12px; color: var(--text-dim);">
+            AI A가 작업 중단 시 남긴 실제 인수인계서(HANDOFF.md) 원문입니다.
+          </p>
+        </div>
+        <span class="badge badge-gold">HANDOFF.md</span>
+      </div>
+
+      <div class="code-box">
+================================================================================
+7칸 인수인계 문서 (HANDOFF.md)
+버전 ID: 452eb2a1d29fa756306c4b22c7eb1df0b89b889b
+================================================================================
+1. 목표 (Goal)
+   과제 4(board.html) 환율 카드 하단에 실시간 환율 변환 계산기 기능을 구현하여,
+   고정 검사 10개(T05-TEST-01 ~ T05-TEST-10)를 100% 통과시키는 것.
+
+2. 현재 상태 (Current State)
+   계산기 기본 UI(#fxCalculatorSection) 및 원화->외화 기본 계산식 calculateExchange()
+   스캐폴딩 완료. 기본 10만 원 입력 시 USD/JPY/CNY 정상 계산 작동 중.
+
+3. 실행 명령 (Execution Commands)
+   - 코드 확인: board.html
+   - 라이브 확인: http://localhost:3000/board.html 또는 https://skt-aleph-gilt.vercel.app/board
+
+4. 통과 검사 (Passed Tests)
+   - T05-TEST-01: 기본 UI 렌더링 (PASS)
+   - T05-TEST-02: 100만 원 입력 시 USD 환산 정확도 (PASS)
+   - T05-TEST-03: 10만 원 입력 시 JPY (100엔 공식) 환산 정확도 (PASS)
+   - T05-TEST-04: 10만 원 입력 시 CNY 환산 정확도 (PASS)
+   - T05-TEST-05: 빠른 금액 100만 버튼 입력 및 자동 계산 (PASS)
+
+5. 남은 문제 (Remaining Issues)
+   - T05-TEST-06: 0원 입력 시 예외 처리 누락 (NaN 또는 빈칸 발생)
+   - T05-TEST-07: 음수(-50,000) 입력 시 경고 메시지 없이 음수 계산 출력됨
+   - T05-TEST-08: 문자열('abc') 입력 시 NaN 발생 및 안내 메시지 부재
+   - T05-TEST-09: 초기화 버튼 클릭 시 0.00으로 리셋하는 resetCalculator() 미구현
+   - T05-TEST-10: 네트워크 오프라인 시 localStorage 캐시 환율 자동 폴백 로직 미비
+
+6. 다음 행동 (Next Action)
+   calculateExchange() 함수 내에 입력값 유효성 검사(0, 음수, 문자열)를 추가하고,
+   resetCalculator() 구현 및 currentFxRecord 미로드 시 localStorage 캐시 읽기 로직을 연결할 것.
+
+7. 건드리지 말 것 (Scope Restrictions)
+   - 기존 서울 실시간 기온 카드(#board-metric-card) 및 일별 기록 테이블(#liveDailyTableBody) 구조 변경 금지
+   - Open-Meteo 및 open.er-api.com 통신 인터페이스 및 비밀키 0건 원칙 엄수
+================================================================================
+      </div>
+    </div>
+
+    <!-- 섹션 5: 다음 작업 도구 선택 기준 -->
+    <div class="card">
+      <h2 style="font-size: 16px; font-weight: 700; color: var(--brown-main); font-family: 'JetBrains Mono', monospace; margin-bottom: 8px;">
+        5. 다음 작업 도구 선택 기준 (T05-C29)
+      </h2>
+      <div style="background: #0d0d10; border-left: 3px solid var(--brown-main); padding: 14px 16px; border-radius: 0 8px 8px 0; margin-top: 8px;">
+        <p style="font-size: 14px; font-weight: 700; color: #fff; font-family: 'JetBrains Mono', monospace;">
+          "대규모 신규 기능의 뼈대 설계와 신속한 스캐폴딩 작업에는 초기 구현 속도가 빠른 도구 A를 우선 투입하고, 세밀한 경계 조건 검증, 예외 방어 및 결함 디버깅 완성 단계에는 완성도가 높은 도구 B를 채택한다."
+        </p>
+      </div>
+    </div>
+
+    <!-- 섹션 6: 바로가기 링크 버튼 -->
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 10px; margin-bottom: 40px;">
+      <a href="/board.html#fxCalculatorSection" class="btn btn-primary" style="padding: 10px 20px; font-size: 13px;">
+        <span>🧮</span> <span>개선된 실시간 환율 계산기 확인하기</span> <span>&rarr;</span>
+      </a>
+      <a href="https://github.com/User-shin0328/skt-aleph2/tree/main/과제5" target="_blank" rel="noopener noreferrer" class="btn" style="padding: 10px 20px; font-size: 13px;">
+        <span>📁</span> <span>과제 5 아카이브 폴더 바로가기</span> <span>&rarr;</span>
+      </a>
+    </div>
+
+  </main>
+
+  <footer style="border-top: 1px solid var(--border-zinc); padding: 24px 16px; text-align: center; font-size: 12px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">
+    신재원페이지 &copy; 2026 — Portfolio Archive (과제 5 무로그인 공개 비교 보고서)
+  </footer>
+
+</body>
+</html>
