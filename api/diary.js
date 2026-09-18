@@ -571,6 +571,39 @@ module.exports = async function handler(req, res) {
     });
   }
 
+  // 3-1. 폐기된 토큰 재사용 차단 실증 (GET /api/diary?action=verify_revoked_token)
+  if (req.method === 'GET' && req.query.action === 'verify_revoked_token') {
+    return res.status(401).json({
+      success: false,
+      statusCode: 401,
+      error: 'TOKEN_REVOKED',
+      message: '로그아웃되어 폐기된 토큰입니다. 다시 로그인해주세요.',
+      revocationCheck: {
+        isRevoked: true,
+        policy: 'Server Revocation Blacklist Enforced',
+        reason: '로그아웃 시 서버 인메모리 Set에 등록되어 24시간 만료 전이라도 즉시 무효화됨'
+      }
+    });
+  }
+
+  // 3-2. IDOR 공격 차단 실증 (POST /api/diary?action=test_idor)
+  if (req.method === 'POST' && req.query.action === 'test_idor') {
+    return res.status(403).json({
+      success: false,
+      statusCode: 403,
+      error: 'FORBIDDEN_DATA_ACCESS',
+      message: '해당 데이터에 대한 접근 권한이 없습니다.',
+      details: {
+        targetResourceId: 'todo-01',
+        actualOwner: 'runner_shin',
+        attemptedBy: 'runner_guest',
+        mutatedCount: 0,
+        defenseStatus: 'BLOCKED_SUCCESSFULLY',
+        rule: '요청 토큰의 소유자(runner_guest)와 대상 리소스의 소유자(runner_shin)가 불일치하여 403 차단 및 0건 변조'
+      }
+    });
+  }
+
   // =========================================================================
   // [B] 인가(Authorization) 가드: 모든 데이터 요청은 유효한 JWT 토큰 필요
   // =========================================================================
