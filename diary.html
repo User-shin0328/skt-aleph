@@ -1264,21 +1264,10 @@
       </div>
     </section>
 
-    <!-- 미인증 시 표시되는 잠금 안내 배너 (탭 1이 선택되어 있을 때) -->
-    <div id="unauthLockNotice" class="public-notice-banner" style="display: none;">
-      <div class="public-notice-text">
-        <span>🔒 </span>
-        <strong>로그인 후 이용할 수 있습니다.</strong>
-        <div style="font-size: 11px; color: #a1a1aa; margin-top: 4px;">
-          상단의 <strong>원클릭 계정 로그인</strong>을 누르시면 즉시 다이어리 데이터와 5일간 기록을 열람 및 편집할 수 있습니다.
-        </div>
-      </div>
-    </div>
-
     <!-- =========================================================================
-         탭 1 영역: 플랜두씨 다이어리 (Plan - Do - See)
+         탭 1 영역: 플랜두씨 다이어리 (Plan - Do - See) — 로그인 완료 시에만 노출
          ========================================================================= -->
-    <div id="tabContentDiary" class="pds-tab-pane">
+    <div id="tabContentDiary" class="pds-tab-pane" style="display: none;">
 
     <!-- 1. Plan (계획 세우기 & 수정 이력 보존) -->
     <section class="card" id="planSection">
@@ -2125,14 +2114,22 @@
           }
         }
         if (pane) {
-          pane.style.display = (t === tabName) ? 'block' : 'none';
+          if (t === 'diary') {
+            // 다이어리 탭은 오직 로그인 상태일 때만 노출! 비로그인 시 100% 숨김
+            pane.style.display = (tabName === 'diary' && !!authToken) ? 'block' : 'none';
+          } else {
+            pane.style.display = (t === tabName) ? 'block' : 'none';
+          }
         }
       });
 
-      // 미인증 시 diary 탭 자물쇠 배너 표시
-      const unauthNotice = document.getElementById('unauthLockNotice');
-      if (unauthNotice) {
-        unauthNotice.style.display = (!authToken && tabName === 'diary') ? 'block' : 'none';
+      const gateEl = document.getElementById('authGateSection');
+      if (!authToken) {
+        // 비로그인 상태: 다이어리 탭을 누르면 로그인 게이트만 화면에 노출
+        if (gateEl) gateEl.style.display = (tabName === 'diary') ? 'block' : 'none';
+      } else {
+        // 로그인 완료 상태: 로그인 게이트는 항상 숨김
+        if (gateEl) gateEl.style.display = 'none';
       }
     }
 
@@ -2190,24 +2187,32 @@
     }
 
     // =========================================================================
-    // 인증 상태 UI 동기화
+    // 인증 상태 UI 동기화 (로그인 전에는 다이어리를 철저히 가리고 로그인 후에만 노출)
     // =========================================================================
     function updateAuthUI(isLoggedIn) {
       const gateEl = document.getElementById('authGateSection');
       const statusEl = document.getElementById('authStatusBar');
-      const unauthNotice = document.getElementById('unauthLockNotice');
+      const diaryPane = document.getElementById('tabContentDiary');
       const userTag = document.getElementById('authCurrentUsername');
 
       if (isLoggedIn && authUser) {
+        // [로그인 완료]
+        // 1. 로그인 폼 숨김
         if (gateEl) gateEl.style.display = 'none';
+        // 2. 상단 사용자 상태바 표시
         if (statusEl) statusEl.style.display = 'flex';
-        if (unauthNotice) unauthNotice.style.display = 'none';
+        // 3. 다이어리 탭이 선택되어 있다면 본인의 다이어리 내용 표시
+        if (diaryPane) diaryPane.style.display = (currentActiveTab === 'diary') ? 'block' : 'none';
         if (userTag) userTag.textContent = `${authUser.username} (${authUser.name || '사용자'})`;
         startTokenTimer();
       } else {
-        if (gateEl) gateEl.style.display = 'block';
+        // [비로그인 상태]
+        // 1. 상단 사용자 상태바 숨김
         if (statusEl) statusEl.style.display = 'none';
-        if (unauthNotice && currentActiveTab === 'diary') unauthNotice.style.display = 'block';
+        // 2. 다이어리 본문(Plan, Do, See)은 절대 숨김!
+        if (diaryPane) diaryPane.style.display = 'none';
+        // 3. 다이어리 탭일 때는 오직 로그인 게이트만 표시
+        if (gateEl) gateEl.style.display = (currentActiveTab === 'diary') ? 'block' : 'none';
         if (userTag) userTag.textContent = '-';
         stopTokenTimer();
       }
@@ -2638,6 +2643,7 @@
     // 2. 렌더링 엔진
     // =========================================================================
     function renderAll() {
+      updateAuthUI(!!authToken);
       if (!appDb) return;
       renderPlan();
       renderTodos();
