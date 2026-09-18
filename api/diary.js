@@ -387,6 +387,50 @@ module.exports = async function handler(req, res) {
         return res.status(201).json({ success: true, message: 'Execution log added', log: newLog, data: db });
       }
 
+      // 6-1. 막힘 기록(장애 요인) 추가 및 수정 설정
+      if (action === 'update_obstacle') {
+        const { todoId, logId, obstacleReason } = payload;
+        
+        if (logId) {
+          const targetLog = db.executionLogs.find(l => l.id === logId);
+          if (targetLog) {
+            targetLog.obstacleReason = obstacleReason || '';
+            targetLog.recordedAt = new Date().toISOString();
+            saveDatabase(db);
+            return res.status(200).json({ success: true, message: 'Obstacle log updated', log: targetLog, data: db });
+          }
+        }
+
+        const targetTodo = db.todos.find(t => t.id === todoId);
+        if (!targetTodo) {
+          return res.status(404).json({ success: false, error: 'Todo not found' });
+        }
+
+        const relatedLogs = db.executionLogs.filter(l => l.todoId === todoId);
+        if (relatedLogs.length > 0) {
+          const lastLog = relatedLogs[relatedLogs.length - 1];
+          lastLog.obstacleReason = obstacleReason || '';
+          lastLog.recordedAt = new Date().toISOString();
+          saveDatabase(db);
+          return res.status(200).json({ success: true, message: 'Obstacle reason updated on latest log', log: lastLog, data: db });
+        } else {
+          const newLog = {
+            id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+            todoId: targetTodo.id,
+            planId: db.plan.id,
+            startedAt: new Date(Date.now() - (targetTodo.estimatedMinutes || 30) * 60000).toISOString(),
+            endedAt: new Date().toISOString(),
+            actualMinutes: targetTodo.estimatedMinutes || 30,
+            obstacleReason: obstacleReason || '',
+            idempotencyKey: `idemp-obs-${Date.now()}`,
+            recordedAt: new Date().toISOString()
+          };
+          db.executionLogs.push(newLog);
+          saveDatabase(db);
+          return res.status(201).json({ success: true, message: 'Obstacle record created', log: newLog, data: db });
+        }
+      }
+
       // 7. 돌아보기 개선점 업데이트
       if (action === 'update_retro_feedback') {
         const { nextImprovementPoint } = payload;

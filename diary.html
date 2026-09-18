@@ -1282,6 +1282,71 @@
     </div>
   </div>
 
+  <!-- 모달 4: 막힘 기록 추가/수정 설정 모달 -->
+  <div id="obstacleModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: #fcd34d; display: flex; align-items: center; gap: 6px;">
+          <span>🛑</span> <span>막힘 기록 추가 및 수정 설정</span>
+        </h3>
+        <button onclick="closeModal('obstacleModal')" class="modal-close-btn">&times;</button>
+      </div>
+      <input type="hidden" id="modalObstacleTodoId" />
+      
+      <div style="background: #0d0d11; padding: 10px 12px; border-radius: 6px; border: 1px solid #27272a; font-size: 12px;">
+        <span style="color: var(--text-dim);">대상 할 일: </span>
+        <strong id="modalObstacleTodoTitle" style="color: #fff;">-</strong>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" style="display: flex; justify-content: space-between;">
+          <span>막혔던 이유 (장애 요인)</span>
+          <span style="font-size: 10px; color: var(--text-dim);">사유를 비우거나 해제하면 일반 상태로 복귀</span>
+        </label>
+        <textarea 
+          id="modalObstacleInput" 
+          class="form-textarea" 
+          style="min-height: 90px; border-color: #f59e0b;" 
+          placeholder="예: 오른쪽 종아리 뭉침, 갑천변 강풍으로 페이스 다운, 야근 누적으로 인한 체력 저하 등 구체적인 장애 요인을 입력하세요..."
+        ></textarea>
+      </div>
+
+      <!-- 빠른 입력 프리셋 버튼 그룹 -->
+      <div class="form-group">
+        <label class="form-label">자주 겪는 막힘 사유 빠른 선택:</label>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+          <button type="button" onclick="setObstaclePreset('오른쪽 종아리 비복근 뭉침 및 근육 피로로 휴식 필요')" class="btn btn-sm" style="font-size: 10px;">
+            ⚡ 종아리/근육 뭉침
+          </button>
+          <button type="button" onclick="setObstaclePreset('갑천변 맞바람 및 기상 악화(우천/기온 급강하)')" class="btn btn-sm" style="font-size: 10px;">
+            🌧️ 갑천변 기상 악화
+          </button>
+          <button type="button" onclick="setObstaclePreset('페이스 급상승으로 인한 호흡 난조 및 심박수 과열')" class="btn btn-sm" style="font-size: 10px;">
+            🫀 호흡/페이스 난조
+          </button>
+          <button type="button" onclick="setObstaclePreset('주중 과도한 업무/야근으로 인한 피로 누적 및 에너지 고갈')" class="btn btn-sm" style="font-size: 10px;">
+            💼 야근/피로 누적
+          </button>
+          <button type="button" onclick="setObstaclePreset('무릎 및 발목 관절 부하로 인한 강도 조절 필요')" class="btn btn-sm" style="font-size: 10px;">
+            🩹 관절/무릎 부담
+          </button>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+        <button type="button" onclick="clearObstacleReason()" class="btn btn-danger btn-sm" title="기존 막힘 사유를 삭제하고 정상 진행 상태로 되돌립니다">
+          <span>🗑️</span> <span>막힘 사유 해제(정상화)</span>
+        </button>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" onclick="closeModal('obstacleModal')" class="btn">취소</button>
+          <button type="button" onclick="saveObstacleReason()" class="btn btn-primary" style="background: #8c674b; border-color: #ba9578;">
+            <span>💾</span> <span>막힘 사유 저장</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 토스트 컨테이너 -->
   <div id="toastContainer" class="toast-container"></div>
 
@@ -1719,7 +1784,10 @@
                   </div>
                 </div>
               </div>
-              <div style="display: flex; gap: 4px;">
+              <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                <button onclick="openObstacleModal('${escapeHtml(todo.id)}')" class="btn btn-sm" style="${hasBlockedLog ? 'background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; color: #fcd34d;' : ''}" title="막힘 기록 추가 및 수정 설정">
+                  <span>${hasBlockedLog ? '🛑' : '⚠️'}</span> <span>${hasBlockedLog ? '막힘 수정' : '막힘 설정'}</span>
+                </button>
                 <button onclick="openExecLogModal('${escapeHtml(todo.id)}')" class="btn btn-sm" title="실행 기록 보기 및 작성">
                   <span>🏃</span> <span>기록 (${logs.length})</span>
                 </button>
@@ -1731,6 +1799,17 @@
                 </button>
               </div>
             </div>
+
+            ${hasBlockedLog ? `
+              <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; padding: 7px 12px; font-size: 11px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <div style="color: #fcd34d; line-height: 1.4;">
+                  <strong style="color: #f59e0b;">🛑 막힘 사유:</strong> ${escapeHtml(logs.slice().reverse().find(l => l.obstacleReason && l.obstacleReason.trim().length > 0)?.obstacleReason || '')}
+                </div>
+                <button onclick="openObstacleModal('${escapeHtml(todo.id)}')" class="btn btn-sm" style="padding: 2px 7px; font-size: 10px; border-color: #f59e0b; color: #fcd34d; flex-shrink: 0;">
+                  사유 수정
+                </button>
+              </div>
+            ` : ''}
 
             <div class="todo-bottom-row">
               <div class="todo-meta-badges">
@@ -2082,8 +2161,17 @@
                   <strong>#${idx + 1} 실행: ${l.actualMinutes}분 소요</strong>
                   <span style="color: var(--text-dim); font-size: 10px;">${l.recordedAt ? l.recordedAt.split('T')[0] : ''}</span>
                 </div>
-                <div style="color: var(--text-gray); font-size: 10px;">시간: ${l.startedAt ? l.startedAt.slice(11, 16) : ''} ~ ${l.endedAt ? l.endedAt.slice(11, 16) : ''}</div>
-                ${l.obstacleReason ? `<div style="color: #fca5a5; font-size: 10px; margin-top: 2px;">막힘 이유: ${escapeHtml(l.obstacleReason)}</div>` : `<div style="color: #86efac; font-size: 10px;">특이사항 없이 완료</div>`}
+                ${l.obstacleReason ? `
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 3px;">
+                    <span style="color: #fca5a5; font-size: 10px;">막힘 이유: ${escapeHtml(l.obstacleReason)}</span>
+                    <button type="button" onclick="editLogObstacleDirect('${escapeHtml(l.id)}')" class="btn btn-sm" style="padding: 1px 6px; font-size: 9px; border-color: #f59e0b; color: #fcd34d;">사유 수정</button>
+                  </div>
+                ` : `
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 3px;">
+                    <span style="color: #86efac; font-size: 10px;">특이사항 없이 완료</span>
+                    <button type="button" onclick="editLogObstacleDirect('${escapeHtml(l.id)}')" class="btn btn-sm" style="padding: 1px 6px; font-size: 9px; border-color: #3f3f46;">+ 막힘 추가</button>
+                  </div>
+                `}
               </div>
             `).join('')}
           </div>
@@ -2218,6 +2306,99 @@
         e.target.classList.remove('open');
       }
     });
+
+
+    // =========================================================================
+    // 막힘 기록 추가 및 수정 설정 기능
+    // =========================================================================
+    function openObstacleModal(todoId) {
+      const todo = appDb.todos.find(t => t.id === todoId);
+      if (!todo) return;
+
+      document.getElementById('modalObstacleTodoId').value = todo.id;
+      document.getElementById('modalObstacleTodoTitle').textContent = todo.title;
+
+      // 해당 할 일의 가장 최근 막힘 사유 조회
+      const logs = (appDb.executionLogs || []).filter(l => l.todoId === todo.id);
+      const blockedLog = logs.slice().reverse().find(l => l.obstacleReason && l.obstacleReason.trim().length > 0);
+      document.getElementById('modalObstacleInput').value = blockedLog ? blockedLog.obstacleReason : '';
+
+      openModal('obstacleModal');
+    }
+
+    function setObstaclePreset(text) {
+      document.getElementById('modalObstacleInput').value = text;
+    }
+
+    async function saveObstacleReason() {
+      const todoId = document.getElementById('modalObstacleTodoId').value;
+      const reason = document.getElementById('modalObstacleInput').value.trim();
+
+      if (!reason) {
+        if (!confirm('막힘 사유가 비어 있습니다. 막힘 사유를 해제(정상화)하시겠습니까?')) {
+          return;
+        }
+        return clearObstacleReason();
+      }
+
+      const todo = appDb.todos.find(t => t.id === todoId);
+      if (!todo) return;
+
+      // 클라이언트 상태 갱신
+      const logs = appDb.executionLogs.filter(l => l.todoId === todoId);
+      let targetLog = null;
+      if (logs.length > 0) {
+        targetLog = logs[logs.length - 1];
+        targetLog.obstacleReason = reason;
+        targetLog.recordedAt = new Date().toISOString();
+      } else {
+        targetLog = {
+          id: `log-${Date.now()}`,
+          todoId: todo.id,
+          planId: appDb.plan.id,
+          startedAt: new Date(Date.now() - (todo.estimatedMinutes || 30) * 60000).toISOString(),
+          endedAt: new Date().toISOString(),
+          actualMinutes: todo.estimatedMinutes || 30,
+          obstacleReason: reason,
+          idempotencyKey: `idemp-obs-${Date.now()}`,
+          recordedAt: new Date().toISOString()
+        };
+        appDb.executionLogs.push(targetLog);
+      }
+
+      closeModal('obstacleModal');
+      renderAll();
+      await pushToServer('update_obstacle', { todoId, obstacleReason: reason });
+      showToast('막힘 기록이 저장되었습니다! (돌아보기 막힘 수 즉시 반영)', '🛑');
+    }
+
+    async function clearObstacleReason() {
+      const todoId = document.getElementById('modalObstacleTodoId').value;
+      const logs = appDb.executionLogs.filter(l => l.todoId === todoId);
+      logs.forEach(l => {
+        l.obstacleReason = '';
+      });
+
+      closeModal('obstacleModal');
+      renderAll();
+      await pushToServer('update_obstacle', { todoId, obstacleReason: '' });
+      showToast('막힘 사유가 해제되어 정상 상태로 복귀했습니다.', '✅');
+    }
+
+    function editLogObstacleDirect(logId) {
+      const log = appDb.executionLogs.find(l => l.id === logId);
+      if (!log) return;
+      const currentReason = log.obstacleReason || '';
+      const newReason = prompt('이 실행 기록의 막힘 사유를 입력하거나 수정하세요:\\n(내용을 지우면 막힘 사유가 해제됩니다)', currentReason);
+      if (newReason === null) return;
+
+      log.obstacleReason = newReason.trim();
+      log.recordedAt = new Date().toISOString();
+      renderAll();
+      openExecLogModal(log.todoId);
+      pushToServer('update_obstacle', { logId: log.id, todoId: log.todoId, obstacleReason: log.obstacleReason });
+      showToast(log.obstacleReason ? '실행 기록의 막힘 사유가 갱신되었습니다!' : '막힘 사유가 해제되었습니다.', '🛑');
+    }
 
     // 시작 시 DB 초기화
     document.addEventListener('DOMContentLoaded', initDatabase);
