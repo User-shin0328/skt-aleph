@@ -1,0 +1,20 @@
+[과제 7 제출 요약문: 플랜두씨 다이어리 2 — 인증을 붙이고, 어떻게 붙였는지 설명하기]
+
+1. 결과물 주소: https://skt-aleph-gilt.vercel.app/diary
+2. 소스 주소: https://github.com/User-shin0328/skt-aleph2/tree/main/과제7
+3. 데이터 계약 스키마: https://github.com/User-shin0328/skt-aleph2/blob/main/contracts/pds-schema-v2.json
+
+---
+
+[짧은 확인 방법 4줄]
+1. 위치: 다이어리 상단 탭에서 [🛡️ 보안 검증 샌드박스] 또는 [🏃 5일 연속 러닝 & 규칙 변경] 메뉴로 진입합니다.
+2. 3단계 이내 행동: [3️⃣ 남의 자료 변조(IDOR) 차단 시험] 또는 [2️⃣ 로그아웃 토큰 재사용 거부 시험] 버튼을 1회 클릭합니다.
+3. 통과 모습: 콘솔에 HTTP 403 Forbidden(FORBIDDEN_DATA_ACCESS) 또는 HTTP 401 Unauthorized(TOKEN_REVOKED)가 마스킹된 토큰(eyJhb...[생략])과 함께 출력되며 데이터 변조 건수가 0건으로 보존됩니다.
+4. 안 될 때 모습: 타인 토큰으로 타인의 할 일/계획이 무단 변조·삭제되거나 폐기된 토큰으로 서버 데이터 조회가 허용되는 경우 실패입니다.
+
+---
+
+[AI와 나의 판단 3줄]
+1. AI에게 맡긴 일: Node.js 표준 crypto 모듈을 사용한 PBKDF2-HMAC-SHA256 10만 회 해싱, 24시간 JWT 토큰 발급·검증 함수 작성 및 실시간 샌드박스 콘솔 UI 렌더링
+2. 직접 판단한 일: Vercel 서버리스 무상태 런타임 특성을 고려한 인메모리 토큰 폐기 블랙리스트(revokedTokens) 도입, 대전 갑천 러닝코스 5일 연속 기록의 단일 단위를 '초/km'로 통일하고 3일차 진입 전 웜업-인터벌-쿨다운 구간 규칙 분할 설계
+3. AI 제안을 따르지 않은 일: 외부 npm 패키지(bcryptjs, jsonwebtoken 등) 설치 제안을 따르지 않고 Node.js 순수 표준 crypto 라이브러리만을 직접 구현하여 공급망 취약점과 번들 컴파일 종속성을 원천 차단함.

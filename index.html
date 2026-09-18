@@ -307,10 +307,10 @@
           <span class="nav-hide-mobile">비교 보고서</span>
           <span class="nav-show-mobile">보고서</span>
         </a>
-        <a href="/diary.html" class="quick-nav-item" title="과제 6 플랜두씨 다이어리">
-          <span>📖</span>
-          <span class="nav-hide-mobile">다이어리</span>
-          <span class="nav-show-mobile">다이어리</span>
+        <a href="/diary.html" class="quick-nav-item" title="과제 7 플랜두씨 다이어리 2 (인증)">
+          <span>🔐</span>
+          <span class="nav-hide-mobile">다이어리 2 (인증)</span>
+          <span class="nav-show-mobile">다이어리2</span>
         </a>
       </nav>
 
@@ -812,6 +812,36 @@
         <a href="https://github.com/User-shin0328/skt-aleph2/tree/main/과제6" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-6 py-3.5 bg-[#18181f] hover:bg-[#24242d] text-zinc-300 font-mono font-bold text-sm sm:text-base rounded-lg border border-[#3f3f46] transition-all shadow hover:scale-105 active:scale-95">
           <span>📁</span>
           <span>과제 6 저장소 아카이브</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 10. 과제 7: 플랜두씨 다이어리 2 (인증) 섹션 -->
+    <section class="card text-center space-y-4 bg-gradient-to-b from-[#141418] to-[#1e1914] border border-[#ba9578]/70 shadow-2xl py-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#ba9578]/40 bg-[#8c674b]/15 text-xs font-mono font-bold text-[#ba9578] uppercase tracking-widest">
+        <span>SECURITY &bull; AUTH &bull; 5-DAY RUNNING</span>
+        <span class="text-zinc-600">•</span>
+        <span>IDOR DEFENSE &bull; PBKDF2</span>
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-[#ba9578] font-mono tracking-tight">플랜두씨 다이어리 2</h2>
+      <p class="text-base sm:text-lg font-bold text-white font-mono">인증을 붙이고, 어떻게 붙였는지 설명하기 (과제 7)</p>
+      <p class="text-xs sm:text-sm text-[#a1a1aa] max-w-lg mx-auto leading-relaxed">
+        6번에서 만든 다이어리에 PBKDF2 10만 회 솔트 해싱 및 24시간 JWT 인증을 적용하여 내 자료를 안전하게 잠갔습니다.<br>
+        실제 5일간 연속 대전 갑천 러닝 기록(43.5km, 310초/km)과 3일차 계획 규칙 변경, 4종 보안 실시간 검증 도구를 제공합니다.
+      </p>
+      <div class="pt-3 flex justify-center gap-3 flex-wrap">
+        <a href="/diary.html" class="inline-flex items-center gap-3 px-8 py-3.5 bg-[#8c674b] hover:bg-[#a27b5c] text-white font-mono font-bold text-sm sm:text-base rounded-lg border border-[#ba9578] transition-all shadow-lg hover:scale-105 active:scale-95">
+          <span>🔐</span>
+          <span>다이어리 2 (인증 앱) 바로가기</span>
+          <span>&rarr;</span>
+        </a>
+        <a href="/diary.html" onclick="sessionStorage.setItem('pds_pending_tab', 'security')" class="inline-flex items-center gap-2 px-6 py-3.5 bg-[#18181f] hover:bg-[#24242d] text-zinc-300 font-mono font-bold text-sm sm:text-base rounded-lg border border-[#3f3f46] transition-all shadow hover:scale-105 active:scale-95">
+          <span>🛡️</span>
+          <span>보안 검증 샌드박스</span>
+        </a>
+        <a href="https://github.com/User-shin0328/skt-aleph2/tree/main/과제7" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-6 py-3.5 bg-[#18181f] hover:bg-[#24242d] text-zinc-300 font-mono font-bold text-sm sm:text-base rounded-lg border border-[#3f3f46] transition-all shadow hover:scale-105 active:scale-95">
+          <span>📁</span>
+          <span>과제 7 저장소 아카이브</span>
         </a>
       </div>
     </section>

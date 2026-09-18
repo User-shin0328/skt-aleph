@@ -1,17 +1,17 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "PlanDoSeeDiaryDatabaseSchemaV2",
-  "description": "플랜두씨 다이어리 1 — 데이터베이스 표, 항목, 관계, 날짜 및 단위 규칙 계약 스키마 v2",
+  "description": "플랜두씨 다이어리 2 — 인증, 권한 격리, 5일 기록 및 계획 규칙 변경 계약 스키마 v2",
   "type": "object",
-  "required": ["version", "rules", "tables"],
+  "required": ["version", "rules", "authRules", "tables"],
   "properties": {
     "version": {
       "type": "string",
-      "const": "2.0.0"
+      "const": "2.1.0"
     },
     "rules": {
       "type": "object",
-      "required": ["timezone", "dateFormat", "timeFormat", "durationUnit", "idempotencyRule", "publicAccessRule"],
+      "required": ["timezone", "dateFormat", "timeFormat", "durationUnit", "idempotencyRule", "authGateRule"],
       "properties": {
         "timezone": {
           "type": "string",
@@ -35,26 +35,66 @@
         },
         "idempotencyRule": {
           "type": "string",
-          "const": "중복 방어 제약: 동일한 완료 요청 키(idempotencyKey) 및 할 일 상태 검증으로 연달아 두 번 요청 시 1회만 반영",
-          "description": "완료 중복 누적 방어 규약"
+          "const": "중복 방어 제약: 동일한 완료 요청 키(idempotencyKey) 및 할 일 상태 검증으로 연달아 두 번 요청 시 1회만 반영"
         },
-        "publicAccessRule": {
+        "authGateRule": {
           "type": "string",
-          "const": "무로그인 공개: 인증 없이 열리며 공개 가능한 운동 및 계획 데이터만 저장",
-          "description": "공개 다이어리 보안 및 접근 규칙"
+          "const": "인증 게이트 규칙: 로그인하지 않은 상태로 접근 시 자료 화면 대신 로그인/가입 화면이 열리며, 비인가자의 데이터 접근은 401로 차단"
+        }
+      }
+    },
+    "authRules": {
+      "type": "object",
+      "required": ["passwordHashing", "tokenType", "tokenExpirySeconds", "idorPreventionRule", "tokenRevocationRule"],
+      "properties": {
+        "passwordHashing": {
+          "type": "string",
+          "const": "PBKDF2-HMAC-SHA256 (100,000 iterations, 32-byte unique random salt)",
+          "description": "단방향 비밀번호 해싱 알고리즘 (NIST SP 800-132 준수)"
+        },
+        "tokenType": {
+          "type": "string",
+          "const": "Bearer JWT (HMAC-SHA256)",
+          "description": "상태 독립적 HTTP Authorization 헤더 토큰"
+        },
+        "tokenExpirySeconds": {
+          "type": "integer",
+          "const": 86400,
+          "description": "토큰 유효기간 (24시간 = 86,400초)"
+        },
+        "idorPreventionRule": {
+          "type": "string",
+          "const": "소유자 격리: 모든 조회, 수정, 삭제 요청 시 토큰 주체(username)와 리소스 소유권을 검증하며 불일치 시 403 Forbidden 거절"
+        },
+        "tokenRevocationRule": {
+          "type": "string",
+          "const": "로그아웃 시 서버 토큰 블랙리스트에 등록하여 동일 토큰 재요청을 즉시 401 Unauthorized로 거절"
         }
       }
     },
     "tables": {
       "type": "object",
-      "required": ["plans", "plan_history", "todos", "execution_logs", "retrospectives"],
+      "required": ["users", "plans", "plan_history", "todos", "execution_logs", "retrospectives", "five_day_running_records"],
       "properties": {
+        "users": {
+          "type": "object",
+          "description": "회원 인증 및 암호화된 비밀번호 보관 테이블",
+          "required": ["id", "username", "passwordHash", "salt", "createdAt"],
+          "properties": {
+            "id": { "type": "string", "pattern": "^usr-[0-9a-fA-F-]+$" },
+            "username": { "type": "string", "minLength": 3 },
+            "passwordHash": { "type": "string", "description": "PBKDF2 해시 16진수 문자열" },
+            "salt": { "type": "string", "description": "계정별 고유 32바이트 솔트 16진수" },
+            "createdAt": { "type": "string", "format": "date-time" }
+          }
+        },
         "plans": {
           "type": "object",
-          "description": "최상위 목표 및 기간을 정의하는 계획 테이블",
-          "required": ["id", "title", "startDate", "endDate", "priority", "successCriteria", "estimatedMinutes", "createdAt", "updatedAt"],
+          "description": "최상위 목표 및 기간을 정의하는 계획 테이블 (사용자 소유권 포함)",
+          "required": ["id", "owner", "title", "startDate", "endDate", "priority", "successCriteria", "estimatedMinutes", "createdAt", "updatedAt"],
           "properties": {
             "id": { "type": "string", "pattern": "^plan-[0-9a-fA-F-]+$" },
+            "owner": { "type": "string", "description": "users.username 외래키" },
             "title": { "type": "string", "minLength": 2 },
             "startDate": { "type": "string", "format": "date" },
             "endDate": { "type": "string", "format": "date" },
@@ -68,10 +108,11 @@
         "plan_history": {
           "type": "object",
           "description": "계획 수정 시 이전 버전의 원본 데이터를 보존하는 계획 수정 이력 테이블",
-          "required": ["historyId", "planId", "version", "title", "startDate", "endDate", "priority", "successCriteria", "estimatedMinutes", "modifiedAt", "changeReason"],
+          "required": ["historyId", "planId", "owner", "version", "title", "startDate", "endDate", "priority", "successCriteria", "estimatedMinutes", "modifiedAt", "changeReason"],
           "properties": {
             "historyId": { "type": "string", "pattern": "^phist-[0-9a-fA-F-]+$" },
-            "planId": { "type": "string", "description": "plans.id 외래키 (Foreign Key)" },
+            "planId": { "type": "string", "description": "plans.id 외래키" },
+            "owner": { "type": "string", "description": "users.username 외래키" },
             "version": { "type": "integer", "minimum": 1 },
             "title": { "type": "string" },
             "startDate": { "type": "string", "format": "date" },
@@ -86,10 +127,11 @@
         "todos": {
           "type": "object",
           "description": "계획에 딸린 구체적인 할 일 테이블",
-          "required": ["id", "planId", "title", "dueDate", "priority", "tags", "estimatedMinutes", "status", "createdAt", "updatedAt"],
+          "required": ["id", "planId", "owner", "title", "dueDate", "priority", "tags", "estimatedMinutes", "status", "createdAt", "updatedAt"],
           "properties": {
             "id": { "type": "string", "pattern": "^todo-[0-9a-fA-F-]+$" },
-            "planId": { "type": "string", "description": "plans.id 외래키 (Foreign Key)" },
+            "planId": { "type": "string", "description": "plans.id 외래키" },
+            "owner": { "type": "string", "description": "users.username 외래키" },
             "title": { "type": "string", "minLength": 1 },
             "dueDate": { "type": "string", "format": "date" },
             "priority": { "type": "string", "enum": ["낮음", "보통", "높음", "아주높음"] },
@@ -104,26 +146,28 @@
         "execution_logs": {
           "type": "object",
           "description": "할 일에 매핑되어 실제로 수행된 시간 및 막힌 사유를 기록하는 실행 테이블",
-          "required": ["id", "todoId", "planId", "startedAt", "endedAt", "actualMinutes", "obstacleReason", "idempotencyKey", "recordedAt"],
+          "required": ["id", "todoId", "planId", "owner", "startedAt", "endedAt", "actualMinutes", "obstacleReason", "idempotencyKey", "recordedAt"],
           "properties": {
             "id": { "type": "string", "pattern": "^log-[0-9a-fA-F-]+$" },
-            "todoId": { "type": "string", "description": "todos.id 외래키 (Foreign Key)" },
-            "planId": { "type": "string", "description": "plans.id 외래키 (Foreign Key)" },
+            "todoId": { "type": "string", "description": "todos.id 외래키" },
+            "planId": { "type": "string", "description": "plans.id 외래키" },
+            "owner": { "type": "string", "description": "users.username 외래키" },
             "startedAt": { "type": "string", "format": "date-time" },
             "endedAt": { "type": "string", "format": "date-time" },
             "actualMinutes": { "type": "integer", "minimum": 0 },
-            "obstacleReason": { "type": "string", "description": "막혔던 이유(없으면 빈 문자열 또는 없음 표기)" },
-            "idempotencyKey": { "type": "string", "description": "중복 방지 고유 키" },
+            "obstacleReason": { "type": "string" },
+            "idempotencyKey": { "type": "string" },
             "recordedAt": { "type": "string", "format": "date-time" }
           }
         },
         "retrospectives": {
           "type": "object",
           "description": "주기적 실행 결과 집계 분석 및 다음 계획 피드백 테이블",
-          "required": ["id", "planId", "period", "totalTodos", "completedTodos", "overdueTodos", "blockedTodos", "totalEstimatedMin", "totalActualMin", "timeVarianceMin", "nextImprovementPoint", "createdAt"],
+          "required": ["id", "planId", "owner", "period", "totalTodos", "completedTodos", "overdueTodos", "blockedTodos", "totalEstimatedMin", "totalActualMin", "timeVarianceMin", "nextImprovementPoint", "createdAt"],
           "properties": {
             "id": { "type": "string", "pattern": "^retro-[0-9a-fA-F-]+$" },
-            "planId": { "type": "string", "description": "plans.id 외래키 (Foreign Key)" },
+            "planId": { "type": "string", "description": "plans.id 외래키" },
+            "owner": { "type": "string", "description": "users.username 외래키" },
             "period": { "type": "string" },
             "totalTodos": { "type": "integer" },
             "completedTodos": { "type": "integer" },
@@ -134,6 +178,44 @@
             "timeVarianceMin": { "type": "integer" },
             "nextImprovementPoint": { "type": "string" },
             "createdAt": { "type": "string", "format": "date-time" }
+          }
+        },
+        "five_day_running_records": {
+          "type": "object",
+          "description": "Asia/Seoul 기준 5일 연속 러닝 관찰 기록 및 계획 규칙 변경 테이블",
+          "required": ["owner", "question", "metricName", "metricUnit", "records", "ruleChange"],
+          "properties": {
+            "owner": { "type": "string" },
+            "question": { "type": "string" },
+            "metricName": { "type": "string" },
+            "metricUnit": { "type": "string" },
+            "records": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["dayIndex", "dateKst", "distanceKm", "durationMinutes", "paceSecPerKm", "completed"],
+                "properties": {
+                  "dayIndex": { "type": "integer" },
+                  "dateKst": { "type": "string", "format": "date" },
+                  "distanceKm": { "type": "number" },
+                  "durationMinutes": { "type": "integer" },
+                  "paceSecPerKm": { "type": "integer" },
+                  "completed": { "type": "boolean" }
+                }
+              }
+            },
+            "ruleChange": {
+              "type": "object",
+              "required": ["appliedAfterDay", "appliedBeforeDay", "changedAt", "reason", "beforeRule", "afterRule"],
+              "properties": {
+                "appliedAfterDay": { "type": "integer", "const": 2 },
+                "appliedBeforeDay": { "type": "integer", "const": 3 },
+                "changedAt": { "type": "string", "format": "date-time" },
+                "reason": { "type": "string" },
+                "beforeRule": { "type": "string" },
+                "afterRule": { "type": "string" }
+              }
+            }
           }
         }
       }
