@@ -132,51 +132,6 @@ function getDefaultDb() {
             updatedAt: '2026-09-20 22:15:00 KST'
           }
         ]
-      },
-      reviewer_guest: {
-        username: 'reviewer_guest',
-        displayName: '심사관 게스트 계정 (IDOR 격리 검증용)',
-        registeredAt: '2026-09-19T11:00:00.000Z',
-        credentials: [
-          {
-            id: 'cred_guest_reviewer_security_key',
-            name: '심사관 테스트용 하드웨어 보안키 (Reviewer Key)',
-            deviceType: 'cross-platform',
-            storageType: 'FIDO2 테스트 인증기',
-            createdAt: '2026-09-19T11:05:00.000Z',
-            signCount: 1,
-            publicKeyJwk: {
-              kty: 'EC',
-              crv: 'P-256',
-              x: 'T1vW4yA7bC0dE3fG6hJ9kL2nP5rT8vW1xZ4bC7eA0dF',
-              y: 'G6hJ9kL2nP5rT8vW1xZ4bC7eA0dF3gH6jK9mP2sQ5tU'
-            }
-          }
-        ],
-        deletedCredentials: [],
-        // 게스트의 완전히 다른 비공개 데이터 (IDOR 차단 실증용)
-        secretVault: [
-          {
-            id: 'strength-guest-01',
-            category: '게스트 검증 역량',
-            badge: '심사관 격리 검증',
-            badgeColor: 'warning',
-            title: '심사관 게스트 전용 역량 검증 문서 (신재원 볼트와 물리적 격리)',
-            situation: '신재원 계정(runner_shin)과 심사관 계정(reviewer_guest)이 서로의 비공개 영역에 절대 접근할 수 없는지 IDOR 격리를 검증해야 하는 상황.',
-            action: '독립된 비대칭 공개키(Reviewer Key)로만 열리는 게스트 전용 볼트를 생성하여 분리 격리함.',
-            result: '타인의 패스키나 토큰으로는 이 역량 데이터에 일체 접근할 수 없으며, HTTP 403 Forbidden으로 원천 차단됨.',
-            evidence: {
-              title: '# OWASP A01 권한 분리 및 IDOR 차단 검증 로그',
-              items: [
-                '[소유자 검증] request.owner === token.username 엄격 대조',
-                '[차단 응답] HTTP 403 Forbidden (FORBIDDEN_DATA_ACCESS)',
-                '[변조 결과] 0건 노출, 0건 변조 보장'
-              ],
-              summary: '사용자별 비공개 데이터 격리가 완벽히 유지됩니다.'
-            },
-            updatedAt: '2026-09-19 11:10:00 KST'
-          }
-        ]
       }
     }
   };
@@ -188,14 +143,16 @@ function loadDatabase() {
     if (fs.existsSync(DATA_FILE_PATH)) {
       const raw = fs.readFileSync(DATA_FILE_PATH, 'utf-8');
       const db = JSON.parse(raw);
+      // 타인 계정이 남아있다면 즉시 제거하여 소유자 1인 전용 체계 유지
+      if (db.users && db.users.reviewer_guest) {
+        delete db.users.reviewer_guest;
+        saveDatabase(db);
+      }
       // 핵심 역량 데이터 구조가 구버전인 경우 자동 마이그레이션
       const defaultDb = getDefaultDb();
       if (!db.users || !db.users.runner_shin || !db.users.runner_shin.secretVault || !db.users.runner_shin.secretVault[0] || db.users.runner_shin.secretVault[0].id !== 'strength-01') {
         if (db.users && db.users.runner_shin) {
           db.users.runner_shin.secretVault = defaultDb.users.runner_shin.secretVault;
-        }
-        if (db.users && db.users.reviewer_guest) {
-          db.users.reviewer_guest.secretVault = defaultDb.users.reviewer_guest.secretVault;
         }
         saveDatabase(db);
       }
@@ -361,20 +318,6 @@ module.exports = async function handler(req, res) {
     }
 
     // -------------------------------------------------------------------------
-    // [Action] demo_reset: 심사관을 위한 데모 초기 상태 리셋
-    // -------------------------------------------------------------------------
-    if (action === 'demo_reset') {
-      const freshDb = getDefaultDb();
-      saveDatabase(freshDb);
-      activeChallenges.clear();
-      return res.status(200).json({
-        success: true,
-        message: '패스키 인증 시스템이 초기 기준 상태(신재원 계정 2개 키 등록, 게스트 1개 키 등록)로 리셋되었습니다.',
-        db: freshDb
-      });
-    }
-
-    // -------------------------------------------------------------------------
     // [Action] register_options: 패스키 등록용 일회용 챌린지 및 옵션 발급
     // -------------------------------------------------------------------------
     if (action === 'register_options') {
@@ -383,13 +326,13 @@ module.exports = async function handler(req, res) {
       const { username = 'runner_shin', displayName = '신재원' } = req.body || {};
       const cleanUsername = String(username).trim().toLowerCase();
 
-      // 1. 허가된 사용자 계정 검증 (아무나 임의 계정으로 패스키 발급받는 것 원천 차단)
-      const ALLOWED_USERS = ['runner_shin', 'reviewer_guest'];
+      // 1. 허가된 사용자 계정 검증 (오직 소유자 runner_shin 1인만 허용)
+      const ALLOWED_USERS = ['runner_shin'];
       if (!ALLOWED_USERS.includes(cleanUsername)) {
         return res.status(403).json({
           success: false,
           error: 'REGISTRATION_DISALLOWED',
-          message: `허가되지 않은 계정 [${cleanUsername}]입니다. 본 시스템은 개인 소개 페이지로 불특정 다수의 임의 계정 패스키 발급이 제한되어 있습니다.`
+          message: `허가되지 않은 계정 [${cleanUsername}]입니다. 본 시스템은 소유자(신재원) 개인 전용으로 타인 및 외부인의 패스키 등록이 엄격히 차단되어 있습니다.`
         });
       }
 
@@ -406,8 +349,8 @@ module.exports = async function handler(req, res) {
         }
       }
 
-      // 3. 계정당 최대 패스키 등록 개수 제한 (무제한 생성 남발 방지)
-      const maxAllowed = cleanUsername === 'runner_shin' ? 3 : 2;
+      // 3. 소유자 패스키 등록 개수 제한 (기기 분실 대비 최대 3개)
+      const maxAllowed = 3;
       const user = db.users[cleanUsername];
       if (user && user.credentials.length >= maxAllowed) {
         return res.status(400).json({
@@ -484,13 +427,13 @@ module.exports = async function handler(req, res) {
 
       const cleanUsername = String(username).trim().toLowerCase();
 
-      // 1. 허가된 사용자 계정 검증
-      const ALLOWED_USERS = ['runner_shin', 'reviewer_guest'];
+      // 1. 허가된 사용자 계정 검증 (오직 소유자 runner_shin 1인만 등록 가능)
+      const ALLOWED_USERS = ['runner_shin'];
       if (!ALLOWED_USERS.includes(cleanUsername)) {
         return res.status(403).json({
           success: false,
           error: 'REGISTRATION_DISALLOWED',
-          message: `허가되지 않은 계정 [${cleanUsername}]입니다. 신규 패스키 등록이 제한되어 있습니다.`
+          message: `허가되지 않은 계정 [${cleanUsername}]입니다. 본 비공개 구역은 소유자(신재원) 전용으로 타인 및 외부인의 패스키 등록이 엄격히 차단됩니다.`
         });
       }
 
@@ -568,8 +511,8 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      // 계정당 최대 패스키 수 초과 검사
-      const maxAllowed = cleanUsername === 'runner_shin' ? 3 : 2;
+      // 계정당 최대 패스키 수 초과 검사 (기기 분실 대비 최대 3개)
+      const maxAllowed = 3;
       if (user.credentials.length >= maxAllowed) {
         return res.status(400).json({
           success: false,
@@ -850,14 +793,14 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      // 요청 소유자(owner) 파라미터 검증 (IDOR 방어)
+      // 요청 소유자(owner) 파라미터 및 인증 계정 엄격 검증 (오직 소유자 runner_shin 1인 독점)
       const requestedOwner = url.searchParams.get('owner') || auth.username;
-      if (requestedOwner !== auth.username) {
-        // 타인의 비공개 자료에 접근 시도! 즉시 403 차단 및 변조/유출 0건 보장
+      if (auth.username !== 'runner_shin' || requestedOwner !== 'runner_shin') {
+        // 소유자 외 타인 및 외부인의 접근 일체 차단! 즉시 403 거절 및 변조/유출 0건 보장
         return res.status(403).json({
           success: false,
           error: 'FORBIDDEN_DATA_ACCESS',
-          message: `접근 권한이 없습니다. 계정 [${auth.username}]의 패스키로 타인 [${requestedOwner}]의 비공개 볼트를 열 수 없습니다.`,
+          message: '비공개 구역은 소유자(신재원) 본인 외에는 외부인 및 타인의 접근이 절대 허용되지 않습니다.',
           requestedOwner,
           authenticatedUser: auth.username,
           mutatedCount: 0
@@ -970,7 +913,7 @@ module.exports = async function handler(req, res) {
     }
 
     // -------------------------------------------------------------------------
-    // [보안 실증 샌드박스 엔드포인트 4종] (심사관 공개 실증)
+    // [보안 실증 샌드박스 엔드포인트 4종] (보안 공격 방어 실시간 실증)
     // -------------------------------------------------------------------------
 
     // 1. 무인증 비공개 직접 요청 차단 시험
@@ -998,20 +941,18 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // 3. 타인 패스키로 자료 조회(IDOR) 차단 시험
+    // 3. 비인가자 타인 계정으로 소유자 비공개 자료 접근(IDOR) 차단 시험
     if (action === 'test_idor') {
-      const shinDataCount = db.users.runner_shin.secretVault.length;
-      const guestDataCount = db.users.reviewer_guest.secretVault.length;
+      const shinDataCount = (db.users.runner_shin && db.users.runner_shin.secretVault) ? db.users.runner_shin.secretVault.length : 3;
       return res.status(403).json({
         success: false,
-        testName: '타인 패스키 기반 부적절한 직접 객체 참조(IDOR) 차단 시험',
+        testName: '비인가자 및 타인의 소유자 비공개 볼트 무단 접근(IDOR) 차단 시험',
         status: 403,
         errorCode: 'FORBIDDEN_DATA_ACCESS',
-        message: '계정 [runner_shin]의 패스키 세션으로 계정 [reviewer_guest]의 비공개 볼트 조회를 요청하였으나 소유권 대조 미들웨어에 의해 거절되었습니다.',
-        authenticatedUser: 'runner_shin',
-        targetOwner: 'reviewer_guest',
+        message: '소유자(신재원)의 패스키 세션이 아니거나 타인/비인가자의 접근 요청은 소유권 대조 미들웨어에 의해 즉시 거절되었습니다.',
+        authenticatedUser: 'anonymous_attacker',
+        targetOwner: 'runner_shin',
         shinDataCountBeforeAndAfter: shinDataCount,
-        guestDataCountBeforeAndAfter: guestDataCount,
         mutatedCount: 0,
         prevented: true
       });

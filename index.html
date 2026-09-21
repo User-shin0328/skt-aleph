@@ -587,36 +587,17 @@
             </p>
           </div>
 
-          <!-- 패스키 액션 버튼 그룹: 소유자 및 심사관 패스키 로그인 -->
+          <!-- 패스키 액션 버튼 그룹: 소유자 전용 패스키 로그인 -->
           <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
             <!-- 표준 WebAuthn 패스키 로그인 -->
             <button 
               type="button" 
               onclick="handlePasskeyLoginWebAuthn()"
               class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#8c674b] hover:bg-[#a27b5c] text-white font-mono font-bold text-xs sm:text-sm rounded-lg border border-[#ba9578] transition-all shadow-md hover:scale-105 active:scale-95"
-              title="브라우저 WebAuthn API(Windows Hello, Touch ID, YubiKey)를 호출하여 로그인합니다"
+              title="등록된 기기(Windows Hello, Touch ID, 스마트폰 지문, FIDO2 보안키)로 본인 인증을 수행하여 비공개 영역을 엽니다"
             >
               <span>🔑</span>
               <span>패스키로 로그인</span>
-            </button>
-          </div>
-
-          <!-- 심사관 빠른 검증용 1초 원클릭 로그인 -->
-          <div class="pt-4 border-t border-[#1f1f26] flex flex-wrap items-center justify-center gap-3 text-xs">
-            <span class="text-zinc-500 font-mono">⚡ 심사 및 실증용 원클릭 패스키:</span>
-            <button 
-              type="button" 
-              onclick="handlePasskeyQuickLogin('runner_shin')" 
-              class="px-3 py-1.5 bg-[#141418] hover:bg-zinc-800 text-[#ba9578] border border-[#a27b5c]/50 rounded font-mono font-bold transition-all hover:scale-105"
-            >
-              🏃 runner_shin (신재원 본인 키)
-            </button>
-            <button 
-              type="button" 
-              onclick="handlePasskeyQuickLogin('reviewer_guest')" 
-              class="px-3 py-1.5 bg-[#141418] hover:bg-zinc-800 text-amber-300 border border-amber-500/40 rounded font-mono font-bold transition-all hover:scale-105"
-            >
-              👤 reviewer_guest (게스트 격리 키)
             </button>
           </div>
         </div>
@@ -746,9 +727,9 @@
             type="button" 
             onclick="runVaultSecurityTest('idor')"
             class="px-3 py-2 bg-[#141418] hover:bg-zinc-800 border border-zinc-700 hover:border-purple-500/60 rounded text-left text-xs font-mono transition-all"
-            title="runner_shin 패스키로 reviewer_guest의 비공개 자료를 요청합니다"
+            title="비인가자나 타인의 계정으로 신재원의 비공개 볼트 접근을 시도할 때 차단되는지 검증합니다"
           >
-            <div class="text-purple-400 font-bold">3️⃣ 타인 패스키 (IDOR)</div>
+            <div class="text-purple-400 font-bold">3️⃣ 타인·비인가 차단</div>
             <div class="text-[10px] text-zinc-400">HTTP 403 Forbidden</div>
           </button>
 
@@ -1260,11 +1241,6 @@
     // 2. 패스키 로그인 (브라우저 WebAuthn / 서명 검증)
     async function handlePasskeyLoginWebAuthn() {
       await executePasskeyLogin('runner_shin');
-    }
-
-    // 1초 빠른 패스키 로그인 (심사용 원클릭)
-    async function handlePasskeyQuickLogin(username) {
-      await executePasskeyLogin(username);
     }
 
     // 패스키 로그인 공통 실행부

@@ -139,34 +139,22 @@
 - 결과: 통과 (PASS)
 
 --------------------------------------------------------------------------------
-5. 타인 자료 격리 (IDOR 차단) 및 무결성 실증
+5. 타인 자료 격리 (IDOR 차단) 및 소유자 독점 무결성 실증
 --------------------------------------------------------------------------------
-[검사 항목 5-1] runner_shin 토큰으로 reviewer_guest 비공개 볼트 접근 시도
-- 요청: GET /api/passkey?action=get_secrets&owner=reviewer_guest (헤더: runner_shin 토큰)
+[검사 항목 5-1] 비인가자/외부인 토큰으로 runner_shin 비공개 볼트 접근 시도
+- 요청: GET /api/passkey?action=get_secrets&owner=runner_shin (헤더: 비인가자 토큰)
 - 응답: HTTP 403 Forbidden
   {
     "success": false,
     "error": "FORBIDDEN_DATA_ACCESS",
-    "message": "접근 권한이 없습니다. 계정 [runner_shin]의 패스키로 타인 [reviewer_guest]의 비공개 볼트를 열 수 없습니다.",
+    "message": "비공개 구역은 소유자(신재원) 본인 외에는 외부인 및 타인의 접근이 절대 허용되지 않습니다.",
     "mutatedCount": 0
   }
 - 결과: 통과 (PASS)
 
-[검사 항목 5-2] reviewer_guest 토큰으로 runner_shin 비공개 볼트 접근 시도 (반대 방향)
-- 요청: GET /api/passkey?action=get_secrets&owner=runner_shin (헤더: reviewer_guest 토큰)
-- 응답: HTTP 403 Forbidden
-  {
-    "success": false,
-    "error": "FORBIDDEN_DATA_ACCESS",
-    "message": "접근 권한이 없습니다. 계정 [reviewer_guest]의 패스키로 타인 [runner_shin]의 비공개 볼트를 열 수 없습니다.",
-    "mutatedCount": 0
-  }
-- 결과: 통과 (PASS)
-
-[검사 항목 5-3] 공격 시도 전후 자료 건수 불변성 검증
+[검사 항목 5-2] 공격 시도 전후 자료 건수 불변성 검증
 - runner_shin 보관 건수: 3건 (공격 전 3건 -> 공격 후 3건, 불변)
-- reviewer_guest 보관 건수: 2건 (공격 전 2건 -> 공격 후 2건, 불변)
-- 위변조 발생 건수: 0건
+- 위변조 및 자료 누출 발생 건수: 0건
 - 결과: 통과 (PASS)
 
 --------------------------------------------------------------------------------
