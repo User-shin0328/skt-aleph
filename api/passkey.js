@@ -996,8 +996,14 @@ module.exports = async function handler(req, res) {
           createdAt: c.createdAt,
           lastUsedAt: c.lastUsedAt || null,
           signCount: c.signCount || 0,
-          publicKeyPreview: `EC P-256 (x: ${c.publicKeyJwk.x.slice(0, 10)}...)`
+          publicKeyPreview: `EC P-256 (x: ${(c.publicKeyJwk && c.publicKeyJwk.x ? c.publicKeyJwk.x.slice(0, 10) : '')}...)`,
+          publicKeyJwk: c.publicKeyJwk || null
         })),
+        securityProof: {
+          serverStored: "Public Key Only (비대칭 공개키만 저장됨)",
+          privateKeyTransferred: false,
+          passwordStored: false
+        },
         deletedKeysCount: (user.deletedCredentials || []).length
       });
     }

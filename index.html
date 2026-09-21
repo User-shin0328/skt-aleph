@@ -714,6 +714,67 @@
           </div>
         </div>
 
+        <!-- [비공개 영역 전용] 서버 보관 데이터 실증: "서버에는 오직 공개키(Public Key)만 보관됨" -->
+        <div class="p-4 bg-[#0d0d10] border border-emerald-500/40 rounded-xl space-y-4 shadow-lg">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#27272a] pb-2.5">
+            <div class="font-mono text-xs sm:text-sm font-bold text-emerald-400 flex items-center gap-2">
+              <span>🗝️</span>
+              <span>서버 보관 데이터 증적: 비밀번호 0건 & 오직 비대칭 공개키(Public Key)만 저장</span>
+            </div>
+            <span class="text-[11px] text-emerald-400 font-mono bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/40">
+              과제 8 카드 2 핵심 실증
+            </span>
+          </div>
+
+          <p class="text-xs text-zinc-300 leading-relaxed">
+            패스키 시스템은 서버에 비밀번호나 개인키를 절대 보관하지 않습니다. 서버 데이터베이스에는 누구나 보아도 안전한 <strong>NIST P-256 타원곡선 공개키(x, y 좌표)</strong>만 저장되며, 서명을 찍는 개인키(Private Key)는 내 기기 보안 칩 내부를 절대 벗어나지 않습니다.
+          </p>
+
+          <!-- 3대 보안 원칙 증적 뱃지 -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 font-mono text-xs">
+            <div class="bg-[#141418] border border-emerald-800/40 p-2.5 rounded-lg flex items-center gap-2.5">
+              <span class="text-emerald-400 text-lg">✅</span>
+              <div>
+                <div class="text-emerald-400 font-bold">서버 보관 형태</div>
+                <div class="text-[11px] text-zinc-400">공개키만 저장 (Public Key Only)</div>
+              </div>
+            </div>
+            <div class="bg-[#141418] border border-blue-800/40 p-2.5 rounded-lg flex items-center gap-2.5">
+              <span class="text-blue-400 text-lg">🛡️</span>
+              <div>
+                <div class="text-blue-400 font-bold">개인키(Private Key)</div>
+                <div class="text-[11px] text-zinc-400">서버 전송 0건 (기기 내부 격리)</div>
+              </div>
+            </div>
+            <div class="bg-[#141418] border border-amber-800/40 p-2.5 rounded-lg flex items-center gap-2.5">
+              <span class="text-amber-400 text-lg">🚫</span>
+              <div>
+                <div class="text-amber-400 font-bold">비밀번호(Password)</div>
+                <div class="text-[11px] text-zinc-400">시스템 전체 0건 (완전 배제)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 서버 실제 DB 저장 공개키 원본 실시간 조회 뷰어 -->
+          <div class="bg-[#141418] border border-[#27272a] rounded-lg p-3 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs font-bold text-zinc-300 flex items-center gap-1.5">
+                <span>📄</span> <span>서버 DB에 저장된 실제 공개키(JWK) 원본 레코드</span>
+              </span>
+              <button 
+                type="button" 
+                onclick="refreshServerPublicKeyView()"
+                class="px-2.5 py-1 bg-[#1c241c] hover:bg-[#253325] text-emerald-300 border border-emerald-700/60 rounded text-[11px] font-mono font-bold transition-all shadow-sm"
+              >
+                🔄 공개키 레코드 실시간 조회
+              </button>
+            </div>
+            <div id="serverStoredPublicKeyDisplay" class="text-[11px] font-mono p-3 bg-black/70 rounded border border-zinc-800 text-zinc-300 overflow-x-auto max-h-60 leading-relaxed">
+              서버에서 실제 저장된 공개키 레코드를 조회 중입니다...
+            </div>
+          </div>
+        </div>
+
         <!-- [비공개 영역 전용] 일회용 질문(Challenge) & 재생 공격(Replay Attack) 방어 실시간 검증 -->
         <div class="p-4 bg-[#0d0d10] border border-[#ba9578]/40 rounded-xl space-y-4 shadow-lg">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#27272a] pb-2.5">
@@ -1488,6 +1549,7 @@
         updateVaultUI(true);
         await loadSecretVault();
         await loadPasskeyList();
+        await refreshServerPublicKeyView();
       } catch (err) {
         console.error('패스키 로그인 오류:', err);
         alert('패스키 로그인 처리 중 오류가 발생했습니다: ' + err.message);
@@ -1733,6 +1795,8 @@
       if (diffEl) diffEl.textContent = '위 [⚡ 새 질문 2회 연속 요청] 버튼을 누르면 실시간 비교 결과가 표시됩니다.';
       const repEl = document.getElementById('replayAttackResult');
       if (repEl) repEl.textContent = '위 [🛡️ 재생 공격 차단 시험] 버튼을 누르면 실시간 방어 결과가 표시됩니다.';
+      const pubEl = document.getElementById('serverStoredPublicKeyDisplay');
+      if (pubEl) pubEl.textContent = '서버에서 실제 저장된 공개키 레코드를 조회 중입니다...';
 
       updateVaultUI(false);
     }
@@ -1880,11 +1944,60 @@
       }
     }
 
+    // [비공개 영역 전용] 8-3. 서버 실제 보관 공개키 원본 레코드 실시간 조회
+    async function refreshServerPublicKeyView() {
+      const container = document.getElementById('serverStoredPublicKeyDisplay');
+      if (!container) return;
+
+      container.innerHTML = '<span class="text-emerald-400 animate-pulse font-mono">⏳ 서버 데이터베이스에서 실제 보관 중인 공개키 레코드를 조회 중...</span>';
+
+      try {
+        const res = await fetch(`${PASSKEY_API}?action=list_keys&username=runner_shin`);
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          container.innerHTML = `<span class="text-rose-400 font-mono">공개키 조회 실패: ${data.error}</span>`;
+          return;
+        }
+
+        const creds = data.credentials || [];
+        if (creds.length === 0) {
+          container.innerHTML = `<span class="text-zinc-500 font-mono">등록된 패스키 공개키가 없습니다.</span>`;
+          return;
+        }
+
+        let html = '';
+        creds.forEach((c, idx) => {
+          const jwk = c.publicKeyJwk || {};
+          html += `
+            <div class="${idx > 0 ? 'mt-3 pt-3 border-t border-zinc-800' : ''}">
+              <div class="text-[#ba9578] font-bold mb-1 flex items-center justify-between">
+                <span>🔑 [등록 패스키 #${idx + 1}] ${escapeHtml(c.name)}</span>
+                <span class="text-zinc-500 text-[10px]">${escapeHtml(c.storageType || c.deviceType)}</span>
+              </div>
+              <div class="text-zinc-400 space-y-0.5 pl-2 border-l border-emerald-500/30">
+                <div>• Credential ID: <span class="text-zinc-200 font-bold">${escapeHtml(c.id)}</span></div>
+                <div>• 암호화 알고리즘: <span class="text-emerald-400 font-bold">NIST P-256 (secp256r1) ECDSA 타원곡선 전자서명 (ES256, alg: -7)</span></div>
+                <div>• 서버 저장 값 형태: <span class="text-emerald-300 font-bold bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-800/40">오직 비대칭 공개키(Public Key Only)</span> <span class="text-zinc-500 text-[10px]">(비밀번호 및 개인키 보관 0건)</span></div>
+                <div>• 공개키 X 좌표 (JWK.x): <span class="text-amber-300 break-all font-bold">${escapeHtml(jwk.x || 'N/A')}</span></div>
+                <div>• 공개키 Y 좌표 (JWK.y): <span class="text-amber-300 break-all font-bold">${escapeHtml(jwk.y || 'N/A')}</span></div>
+                <div class="text-zinc-500 text-[10px] pt-0.5">↳ 설명: 서버는 위 수학적 공개키 좌표만 알고 있으며, 서명을 생성하는 개인키는 기기 외부로 절대 전송되지 않습니다.</div>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      } catch (err) {
+        container.innerHTML = `<span class="text-rose-400 font-mono">오류 발생: ${escapeHtml(err.message)}</span>`;
+      }
+    }
+
     // 초기 상태 확인 및 자동 복원
     if (vaultToken && vaultUser) {
       updateVaultUI(true);
       loadSecretVault();
       loadPasskeyList();
+      refreshServerPublicKeyView();
     } else {
       updateVaultUI(false);
     }
