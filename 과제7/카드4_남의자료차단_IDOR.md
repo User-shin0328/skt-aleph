@@ -73,10 +73,3 @@ function assertOwnership(entity, currentUsername, entityName = '데이터') {
 - **실증 결론:** 타인의 토큰이나 식별자를 위조한 침범 시도가 서버 인가 계층에서 100% 탐지되어 `HTTP 403 Forbidden`으로 거부되었으며, 데이터베이스 변경 건수는 `mutatedCount: 0`으로 완벽히 보존되었습니다.
 
 ---
-
-## 3. 화면 검증 및 캡처 방법 안내
-
-1. 다이어리 웹페이지(`https://skt-aleph-gilt.vercel.app/diary`)에 접속합니다.
-2. 상단 탭에서 **[🛡️ 보안 검증 샌드박스]** 버튼을 클릭합니다.
-3. 세 번째 시험 버튼인 **[3️⃣ 남의 자료 변조(IDOR) 차단 시험]**을 클릭합니다.
-4. 하단 터미널 콘솔에 `HTTP 403 Forbidden` 응답과 함께 `"code": "FORBIDDEN_DATA_ACCESS"`, `"mutatedCount": 0`이 출력되는 화면을 캡처할 수 있습니다.

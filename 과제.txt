@@ -1,15 +1,12 @@
 
 https://skt-aleph-gilt.vercel.app/ 
+https://github.com/User-shin0328/skt-aleph/commit/b7b6840573553d47719fec5edee1caba0305a6a1
 
 
+어디로 가나요 : https://skt-aleph-gilt.vercel.app/diary
+무엇을하나요 : 다이어리
+무엇이 보이면 통과: 다이어리 페이지
 
-어디로 가나요 : https://skt-aleph-gilt.vercel.app/board
-무엇을하나요 
-1) 실시간 날씨와 환율
-2) 날씨 기록 
-무엇이 보이면 통과: 실시간 날씨와 환율, 갱신, 기록
-
-
-ai에게 맡긴일: 페이지 디자인과 기능 구현
+ai에게 맡긴일: 페이지 디자인과 기능 구현 및 데이터베이스 연결
 내가 판단한 일: 디자인 수정과 기능 수정, 오류수정
-ai 말을 안들은 일: 아직 내가 원하는대로 결과물이 나오게 프롬프트를 작성하는 능력이 모잘라서 AI의 결과물이 처음부터 마음에 들지않음.
+ai 말을 안들은 일: 결과물이 생각한 형식으로 나오지않아 재수정
