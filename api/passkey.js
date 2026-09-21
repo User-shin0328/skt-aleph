@@ -40,7 +40,7 @@ function getDefaultDb() {
         username: 'runner_shin',
         displayName: '신재원 (소유자 본인 계정)',
         registeredAt: '2026-09-19T10:00:00.000Z',
-        // 오직 현재 컴퓨터(마스터 PC) 단 1개만 인가된 기기로 등록
+        // 기기 분실에 대비한 마스터 컴퓨터 키 + 예비 물리 보안키(보조 패스키) 2개 구성
         credentials: [
           {
             id: 'cred_master_pc_shin',
@@ -55,6 +55,20 @@ function getDefaultDb() {
               crv: 'P-256',
               x: 'W4sF5v7K9Y1pM3rT6vB8nQ2xL5zC7eA4dF1gH9jK3mP',
               y: 'Q8wE2rT5yU7iO9pA1sD3fG5hJ7kL9zX2c4vB6nM8qE1'
+            }
+          },
+          {
+            id: 'cred_shin_backup_key',
+            name: '신재원 예비 물리 보안키 (보조 패스키)',
+            deviceType: 'cross-platform',
+            storageType: 'FIDO2 FIPS 140-2 Level 3 하드웨어 보안키 (YubiKey 5C NFC)',
+            createdAt: '2026-09-20T14:30:00.000Z',
+            signCount: 0,
+            publicKeyJwk: {
+              kty: 'EC',
+              crv: 'P-256',
+              x: 'M7nP2qR5sT8vW1xZ4bC6dE9fG2hJ5kL8mP1rT4vW7yA',
+              y: 'B3dF6hJ9kL2nP5rT8vW1xZ4bC7eA0dF3gH6jK9mP2sQ'
             }
           }
         ],
@@ -155,6 +169,15 @@ function loadDatabase() {
         if (!hasMaster) {
           db.users.runner_shin.credentials = defaultDb.users.runner_shin.credentials;
           saveDatabase(db);
+        }
+        // 보조 패스키(예비 물리 보안키) 마이그레이션
+        const hasBackup = db.users.runner_shin.credentials.some(c => c.id === 'cred_shin_backup_key');
+        if (!hasBackup) {
+          const backupCred = defaultDb.users.runner_shin.credentials.find(c => c.id === 'cred_shin_backup_key');
+          if (backupCred) {
+            db.users.runner_shin.credentials.push(backupCred);
+            saveDatabase(db);
+          }
         }
       }
       return db;

@@ -588,7 +588,16 @@
           </div>
 
           <!-- 패스키 액션 버튼 그룹: 소유자 전용 패스키 로그인 -->
-          <div class="flex flex-col items-center justify-center gap-2 pt-2">
+          <div class="flex flex-col items-center justify-center gap-2.5 pt-2">
+            <!-- 데스크탑 패스키 선택 드롭다운 (마스터 PC 또는 보조 패스키) -->
+            <div id="desktopKeySelectorBox" class="flex flex-wrap items-center justify-center gap-2 text-xs font-mono text-zinc-400 bg-[#141418] px-3 py-1.5 rounded-lg border border-[#27272a]">
+              <span class="text-zinc-500">인증 패스키:</span>
+              <select id="selectedPasskeyId" class="bg-[#1c1c24] text-[#ffedd5] border border-[#ba9578]/50 rounded px-2 py-1 text-xs font-mono focus:outline-none focus:border-[#ba9578] cursor-pointer">
+                <option value="cred_master_pc_shin">신재원 마스터 컴퓨터 (현재 인가 기기)</option>
+                <option value="cred_shin_backup_key">신재원 예비 물리 보안키 (보조 패스키)</option>
+              </select>
+            </div>
+
             <!-- 표준 WebAuthn 패스키 로그인 -->
             <button 
               type="button" 
@@ -1123,18 +1132,34 @@
     // 기기 인가 패스키 관리 (현재 컴퓨터 단독 인가 & 보조 기기 승인 발급제)
     // -------------------------------------------------------------------------
     function getDevicePasskey() {
-      const saved = localStorage.getItem('shin_device_passkey');
-      if (saved) {
-        try { return JSON.parse(saved); } catch(e) {}
-      }
-      
-      // 모바일 기기(휴대폰/태블릿) 감지: 모바일 환경은 절대 자동 마스터로 등록하지 않음!
+      // 모바일 기기(휴대폰/태블릿) 감지: 모바일 환경은 코드 승인 전까지 미인가 상태 유지!
       const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
       if (isMobile) {
+        const selectorBox = document.getElementById('desktopKeySelectorBox');
+        if (selectorBox) selectorBox.classList.add('hidden');
+
+        const saved = localStorage.getItem('shin_device_passkey');
+        if (saved) {
+          try { return JSON.parse(saved); } catch(e) {}
+        }
         return null; // 휴대폰은 마스터 컴퓨터의 코드 승인 전까지 미인가 상태
       }
 
-      // 현재 작업 중인 데스크탑 컴퓨터 브라우저: 마스터 기기 패스키 자동 바인딩
+      // 데스크탑 컴퓨터: 드롭다운에서 선택된 패스키(마스터 PC 또는 예비 보조 패스키) 사용
+      const selectElem = document.getElementById('selectedPasskeyId');
+      const selectedId = selectElem ? selectElem.value : 'cred_master_pc_shin';
+
+      if (selectedId === 'cred_shin_backup_key') {
+        const backupKey = {
+          id: 'cred_shin_backup_key',
+          name: '신재원 예비 물리 보안키 (보조 패스키)',
+          deviceType: 'cross-platform',
+          isMaster: false
+        };
+        localStorage.setItem('shin_device_passkey', JSON.stringify(backupKey));
+        return backupKey;
+      }
+
       const masterKey = {
         id: 'cred_master_pc_shin',
         name: '신재원 마스터 컴퓨터 (현재 인가 기기)',
