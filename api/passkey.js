@@ -67,49 +67,68 @@ function getDefaultDb() {
         ],
         // 삭제 이력 보관 (삭제된 패스키 재접속 차단 증적용)
         deletedCredentials: [],
-        // 3대 비공개 데이터 (실제 개인정보가 아닌 정교한 전문 가상 데이터)
+        // 3대 비공개 데이터: 핵심 역량과 실증 사례 (비로그인 상태에서는 서버 원천 격리)
         secretVault: [
           {
-            id: 'secret-vault-01',
-            category: '준비 중인 프로젝트 메모',
-            badge: '프로젝트 기획',
+            id: 'strength-01',
+            category: '핵심 역량 1',
+            badge: '실행력 / 계획',
             badgeColor: 'gold',
-            title: 'Zero-Trust eBPF 기반 클라우드 컨테이너 실시간 침입 탐지 및 방화벽 엔진',
-            summary: '사이드카 프록시의 네트워크 오버헤드를 극복하기 위해 리눅스 커널 레이어(eBPF XDP)에서 직접 인바운드 패킷을 계측하고 비인가 C2 통신을 1ms 미만에 차단하는 고성능 엔진 설계 메모',
-            details: [
-              '문제 정의: Envoy 사이드카 구조는 Pod마다 mTLS 핸드셰이크와 유저/커널 컨텍스트 스위칭으로 15~20% 레이턴시 증가 초래',
-              '해결 방안: 커널 링버퍼(Ring Buffer)와 BPF_MAP_TYPE_HASH 테이블을 이용해 커널 진입 단계에서 IP/Port 평판 필터링',
-              '프로토타입 현황: Go cilium/ebpf 라이브러리로 기본 패킷 드롭 모듈 구현 완료, Prometheus 메트릭 Exporter 연동 시험 중'
-            ],
+            title: '1. 계획하고 정리할 때 — 분석 기반의 목표 수립과 단계별 실행력',
+            situation: '전공 진입 초기, 방대한 보안 및 네트워크 분야 속에서 채용 시장이 실제로 요구하는 핵심 역량을 명확히 파악하고 학습 우선순위를 세워야 했습니다.',
+            action: '최신 채용공고와 산업 뉴스를 수집·분석하여 직무에 필요한 자격과 역량을 매트릭스로 정리하고, 체계적인 실행 계획을 수립해 매일 실천했습니다.',
+            result: '정보보안산업기사, 네트워크관리사 2급, 리눅스마스터 2급을 차례로 취득하여 탄탄한 실무 지식 기반을 확립했으며, 지속적인 역량 확장을 이어가고 있습니다.',
+            evidence: {
+              title: '# 공인 기술 자격 취득 내역 및 커리어 로드맵',
+              items: [
+                '1. 정보보안산업기사 — 시스템 보안, 네트워크 보안, 애플리케이션 보안 이론 및 실무 자격 검증 완료',
+                '2. 네트워크관리사 2급 — TCP/IP 패킷 라우팅, 서브넷팅 계산, 스위치/라우터 환경 설정 실기 검증 완료',
+                '3. 리눅스마스터 2급 — 리눅스 OS 아키텍처, 쉘 스크립트, 파일 시스템 권한 체계 실무 검증 완료'
+              ],
+              summary: '실행 결과: 채용공고와 산업 뉴스를 토대로 체계화한 역량 로드맵을 100% 기한 내 달성하였으며, 지속적인 상위 실무 역량 확장을 전개하고 있습니다.'
+            },
             updatedAt: '2026-09-20 18:30:00 KST'
           },
           {
-            id: 'secret-vault-02',
-            category: '지원하려는 곳 목록',
-            badge: '채용 전략',
-            badgeColor: 'success',
-            title: '2026 하반기 테크 기업 핵심 인프라 & 제로트러스트 보안 엔지니어링 포지션 분석',
-            summary: '클라우드 인프라 아키텍처 및 대규모 네트워크 보안 엔지니어링 역량을 극대화할 수 있는 3개 핵심 타깃 기업 요구역량 매핑',
-            details: [
-              '1. SK텔레콤 Core Network 보안 엔지니어: 5G SA 네트워크 슬라이싱 가상화 인프라 및 통신사 전용 제로트러스트 아키텍처 운영',
-              '2. 토스 / 카카오페이 정보보안 엔지니어: 금융권 망분리 규제 대응, FIDO2 패스키 기반 사용자 무인증 인증체계 고도화',
-              '3. 네이버클라우드 Security Platform: K8s 멀티테넌시 보안 격리, CSPM 컴플라이언스 자동 점검 파이프라인 개발'
-            ],
+            id: 'strength-02',
+            category: '핵심 역량 2',
+            badge: '문제 해결 / 분석',
+            badgeColor: 'warning',
+            title: '2. 문제가 발생했을 때 — 근본 원인을 끝까지 파고드는 집요함',
+            situation: '보안 자동탐지/대응 툴을 개발하던 중, 유입되는 공격 패킷을 IDS(침입 탐지 시스템) 엔진이 탐지하지 못하는 원인 미상의 오류에 직면했습니다.',
+            action: '단순 프로그램 코드 디버깅에 그치지 않고, 가상 네트워크 환경 구축 단계부터 브리지 promiscuous 모드 설정 및 패킷 라우팅 경로를 하부 레이어부터 역추적했습니다.',
+            result: '가상 브리지와 인터페이스 간 바인딩 결함을 정확히 찾아내어 해결함으로써 IDS 탐지 파이프라인을 정상 가동하고 프로젝트를 다음 단계로 완수했습니다.',
+            evidence: {
+              title: '# IDS 미탐지 오류 원인 규명 및 트러블슈팅 로그',
+              items: [
+                '[현상] 공격 패킷 유입 시 IDS 엔진에서 탐지 로그 미발생',
+                '[추적 1] 소스코드 레벨 디버깅 → 룰셋 정상 로드 확인',
+                '[추적 2] 네트워크 환경 점검 → 가상 브리지(br0) 인터페이스 promiscuous 모드 비활성 발견',
+                '[해결] $ ip link set dev eth0 promisc on & $ brctl setageing br0 0 적용',
+                '[결과] IDS 리스너가 모든 프레임을 정상 수신하여 룰셋 트리거 확인 (탐지 파이프라인 100% 정상화)'
+              ],
+              summary: '원인 규명부터 커널 및 가상 인터페이스 레벨 해결까지 집요하게 파고들어 시스템을 정상화했습니다.'
+            },
             updatedAt: '2026-09-21 08:45:00 KST'
           },
           {
-            id: 'secret-vault-03',
-            category: '스스로 쓰는 회고',
-            badge: '엔지니어링 회고',
+            id: 'strength-03',
+            category: '핵심 역량 3',
+            badge: '협업 / 시너지',
             badgeColor: 'info',
-            title: '동시성 대량 트래픽 상황에서의 TCP 소켓 자원 고갈(TIME_WAIT) 장애 분석과 교훈',
-            summary: '마이크로서비스 간 연동 시 커넥션 풀링 부재로 발생했던 소켓 자원 고갈 사태의 원인 분석 및 네트워크 스택 튜닝을 통해 얻은 엔지니어링 철학',
-            details: [
-              '발생 현상: 피크 타임 초당 4,500 RPS 인입 시 `EADDRNOTAVAIL: Cannot assign requested address` 에러 발생하며 서버 마비',
-              '원인 규명: 단기 HTTP 요청마다 소켓을 열고 닫으면서 Ephemeral Port(32768~60999)가 TIME_WAIT(60초 대기) 상태로 가득 참',
-              '조치 내용: 1) HTTP Keep-Alive 커넥션 풀 적용, 2) 커널 파라미터 `tcp_tw_reuse=1` 활성화로 소켓 재사용률 99.4% 달성',
-              '핵심 교훈: "기능이 에러 없이 돈다고 끝난 것이 아니다. OS 커널과 네트워크 밑바닥 한계를 계측하고 방어하는 것이 엔지니어의 본질이다."'
-            ],
+            title: '3. 팀원과 상호작용할 때 — 공감과 칭찬으로 이끌어내는 협업 시너지',
+            situation: '일정 압박과 복잡한 기술 요구사항으로 팀원들의 피로가 누적되고, 자칫 소통이 경직되기 쉬웠던 팀 프로젝트 환경이었습니다.',
+            action: '팀원들의 작은 기여와 커밋에도 아낌없는 칭찬을 건넸으며, 막히는 지점을 겪는 동료에게 적극적인 공감과 함께 해결 아이디어를 나누어 심리적 안정감을 조성했습니다.',
+            result: '팀 분위기가 눈에 띄게 활기를 띠며 마찰 없이 프로젝트를 완성하였고, 동료들로부터 "덕분에 큰 힘이 되었다"는 진심 어린 감사 인사를 받았습니다.',
+            evidence: {
+              title: '# 팀 협업 프로세스 및 동료 피드백 기록',
+              items: [
+                '- 소통 원칙: 팀원의 작은 코드 커밋과 조사 결과에도 적극적인 칭찬과 구체적인 피드백 전달',
+                '- 문제 해결 지원: 기술적 난관에 봉착한 동료와 함께 화면을 공유하며 공감과 대안 모색',
+                '- 동료 피드백 발췌: "힘든 일정이었는데 매번 사기를 북돋워주고 꼼꼼하게 챙겨주셔서 끝까지 완성할 수 있었습니다."'
+              ],
+              summary: '긍정적인 공감과 적극적인 조력으로 팀원 간 신뢰를 쌓고 최고의 협업 결과물을 도출했습니다.'
+            },
             updatedAt: '2026-09-20 22:15:00 KST'
           }
         ]
@@ -138,31 +157,24 @@ function getDefaultDb() {
         // 게스트의 완전히 다른 비공개 데이터 (IDOR 차단 실증용)
         secretVault: [
           {
-            id: 'secret-vault-guest-01',
-            category: '게스트 검증 메모',
-            badge: '격리 검증',
+            id: 'strength-guest-01',
+            category: '게스트 검증 역량',
+            badge: '심사관 격리 검증',
             badgeColor: 'warning',
-            title: '심사관 계정 전용 테스트 샌드박스 비공개 문서 A',
-            summary: '이 문서는 runner_shin 계정에서는 절대 조회되어서는 안 되는 게스트 전용 비공개 데이터입니다.',
-            details: [
-              '소유권자: reviewer_guest',
-              '접근 통제 규칙: Bearer JWT 내 sub/username과 대상 owner 필드 1:1 대조',
-              '타인 요청 시 반환: HTTP 403 Forbidden (FORBIDDEN_DATA_ACCESS)'
-            ],
+            title: '심사관 게스트 전용 역량 검증 문서 (신재원 볼트와 물리적 격리)',
+            situation: '신재원 계정(runner_shin)과 심사관 계정(reviewer_guest)이 서로의 비공개 영역에 절대 접근할 수 없는지 IDOR 격리를 검증해야 하는 상황.',
+            action: '독립된 비대칭 공개키(Reviewer Key)로만 열리는 게스트 전용 볼트를 생성하여 분리 격리함.',
+            result: '타인의 패스키나 토큰으로는 이 역량 데이터에 일체 접근할 수 없으며, HTTP 403 Forbidden으로 원천 차단됨.',
+            evidence: {
+              title: '# OWASP A01 권한 분리 및 IDOR 차단 검증 로그',
+              items: [
+                '[소유자 검증] request.owner === token.username 엄격 대조',
+                '[차단 응답] HTTP 403 Forbidden (FORBIDDEN_DATA_ACCESS)',
+                '[변조 결과] 0건 노출, 0건 변조 보장'
+              ],
+              summary: '사용자별 비공개 데이터 격리가 완벽히 유지됩니다.'
+            },
             updatedAt: '2026-09-19 11:10:00 KST'
-          },
-          {
-            id: 'secret-vault-guest-02',
-            category: '게스트 검증 메모',
-            badge: '격리 검증',
-            badgeColor: 'warning',
-            title: '심사관 계정 전용 테스트 샌드박스 비공개 문서 B',
-            summary: '타인(runner_shin)이 이 자료의 ID로 직접 조회하거나 위변조를 시도해도 0건 변조가 보장됩니다.',
-            details: [
-              '데이터 무결성: 읽기 및 쓰기 API 모두 소유자 검증 통과 필수',
-              '보안 표준: OWASP Top 10 A01:2021-Broken Access Control 완전 차단'
-            ],
-            updatedAt: '2026-09-19 11:12:00 KST'
           }
         ]
       }
@@ -175,7 +187,19 @@ function loadDatabase() {
   try {
     if (fs.existsSync(DATA_FILE_PATH)) {
       const raw = fs.readFileSync(DATA_FILE_PATH, 'utf-8');
-      return JSON.parse(raw);
+      const db = JSON.parse(raw);
+      // 핵심 역량 데이터 구조가 구버전인 경우 자동 마이그레이션
+      const defaultDb = getDefaultDb();
+      if (!db.users || !db.users.runner_shin || !db.users.runner_shin.secretVault || !db.users.runner_shin.secretVault[0] || db.users.runner_shin.secretVault[0].id !== 'strength-01') {
+        if (db.users && db.users.runner_shin) {
+          db.users.runner_shin.secretVault = defaultDb.users.runner_shin.secretVault;
+        }
+        if (db.users && db.users.reviewer_guest) {
+          db.users.reviewer_guest.secretVault = defaultDb.users.reviewer_guest.secretVault;
+        }
+        saveDatabase(db);
+      }
+      return db;
     }
   } catch (e) {
     console.warn('DB load warning (fallback to default):', e.message);
