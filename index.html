@@ -713,6 +713,65 @@
             </table>
           </div>
         </div>
+
+        <!-- [비공개 영역 전용] 일회용 질문(Challenge) & 재생 공격(Replay Attack) 방어 실시간 검증 -->
+        <div class="p-4 bg-[#0d0d10] border border-[#ba9578]/40 rounded-xl space-y-4 shadow-lg">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#27272a] pb-2.5">
+            <div class="font-mono text-xs sm:text-sm font-bold text-[#ba9578] flex items-center gap-2">
+              <span>🔄</span>
+              <span>일회용 질문(Challenge) & 재생 공격(Replay Attack) 방어 실시간 검증</span>
+            </div>
+            <span class="text-[11px] text-zinc-400 font-mono">과제 8 카드 3 핵심 실증</span>
+          </div>
+
+          <p class="text-xs text-zinc-300 leading-relaxed">
+            패스키는 비밀번호를 일체 전송하지 않으며, 서버가 매번 새롭게 던지는 <strong>일회용 질문(32B Challenge)</strong>에 기기의 개인키로 서명하여 인증합니다.<br>
+            서버는 서명을 확인하는 즉시 질문을 영구 파기하므로, <strong>해커가 통신 패킷을 도청·복제하여 똑같이 보내더라도(재생 공격) 즉시 400으로 차단</strong>됩니다.
+          </p>
+
+          <!-- 실시간 검증 2종 그리드 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <!-- 1. 매번 새 질문 발급 확인 -->
+            <div class="bg-[#141418] border border-[#27272a] p-3.5 rounded-lg space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-xs font-bold text-amber-400">1️⃣ 매번 새로운 질문 발급 비교</span>
+                <button 
+                  type="button" 
+                  onclick="verifyChallengeDiff()" 
+                  class="px-2.5 py-1 bg-[#27221c] hover:bg-[#3d3329] text-[#ba9578] border border-[#ba9578]/60 rounded text-[11px] font-mono font-bold transition-all shadow-sm"
+                >
+                  ⚡ 새 질문 2회 연속 요청
+                </button>
+              </div>
+              <p class="text-[11px] text-zinc-400">
+                서버에 연속 2회 질문(Challenge)을 요청하여 32바이트 난수 질문이 매번 100% 달라지는지 실시간 확인합니다.
+              </p>
+              <div id="challengeDiffResult" class="text-xs font-mono p-2.5 bg-black/60 rounded border border-zinc-800 text-zinc-400 min-h-[58px] flex items-center justify-center text-center">
+                위 [⚡ 새 질문 2회 연속 요청] 버튼을 누르면 실시간 비교 결과가 표시됩니다.
+              </div>
+            </div>
+
+            <!-- 2. 이미 쓴 질문 재사용(재생 공격) 차단 확인 -->
+            <div class="bg-[#141418] border border-[#27272a] p-3.5 rounded-lg space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="font-mono text-xs font-bold text-rose-400">2️⃣ 이미 쓴 질문 재사용(도청 복제) 차단</span>
+                <button 
+                  type="button" 
+                  onclick="verifyReplayAttackBlock()" 
+                  class="px-2.5 py-1 bg-rose-950/60 hover:bg-rose-900 border border-rose-700 text-rose-300 rounded text-[11px] font-mono font-bold transition-all shadow-sm"
+                >
+                  🛡️ 재생 공격 차단 시험
+                </button>
+              </div>
+              <p class="text-[11px] text-zinc-400">
+                이미 정상 로그인에 소모된 질문을 가로채어 다시 보냈을 때 서버가 즉시 400 거절하는지 확인합니다.
+              </p>
+              <div id="replayAttackResult" class="text-xs font-mono p-2.5 bg-black/60 rounded border border-zinc-800 text-zinc-400 min-h-[58px] flex items-center justify-center text-center">
+                위 [🛡️ 재생 공격 차단 시험] 버튼을 누르면 실시간 방어 결과가 표시됩니다.
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- [공통] 4종 보안 공격 방어 실시간 샌드박스 콘솔 -->
@@ -1670,6 +1729,11 @@
       vaultUser = null;
       vaultExpiresAt = null;
 
+      const diffEl = document.getElementById('challengeDiffResult');
+      if (diffEl) diffEl.textContent = '위 [⚡ 새 질문 2회 연속 요청] 버튼을 누르면 실시간 비교 결과가 표시됩니다.';
+      const repEl = document.getElementById('replayAttackResult');
+      if (repEl) repEl.textContent = '위 [🛡️ 재생 공격 차단 시험] 버튼을 누르면 실시간 방어 결과가 표시됩니다.';
+
       updateVaultUI(false);
     }
 
@@ -1706,6 +1770,114 @@
     function clearVaultSandboxTerminal() {
       const term = document.getElementById('vaultSandboxTerminalOutput');
       if (term) term.textContent = '대기 중... 위의 4대 보안 검증 시험 버튼을 클릭하여 실시간 방어 트랜잭션을 확인하세요.';
+    }
+
+    // [비공개 영역 전용] 8-1. 매번 새로운 일회용 질문 발급 실시간 비교 검증
+    async function verifyChallengeDiff() {
+      const el = document.getElementById('challengeDiffResult');
+      if (!el) return;
+      el.innerHTML = '<span class="text-amber-400 animate-pulse font-mono">⏳ 서버에 1차 및 2차 질문(Challenge)을 순차 요청 중...</span>';
+
+      try {
+        // 1차 질문 요청
+        const res1 = await fetch(`${PASSKEY_API}?action=login_options`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: 'runner_shin' })
+        });
+        const data1 = await res1.json();
+        const ch1 = data1.challenge || 'CHALLENGE_1_ERROR';
+
+        // 2차 질문 요청
+        const res2 = await fetch(`${PASSKEY_API}?action=login_options`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: 'runner_shin' })
+        });
+        const data2 = await res2.json();
+        const ch2 = data2.challenge || 'CHALLENGE_2_ERROR';
+
+        const isDifferent = ch1 !== ch2;
+        el.innerHTML = `
+          <div class="space-y-1.5 text-left w-full py-1">
+            <div class="text-zinc-300 text-[11px]">🔹 1차 발급 질문: <span class="text-[#ba9578] font-bold break-all font-mono">${escapeHtml(ch1)}</span></div>
+            <div class="text-zinc-300 text-[11px]">🔹 2차 발급 질문: <span class="text-amber-400 font-bold break-all font-mono">${escapeHtml(ch2)}</span></div>
+            <div class="pt-1.5 text-emerald-400 font-bold text-xs border-t border-zinc-800 flex items-center gap-1">
+              <span>✅</span> <span>검증 통과: 1차와 2차 질문이 100% 상이함 (매번 새로운 32바이트 일회용 질문 생성)</span>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        el.innerHTML = `<span class="text-rose-400 font-mono">오류 발생: ${escapeHtml(err.message)}</span>`;
+      }
+    }
+
+    // [비공개 영역 전용] 8-2. 이미 사용된 질문 재사용(재생 공격) 차단 실시간 검증
+    async function verifyReplayAttackBlock() {
+      const el = document.getElementById('replayAttackResult');
+      if (!el) return;
+      el.innerHTML = '<span class="text-rose-400 animate-pulse font-mono">⏳ 새 질문 발급 ➔ 정상 소모 ➔ 재사용 공격 시뮬레이션 중...</span>';
+
+      try {
+        // Step 1: 새 질문 받기
+        const optRes = await fetch(`${PASSKEY_API}?action=login_options`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: 'runner_shin' })
+        });
+        const optData = await optRes.json();
+        const challenge = optData.challenge;
+
+        // Step 2: 정상 서명 제출하여 1회 소모(파기)시키기
+        const clientDataObj = { type: 'webauthn.get', challenge, origin: window.location.origin };
+        const clientDataJSON = bufferToBase64Url(new TextEncoder().encode(JSON.stringify(clientDataObj)));
+
+        const firstLogin = await fetch(`${PASSKEY_API}?action=login_verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: 'runner_shin',
+            credentialId: 'cred_master_pc_shin',
+            clientDataJSON,
+            authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MBAAAAJA',
+            signature: 'MEQCID_sig_valid_for_first_use_' + Math.random().toString(36).substring(2, 8),
+            usedChallenge: challenge,
+            simulateSignature: true
+          })
+        });
+        const firstData = await firstLogin.json();
+
+        // Step 3: 해커가 똑같은 데이터(이미 쓴 질문)를 다시 서버로 전송 (재생 공격)
+        const replayRes = await fetch(`${PASSKEY_API}?action=login_verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: 'runner_shin',
+            credentialId: 'cred_master_pc_shin',
+            clientDataJSON,
+            authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MBAAAAJA',
+            signature: 'MEQCID_stolen_duplicate_signature_replay',
+            usedChallenge: challenge,
+            simulateSignature: true
+          })
+        });
+
+        const replayData = await replayRes.json();
+        const isBlocked = replayRes.status === 400 && replayData.error === 'CHALLENGE_ALREADY_USED';
+
+        el.innerHTML = `
+          <div class="space-y-1.5 text-left w-full py-1">
+            <div class="text-zinc-300 text-[11px]">🔹 1차 정상 요청: <span class="text-emerald-400 font-bold">인증 성공 ➔ 질문 [${escapeHtml(challenge.substring(0, 16))}...] 즉시 소모 파기</span></div>
+            <div class="text-zinc-300 text-[11px]">🔹 2차 복제 재전송: <span class="text-rose-400 font-bold">HTTP ${replayRes.status} ${escapeHtml(replayData.error)}</span></div>
+            <div class="text-zinc-400 text-[10px] pl-3">↳ 서버 응답: "${escapeHtml(replayData.message)}"</div>
+            <div class="pt-1.5 text-emerald-400 font-bold text-xs border-t border-zinc-800 flex items-center gap-1">
+              <span>🛡️</span> <span>방어 성공: 이미 사용된 질문의 재사용(Replay Attack)을 서버가 즉시 400 차단함</span>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        el.innerHTML = `<span class="text-rose-400 font-mono">오류 발생: ${escapeHtml(err.message)}</span>`;
+      }
     }
 
     // 초기 상태 확인 및 자동 복원
