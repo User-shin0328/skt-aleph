@@ -583,32 +583,21 @@
           <div class="space-y-1">
             <h3 class="text-lg sm:text-xl font-bold text-white font-mono">기기 패스키로 잠금 해제</h3>
             <p class="text-xs sm:text-sm text-zinc-400 max-w-md mx-auto">
-              비밀번호 입력란은 존재하지 않습니다. 서버가 발급하는 일회용 질문(Challenge)에 기기의 개인키로 서명하여 안전하게 열람합니다.
+              비밀번호 입력란은 존재하지 않습니다. 등록된 기기의 패스키 서명으로 나만의 비공개 자리를 안전하게 엽니다. (기기 분실 대비 새 패스키 추가는 로그인 후 관리 패널에서 본인 인증을 거쳐 진행됩니다.)
             </p>
           </div>
 
-          <!-- 패스키 액션 버튼 그룹 -->
+          <!-- 패스키 액션 버튼 그룹: 소유자 및 심사관 패스키 로그인 -->
           <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <!-- 1. 표준 WebAuthn 패스키 로그인 -->
+            <!-- 표준 WebAuthn 패스키 로그인 -->
             <button 
               type="button" 
               onclick="handlePasskeyLoginWebAuthn()"
-              class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#8c674b] hover:bg-[#a27b5c] text-white font-mono font-bold text-xs sm:text-sm rounded-lg border border-[#ba9578] transition-all shadow-md hover:scale-105 active:scale-95"
+              class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#8c674b] hover:bg-[#a27b5c] text-white font-mono font-bold text-xs sm:text-sm rounded-lg border border-[#ba9578] transition-all shadow-md hover:scale-105 active:scale-95"
               title="브라우저 WebAuthn API(Windows Hello, Touch ID, YubiKey)를 호출하여 로그인합니다"
             >
               <span>🔑</span>
               <span>패스키로 로그인</span>
-            </button>
-
-            <!-- 2. 신규 패스키 등록 (비밀번호 없음) -->
-            <button 
-              type="button" 
-              onclick="openRegisterPasskeyModal()"
-              class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1a1a22] hover:bg-[#242430] text-zinc-200 font-mono font-bold text-xs sm:text-sm rounded-lg border border-[#3f3f46] transition-all hover:border-[#ba9578]"
-              title="현재 기기에 새로운 비대칭 키 쌍을 생성하고 공개키를 서버에 등록합니다"
-            >
-              <span>➕</span>
-              <span>새 패스키 등록하기</span>
             </button>
           </div>
 
@@ -804,15 +793,15 @@
       <div class="bg-[#141418] border border-[#ba9578] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
         <div class="flex items-start justify-between border-b border-[#27272a] pb-3">
           <div>
-            <div class="text-xs font-mono text-[#ba9578] font-bold">FIDO2 WEBAUTHN REGISTRATION</div>
-            <h3 class="text-lg font-bold text-white font-mono">새 기기 패스키 등록</h3>
+            <div class="text-xs font-mono text-[#ba9578] font-bold">AUTHENTICATED FIDO2 WEBAUTHN</div>
+            <h3 class="text-lg font-bold text-white font-mono">소유자 보조 기기 패스키 추가</h3>
           </div>
           <button type="button" onclick="closeRegisterPasskeyModal()" class="text-zinc-400 hover:text-white text-lg font-bold">&times;</button>
         </div>
 
         <div class="space-y-3 text-xs text-zinc-300">
           <p class="text-zinc-400 leading-relaxed">
-            비밀번호를 만들지 않습니다. 이 기기에서 비대칭 키 쌍을 생성하고 <strong class="text-white">공개키만 서버에 보관</strong>합니다. 개인키는 기기 밖으로 나가지 않습니다.
+            비밀번호는 만들지 않습니다. 기기 분실 대비를 위해 현재 로그인된 소유자 계정에 신규 기기 비대칭 키 쌍을 생성하고 <strong class="text-white">공개키만 서버에 등록</strong>합니다. (무인가자의 임의 패스키 발급은 엄격히 차단됩니다.)
           </p>
 
           <div class="space-y-1.5">
@@ -827,18 +816,20 @@
           </div>
 
           <div class="space-y-1.5">
-            <label class="block text-zinc-400 font-mono text-[11px]">등록 대상 사용자 계정</label>
-            <select id="regKeyUsername" class="w-full bg-[#09090b] border border-zinc-700 rounded px-3 py-2 text-white font-mono focus:border-[#ba9578] focus:outline-none">
-              <option value="runner_shin">runner_shin (신재원 본인 계정)</option>
-              <option value="reviewer_guest">reviewer_guest (심사관 게스트 계정)</option>
-            </select>
+            <label class="block text-zinc-400 font-mono text-[11px]">등록 대상 계정 (현재 인증된 소유자)</label>
+            <div class="flex items-center gap-2 p-2.5 bg-[#09090b] border border-zinc-700 rounded text-xs font-mono text-zinc-200">
+              <span class="text-emerald-400">🛡️</span>
+              <span id="regKeyUsernameDisplay" class="font-bold text-[#ffedd5]">runner_shin</span>
+              <span class="text-zinc-500 text-[10px] ml-auto">인증 세션 확인됨</span>
+            </div>
+            <input type="hidden" id="regKeyUsername" value="runner_shin" />
           </div>
 
           <div class="p-3 bg-[#09090b] border border-zinc-800 rounded text-[11px] text-zinc-400 space-y-1 font-mono">
-            <div class="text-emerald-400 font-bold">✓ 암호학적 보안 보장:</div>
+            <div class="text-emerald-400 font-bold">✓ 암호학적 보안 및 무인가 방지:</div>
             <div>- NIST P-256 ECDSA 비대칭 키 알고리즘</div>
             <div>- 개인키 기기 내부 보관 (Secure Enclave / TPM)</div>
-            <div>- 서버 저장: 공개키 및 일련번호만 전송</div>
+            <div>- 비인가자 임의 계정 발급 차단 (소유자 인증 필수)</div>
           </div>
         </div>
 
@@ -1087,6 +1078,15 @@
 
     // 모달 제어
     function openRegisterPasskeyModal() {
+      if (!vaultToken || !vaultUser) {
+        alert('새 패스키 추가 등록은 무인가자의 무단 발급을 방지하기 위해 먼저 기존 등록된 패스키로 로그인(본인 인증)을 완료해야 합니다.');
+        return;
+      }
+      const userDisplay = document.getElementById('regKeyUsernameDisplay');
+      const userInput = document.getElementById('regKeyUsername');
+      if (userDisplay) userDisplay.textContent = vaultUser.username;
+      if (userInput) userInput.value = vaultUser.username;
+
       const modal = document.getElementById('passkeyRegisterModal');
       if (modal) modal.classList.remove('hidden');
     }
@@ -1166,17 +1166,27 @@
       const keyName = (nameInput && nameInput.value.trim()) || '내 기기 패스키';
       const targetUsername = (userInput && userInput.value) || 'runner_shin';
 
+      if (!vaultToken) {
+        alert('인증 세션이 유효하지 않습니다. 다시 로그인 후 시도해주세요.');
+        return;
+      }
+
       if (btn) {
         btn.disabled = true;
         btn.textContent = '등록 챌린지 생성 중...';
       }
 
       try {
+        const authHeaders = {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${vaultToken}`
+        };
+
         // Step 1: 서버에서 일회용 등록 챌린지 획득
         const optRes = await fetch(`${PASSKEY_API}?action=register_options`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: targetUsername, displayName: targetUsername })
+          headers: authHeaders,
+          body: JSON.stringify({ username: targetUsername, displayName: (vaultUser && vaultUser.displayName) || targetUsername })
         });
         const optData = await optRes.json();
         if (!optRes.ok || !optData.success) {
@@ -1212,7 +1222,7 @@
         // Step 3: 서버로 공개키만 전송 (개인키 전송 없음!)
         const verifyRes = await fetch(`${PASSKEY_API}?action=register_verify`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders,
           body: JSON.stringify({
             username: targetUsername,
             credentialId,

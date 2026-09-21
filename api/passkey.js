@@ -383,11 +383,44 @@ module.exports = async function handler(req, res) {
       const { username = 'runner_shin', displayName = '신재원' } = req.body || {};
       const cleanUsername = String(username).trim().toLowerCase();
 
+      // 1. 허가된 사용자 계정 검증 (아무나 임의 계정으로 패스키 발급받는 것 원천 차단)
+      const ALLOWED_USERS = ['runner_shin', 'reviewer_guest'];
+      if (!ALLOWED_USERS.includes(cleanUsername)) {
+        return res.status(403).json({
+          success: false,
+          error: 'REGISTRATION_DISALLOWED',
+          message: `허가되지 않은 계정 [${cleanUsername}]입니다. 본 시스템은 개인 소개 페이지로 불특정 다수의 임의 계정 패스키 발급이 제한되어 있습니다.`
+        });
+      }
+
+      // 2. 소유자 계정(runner_shin)의 경우, 기존 패스키로 인증된 세션이 있어야만 추가 기기 등록 허용
+      // (외부 비인가자가 신재원 계정에 임의로 자기 기기 패스키를 무단 등록하는 것 방지)
+      if (cleanUsername === 'runner_shin') {
+        const auth = extractAuthUser(req);
+        if (!auth || auth.username !== 'runner_shin') {
+          return res.status(401).json({
+            success: false,
+            error: 'UNAUTHORIZED_KEY_ADDITION',
+            message: '소유자(신재원) 계정에 새로운 기기 패스키를 추가하려면, 먼저 기존에 등록된 패스키로 로그인하여 본인 인증을 완료해야 합니다.'
+          });
+        }
+      }
+
+      // 3. 계정당 최대 패스키 등록 개수 제한 (무제한 생성 남발 방지)
+      const maxAllowed = cleanUsername === 'runner_shin' ? 3 : 2;
+      const user = db.users[cleanUsername];
+      if (user && user.credentials.length >= maxAllowed) {
+        return res.status(400).json({
+          success: false,
+          error: 'MAX_CREDENTIALS_REACHED',
+          message: `기기 분실 대비 패스키는 계정당 최대 ${maxAllowed}개까지만 등록할 수 있습니다. 불필요한 패스키를 먼저 삭제해주세요.`
+        });
+      }
+
       // 일회용 등록 챌린지 생성 (32바이트 암호학적 난수)
       const challenge = generateChallenge(cleanUsername, 'register');
 
       // 사용자가 이미 등록한 키가 있다면 excludeCredentials에 추가 (동일 기기 중복 등록 방지)
-      const user = db.users[cleanUsername];
       const excludeCredentials = user
         ? user.credentials.map(c => ({
             id: c.id,
@@ -408,7 +441,7 @@ module.exports = async function handler(req, res) {
         user: {
           id: base64UrlEncode(Buffer.from(cleanUsername, 'utf-8')),
           name: cleanUsername,
-          displayName: displayName || cleanUsername
+          displayName: displayName || (user ? user.displayName : cleanUsername)
         },
         pubKeyCredParams: [
           { type: 'public-key', alg: -7 },   // ES256 (NIST P-256 with SHA-256)
@@ -450,6 +483,28 @@ module.exports = async function handler(req, res) {
       } = req.body || {};
 
       const cleanUsername = String(username).trim().toLowerCase();
+
+      // 1. 허가된 사용자 계정 검증
+      const ALLOWED_USERS = ['runner_shin', 'reviewer_guest'];
+      if (!ALLOWED_USERS.includes(cleanUsername)) {
+        return res.status(403).json({
+          success: false,
+          error: 'REGISTRATION_DISALLOWED',
+          message: `허가되지 않은 계정 [${cleanUsername}]입니다. 신규 패스키 등록이 제한되어 있습니다.`
+        });
+      }
+
+      // 2. 소유자 계정인 경우 토큰 인증 검증 필수
+      if (cleanUsername === 'runner_shin') {
+        const auth = extractAuthUser(req);
+        if (!auth || auth.username !== 'runner_shin') {
+          return res.status(401).json({
+            success: false,
+            error: 'UNAUTHORIZED_KEY_ADDITION',
+            message: '소유자(신재원) 계정에 새 기기 패스키를 저장하려면 기존 패스키 인증 토큰이 필요합니다.'
+          });
+        }
+      }
 
       if (!credentialId || !clientDataJSON || !publicKeyJwk) {
         return res.status(400).json({
@@ -503,20 +558,27 @@ module.exports = async function handler(req, res) {
       challengeInfo.used = true;
       activeChallenges.delete(receivedChallenge);
 
-      // 사용자 정보 로드 또는 신규 생성
-      if (!db.users[cleanUsername]) {
-        db.users[cleanUsername] = {
-          username: cleanUsername,
-          displayName: cleanUsername,
-          registeredAt: new Date().toISOString(),
-          credentials: [],
-          deletedCredentials: [],
-          secretVault: []
-        };
+      // 사용자 정보 로드 (임의 계정 자동 생성 차단: 이미 DB에 있는 계정만 허용)
+      const user = db.users[cleanUsername];
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          error: 'USER_NOT_FOUND',
+          message: `등록 대상 사용자 [${cleanUsername}]를 찾을 수 없습니다.`
+        });
+      }
+
+      // 계정당 최대 패스키 수 초과 검사
+      const maxAllowed = cleanUsername === 'runner_shin' ? 3 : 2;
+      if (user.credentials.length >= maxAllowed) {
+        return res.status(400).json({
+          success: false,
+          error: 'MAX_CREDENTIALS_REACHED',
+          message: `최대 등록 가능한 패스키 개수(${maxAllowed}개)를 초과했습니다.`
+        });
       }
 
       // 동일 credentialId 중복 검사
-      const user = db.users[cleanUsername];
       const existingIndex = user.credentials.findIndex(c => c.id === credentialId);
       if (existingIndex !== -1) {
         return res.status(400).json({
