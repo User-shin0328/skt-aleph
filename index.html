@@ -588,17 +588,31 @@
           </div>
 
           <!-- 패스키 액션 버튼 그룹: 소유자 전용 패스키 로그인 -->
-          <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <div class="flex flex-col items-center justify-center gap-2 pt-2">
             <!-- 표준 WebAuthn 패스키 로그인 -->
             <button 
               type="button" 
               onclick="handlePasskeyLoginWebAuthn()"
               class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#8c674b] hover:bg-[#a27b5c] text-white font-mono font-bold text-xs sm:text-sm rounded-lg border border-[#ba9578] transition-all shadow-md hover:scale-105 active:scale-95"
-              title="등록된 기기(Windows Hello, Touch ID, 스마트폰 지문, FIDO2 보안키)로 본인 인증을 수행하여 비공개 영역을 엽니다"
+              title="인가된 컴퓨터(또는 발급받은 기기)에서 비공개 영역을 엽니다"
             >
               <span>🔑</span>
               <span>패스키로 로그인</span>
             </button>
+
+            <!-- 보조 기기(휴대폰 등)에서 마스터 승인 코드로 등록하는 링크 -->
+            <div class="pt-2">
+              <button 
+                type="button" 
+                onclick="openClaimDeviceModal()" 
+                class="inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-[#ba9578] transition-colors"
+                title="마스터 컴퓨터에서 발급받은 6자리 코드가 있다면 이 기기(휴대폰)에 패스키를 등록할 수 있습니다"
+              >
+                <span>📱</span>
+                <span class="underline">마스터 컴퓨터에서 발급받은 코드로 이 기기(휴대폰 등) 등록하기</span>
+                <span>&rarr;</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -628,10 +642,11 @@
           <div class="flex items-center gap-2">
             <button 
               type="button" 
-              onclick="openRegisterPasskeyModal()" 
-              class="px-3 py-1.5 bg-[#1e1e26] hover:bg-[#2a2a36] text-zinc-300 border border-zinc-700 rounded text-xs font-mono transition-all"
+              onclick="openIssueGrantModal()" 
+              class="px-3 py-1.5 bg-[#1e1e26] hover:bg-[#2a2a36] text-[#ba9578] border border-[#ba9578]/50 rounded text-xs font-mono font-bold transition-all"
+              title="휴대폰 등 다른 기기에서 접속할 수 있도록 1회용 등록 승인 코드를 발급합니다"
             >
-              <span>➕</span> <span>패스키 추가 등록</span>
+              <span>📱</span> <span>새 기기 패스키 발급</span>
             </button>
             <button 
               type="button" 
@@ -769,57 +784,104 @@
       </div>
     </section>
 
-    <!-- 새 패스키 등록 모달 다이얼로그 (비밀번호 없음) -->
-    <div id="passkeyRegisterModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <!-- 1. 마스터 컴퓨터: 보조 기기(휴대폰 등) 패스키 발급 모달 다이얼로그 -->
+    <div id="issueGrantModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
       <div class="bg-[#141418] border border-[#ba9578] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
         <div class="flex items-start justify-between border-b border-[#27272a] pb-3">
           <div>
-            <div class="text-xs font-mono text-[#ba9578] font-bold">AUTHENTICATED FIDO2 WEBAUTHN</div>
-            <h3 class="text-lg font-bold text-white font-mono">소유자 보조 기기 패스키 추가</h3>
+            <div class="text-xs font-mono text-[#ba9578] font-bold">MASTER PC AUTHORIZATION</div>
+            <h3 class="text-lg font-bold text-white font-mono">새 기기(휴대폰 등) 패스키 발급</h3>
           </div>
-          <button type="button" onclick="closeRegisterPasskeyModal()" class="text-zinc-400 hover:text-white text-lg font-bold">&times;</button>
+          <button type="button" onclick="closeIssueGrantModal()" class="text-zinc-400 hover:text-white text-lg font-bold">&times;</button>
         </div>
 
         <div class="space-y-3 text-xs text-zinc-300">
           <p class="text-zinc-400 leading-relaxed">
-            비밀번호는 만들지 않습니다. 기기 분실 대비를 위해 현재 로그인된 소유자 계정에 신규 기기 비대칭 키 쌍을 생성하고 <strong class="text-white">공개키만 서버에 등록</strong>합니다. (무인가자의 임의 패스키 발급은 엄격히 차단됩니다.)
+            현재 인가된 이 컴퓨터에서 승인 코드를 발급해야만 다른 기기(스마트폰 등)에서 패스키를 등록하고 비공개 구역에 들어갈 수 있습니다.
+          </p>
+
+          <div class="p-3 bg-[#09090b] border border-zinc-700 rounded-lg text-center space-y-2">
+            <div class="text-[11px] text-zinc-400 font-mono">보조 기기 등록용 1회용 승인 코드 (10분 유효)</div>
+            <div id="grantCodeDisplay" class="text-2xl sm:text-3xl font-mono font-bold tracking-widest text-[#ffedd5] select-all">
+              ------
+            </div>
+            <button 
+              type="button" 
+              id="genGrantCodeBtn" 
+              onclick="handleIssueDeviceGrant()" 
+              class="px-4 py-2 bg-[#8c674b] hover:bg-[#a27b5c] text-white rounded font-mono text-xs font-bold transition-all shadow"
+            >
+              ⚡ 1회용 등록 승인 코드 생성
+            </button>
+          </div>
+
+          <div id="grantResultNotice" class="hidden p-3 bg-emerald-950/30 border border-emerald-800/60 rounded text-[11px] text-emerald-300 space-y-1 font-mono">
+            <div class="font-bold">📱 휴대폰 등 다른 기기 등록 방법:</div>
+            <div>1. 등록할 기기로 본 사이트에 접속합니다.</div>
+            <div>2. 비공개 영역 하단의 <strong class="text-white">[마스터 컴퓨터에서 발급받은 코드로 등록]</strong> 클릭</div>
+            <div>3. 위의 6자리 코드를 입력하면 해당 기기에 패스키가 발급됩니다.</div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end pt-2 border-t border-[#27272a]">
+          <button type="button" onclick="closeIssueGrantModal()" class="px-4 py-2 bg-[#1f1f26] text-zinc-300 rounded font-mono text-xs hover:bg-zinc-800">
+            닫기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 보조 기기(휴대폰 등): 마스터 승인 코드로 패스키 등록하는 모달 다이얼로그 -->
+    <div id="claimDeviceModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+      <div class="bg-[#141418] border border-[#ba9578] rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+        <div class="flex items-start justify-between border-b border-[#27272a] pb-3">
+          <div>
+            <div class="text-xs font-mono text-[#ba9578] font-bold">DEVICE PASSKEY CLAIM</div>
+            <h3 class="text-lg font-bold text-white font-mono">이 기기(휴대폰) 패스키 등록</h3>
+          </div>
+          <button type="button" onclick="closeClaimDeviceModal()" class="text-zinc-400 hover:text-white text-lg font-bold">&times;</button>
+        </div>
+
+        <div class="space-y-3 text-xs text-zinc-300">
+          <p class="text-zinc-400 leading-relaxed">
+            마스터 컴퓨터 화면에 표시된 6자리 승인 코드를 입력하여 이 기기에 정식 패스키를 발급·등록합니다. (마스터 컴퓨터에서 승인하지 않은 기기는 등록 불가)
           </p>
 
           <div class="space-y-1.5">
-            <label class="block text-zinc-400 font-mono text-[11px]" for="regKeyName">패스키 별칭 (기기 식별 이름)</label>
+            <label class="block text-zinc-400 font-mono text-[11px]" for="claimGrantCode">마스터 컴퓨터 발급 승인 코드 (6자리)</label>
             <input 
               type="text" 
-              id="regKeyName" 
-              class="w-full bg-[#09090b] border border-zinc-700 rounded px-3 py-2 text-white font-mono focus:border-[#ba9578] focus:outline-none" 
-              placeholder="예: 신재원 갤럭시 지문인식, 서브PC 윈도우헬로"
-              value="신재원 보조 기기 (Passkey)"
+              id="claimGrantCode" 
+              maxlength="6"
+              class="w-full bg-[#09090b] border border-zinc-700 rounded px-3 py-2.5 text-center text-lg font-mono font-bold tracking-widest text-[#ffedd5] focus:border-[#ba9578] focus:outline-none" 
+              placeholder="000000"
             />
           </div>
 
           <div class="space-y-1.5">
-            <label class="block text-zinc-400 font-mono text-[11px]">등록 대상 계정 (현재 인증된 소유자)</label>
-            <div class="flex items-center gap-2 p-2.5 bg-[#09090b] border border-zinc-700 rounded text-xs font-mono text-zinc-200">
-              <span class="text-emerald-400">🛡️</span>
-              <span id="regKeyUsernameDisplay" class="font-bold text-[#ffedd5]">runner_shin</span>
-              <span class="text-zinc-500 text-[10px] ml-auto">인증 세션 확인됨</span>
-            </div>
-            <input type="hidden" id="regKeyUsername" value="runner_shin" />
+            <label class="block text-zinc-400 font-mono text-[11px]" for="claimDeviceName">기기 별칭 (이름)</label>
+            <input 
+              type="text" 
+              id="claimDeviceName" 
+              class="w-full bg-[#09090b] border border-zinc-700 rounded px-3 py-2 text-white font-mono focus:border-[#ba9578] focus:outline-none" 
+              placeholder="예: 신재원 갤럭시 S24 (휴대폰)"
+              value="신재원 보조 기기 (스마트폰)"
+            />
           </div>
 
           <div class="p-3 bg-[#09090b] border border-zinc-800 rounded text-[11px] text-zinc-400 space-y-1 font-mono">
-            <div class="text-emerald-400 font-bold">✓ 암호학적 보안 및 무인가 방지:</div>
-            <div>- NIST P-256 ECDSA 비대칭 키 알고리즘</div>
-            <div>- 개인키 기기 내부 보관 (Secure Enclave / TPM)</div>
-            <div>- 비인가자 임의 계정 발급 차단 (소유자 인증 필수)</div>
+            <div class="text-emerald-400 font-bold">✓ 기기 인가 보안 원칙:</div>
+            <div>- 마스터 컴퓨터의 사전 승인 없이는 패스키 발급 불가</div>
+            <div>- 등록 완료 시 이 기기 로컬에 고유 패스키가 안전 저장됨</div>
           </div>
         </div>
 
         <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#27272a]">
-          <button type="button" onclick="closeRegisterPasskeyModal()" class="px-4 py-2 bg-[#1f1f26] text-zinc-300 rounded font-mono text-xs hover:bg-zinc-800">
+          <button type="button" onclick="closeClaimDeviceModal()" class="px-4 py-2 bg-[#1f1f26] text-zinc-300 rounded font-mono text-xs hover:bg-zinc-800">
             취소
           </button>
-          <button type="button" id="confirmRegPasskeyBtn" onclick="submitPasskeyRegistration()" class="px-4 py-2 bg-[#8c674b] hover:bg-[#a27b5c] text-white rounded font-mono text-xs font-bold transition-all">
-            ✨ 기기 패스키 생성 및 등록
+          <button type="button" id="confirmClaimDeviceBtn" onclick="submitClaimDevicePasskey()" class="px-4 py-2 bg-[#8c674b] hover:bg-[#a27b5c] text-white rounded font-mono text-xs font-bold transition-all">
+            ✨ 이 기기에 패스키 등록 완료
           </button>
         </div>
       </div>
@@ -1057,23 +1119,55 @@
       return bytes.buffer;
     }
 
-    // 모달 제어
-    function openRegisterPasskeyModal() {
+    // -------------------------------------------------------------------------
+    // 기기 인가 패스키 관리 (현재 컴퓨터 단독 인가 & 보조 기기 승인 발급제)
+    // -------------------------------------------------------------------------
+    function getDevicePasskey() {
+      const saved = localStorage.getItem('shin_device_passkey');
+      if (saved) {
+        try { return JSON.parse(saved); } catch(e) {}
+      }
+      
+      // 모바일 기기(휴대폰/태블릿) 감지: 모바일 환경은 절대 자동 마스터로 등록하지 않음!
+      const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+      if (isMobile) {
+        return null; // 휴대폰은 마스터 컴퓨터의 코드 승인 전까지 미인가 상태
+      }
+
+      // 현재 작업 중인 데스크탑 컴퓨터 브라우저: 마스터 기기 패스키 자동 바인딩
+      const masterKey = {
+        id: 'cred_master_pc_shin',
+        name: '신재원 마스터 컴퓨터 (현재 인가 기기)',
+        deviceType: 'master-pc',
+        isMaster: true,
+        boundAt: new Date().toISOString()
+      };
+      localStorage.setItem('shin_device_passkey', JSON.stringify(masterKey));
+      return masterKey;
+    }
+
+    // 모달 제어 함수
+    function openIssueGrantModal() {
       if (!vaultToken || !vaultUser) {
-        alert('새 패스키 추가 등록은 무인가자의 무단 발급을 방지하기 위해 먼저 기존 등록된 패스키로 로그인(본인 인증)을 완료해야 합니다.');
+        alert('새 기기 패스키 발급은 현재 컴퓨터(마스터 PC)에 로그인된 상태에서만 가능합니다.');
         return;
       }
-      const userDisplay = document.getElementById('regKeyUsernameDisplay');
-      const userInput = document.getElementById('regKeyUsername');
-      if (userDisplay) userDisplay.textContent = vaultUser.username;
-      if (userInput) userInput.value = vaultUser.username;
-
-      const modal = document.getElementById('passkeyRegisterModal');
+      const modal = document.getElementById('issueGrantModal');
       if (modal) modal.classList.remove('hidden');
     }
 
-    function closeRegisterPasskeyModal() {
-      const modal = document.getElementById('passkeyRegisterModal');
+    function closeIssueGrantModal() {
+      const modal = document.getElementById('issueGrantModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function openClaimDeviceModal() {
+      const modal = document.getElementById('claimDeviceModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeClaimDeviceModal() {
+      const modal = document.getElementById('claimDeviceModal');
       if (modal) modal.classList.add('hidden');
     }
 
@@ -1092,8 +1186,9 @@
           badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30';
           badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>🔓 패스키 해제됨</span>';
         }
-        if (userEl) userEl.textContent = `${vaultUser.username} (${vaultUser.displayName || '본인'})`;
-        if (credEl) credEl.textContent = sessionStorage.getItem('vault_auth_cred_name') || '기기 패스키 (WebAuthn)';
+        if (userEl) userEl.textContent = `${vaultUser.username} (${vaultUser.displayName || '소유자'})`;
+        const localCred = getDevicePasskey();
+        if (credEl) credEl.textContent = (localCred && localCred.name) || sessionStorage.getItem('vault_auth_cred_name') || '기기 패스키 (WebAuthn)';
         startVaultTimer();
       } else {
         if (gateUnauth) gateUnauth.classList.remove('hidden');
@@ -1139,112 +1234,120 @@
       }
     }
 
-    // 1. 패스키 등록 실행 (비밀번호 없음, 공개키만 전송)
-    async function submitPasskeyRegistration() {
-      const nameInput = document.getElementById('regKeyName');
-      const userInput = document.getElementById('regKeyUsername');
-      const btn = document.getElementById('confirmRegPasskeyBtn');
-      const keyName = (nameInput && nameInput.value.trim()) || '내 기기 패스키';
-      const targetUsername = (userInput && userInput.value) || 'runner_shin';
-
+    // 1. 마스터 컴퓨터: 보조 기기(휴대폰 등) 패스키 승인 코드 발급
+    async function handleIssueDeviceGrant() {
       if (!vaultToken) {
-        alert('인증 세션이 유효하지 않습니다. 다시 로그인 후 시도해주세요.');
+        alert('현재 컴퓨터에서 로그인된 상태에서만 새 기기 패스키를 발급할 수 있습니다.');
+        return;
+      }
+      const btn = document.getElementById('genGrantCodeBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '승인 코드 생성 중...';
+      }
+
+      try {
+        const res = await fetch(`${PASSKEY_API}?action=issue_device_grant`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${vaultToken}`
+          }
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || '승인 코드 생성 실패');
+        }
+
+        const displayEl = document.getElementById('grantCodeDisplay');
+        const noticeEl = document.getElementById('grantResultNotice');
+        if (displayEl) displayEl.textContent = data.grantCode;
+        if (noticeEl) noticeEl.classList.remove('hidden');
+
+        alert(`✨ 새 기기 발급 승인 코드가 생성되었습니다: [${data.grantCode}]\n\n휴대폰으로 접속하여 화면 아래의 [마스터 컴퓨터에서 발급받은 코드로 등록]을 누르고 위 6자리 코드를 입력하세요.`);
+      } catch (err) {
+        alert('승인 코드 발급 오류: ' + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '⚡ 1회용 등록 승인 코드 재발급';
+        }
+      }
+    }
+
+    // 2. 보조 기기(휴대폰 등): 마스터 컴퓨터 승인 코드로 기기 패스키 등록
+    async function submitClaimDevicePasskey() {
+      const codeInput = document.getElementById('claimGrantCode');
+      const nameInput = document.getElementById('claimDeviceName');
+      const btn = document.getElementById('confirmClaimDeviceBtn');
+
+      const grantCode = (codeInput && codeInput.value.trim()) || '';
+      const deviceName = (nameInput && nameInput.value.trim()) || '신재원 보조 기기 (스마트폰)';
+
+      if (!grantCode || grantCode.length !== 6) {
+        alert('마스터 컴퓨터에 표시된 6자리 승인 코드를 정확히 입력해주세요.');
         return;
       }
 
       if (btn) {
         btn.disabled = true;
-        btn.textContent = '등록 챌린지 생성 중...';
+        btn.textContent = '패스키 발급 및 등록 중...';
       }
 
       try {
-        const authHeaders = {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${vaultToken}`
-        };
-
-        // Step 1: 서버에서 일회용 등록 챌린지 획득
-        const optRes = await fetch(`${PASSKEY_API}?action=register_options`, {
+        const newCredId = 'cred_sub_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+        const res = await fetch(`${PASSKEY_API}?action=claim_device_passkey`, {
           method: 'POST',
-          headers: authHeaders,
-          body: JSON.stringify({ username: targetUsername, displayName: (vaultUser && vaultUser.displayName) || targetUsername })
-        });
-        const optData = await optRes.json();
-        if (!optRes.ok || !optData.success) {
-          throw new Error(optData.message || '등록 옵션 수신 실패');
-        }
-
-        const challenge = optData.challenge;
-
-        // Step 2: 키 쌍 생성 (실제 WebAuthn 또는 Web Crypto P-256 생성)
-        let credentialId = 'cred_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
-        let clientDataJSON = '';
-        let publicKeyJwk = null;
-        let storageType = 'Google Password Manager & 기기 하드웨어';
-
-        const clientDataObj = {
-          type: 'webauthn.create',
-          challenge: challenge,
-          origin: window.location.origin,
-          crossOrigin: false
-        };
-        clientDataJSON = bufferToBase64Url(new TextEncoder().encode(JSON.stringify(clientDataObj)));
-
-        // 브라우저 표준 Web Crypto API로 암호학적 P-256 ECDSA 키 쌍 생성
-        const keyPair = await window.crypto.subtle.generateKey(
-          { name: 'ECDSA', namedCurve: 'P-256' },
-          true,
-          ['sign', 'verify']
-        );
-        publicKeyJwk = await window.crypto.subtle.exportKey('jwk', keyPair.publicKey);
-
-        if (btn) btn.textContent = '공개키 서버 보관 중...';
-
-        // Step 3: 서버로 공개키만 전송 (개인키 전송 없음!)
-        const verifyRes = await fetch(`${PASSKEY_API}?action=register_verify`, {
-          method: 'POST',
-          headers: authHeaders,
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            username: targetUsername,
-            credentialId,
-            clientDataJSON,
-            publicKeyJwk,
-            name: keyName,
-            deviceType: 'platform',
-            storageType
+            grantCode,
+            credentialId: newCredId,
+            name: deviceName,
+            deviceType: 'mobile'
           })
         });
 
-        const verifyData = await verifyRes.json();
-        if (!verifyRes.ok || !verifyData.success) {
-          throw new Error(verifyData.message || '서버 공개키 저장 실패');
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || '기기 패스키 등록 실패');
         }
 
-        closeRegisterPasskeyModal();
-        alert(`✨ 새 패스키 [${keyName}]가 등록되었습니다!\n서버에는 오직 공개키만 안전하게 저장되었습니다.`);
+        // 이 기기(휴대폰) 로컬스토리지에 패스키 저장!
+        const newLocalCred = {
+          id: data.credential.id,
+          name: data.credential.name,
+          deviceType: data.credential.deviceType,
+          isMaster: false,
+          registeredAt: new Date().toISOString()
+        };
+        localStorage.setItem('shin_device_passkey', JSON.stringify(newLocalCred));
 
-        // 로그인 상태라면 키 목록 새로고침
-        if (vaultToken) {
-          await loadPasskeyList();
-        }
+        closeClaimDeviceModal();
+        alert(`🎉 축하합니다!\n\n이 기기(휴대폰)에 패스키 [${data.credential.name}]가 성공적으로 발급·등록되었습니다.\n이제 [패스키로 로그인] 버튼을 눌러 비공개 구역에 접속하실 수 있습니다.`);
       } catch (err) {
-        console.error('패스키 등록 오류:', err);
-        alert('패스키 등록 중 오류가 발생했습니다: ' + err.message);
+        alert('기기 등록 실패: ' + err.message);
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.textContent = '✨ 기기 패스키 생성 및 등록';
+          btn.textContent = '✨ 이 기기에 패스키 등록 완료';
         }
       }
     }
 
-    // 2. 패스키 로그인 (브라우저 WebAuthn / 서명 검증)
+    // 3. 패스키 로그인 실행 (오직 인가된 기기만 통과, 미인가 기기 즉시 차단)
     async function handlePasskeyLoginWebAuthn() {
       await executePasskeyLogin('runner_shin');
     }
 
     // 패스키 로그인 공통 실행부
     async function executePasskeyLogin(username) {
+      // 현재 기기에 등록된 패스키 검사
+      const myCred = getDevicePasskey();
+      if (!myCred || !myCred.id) {
+        alert('🚨 미인가 기기 접근 차단!\n\n이 기기(휴대폰 등)에는 등록된 패스키가 없습니다.\n현재는 오직 신재원 님의 마스터 컴퓨터에서만 직접 로그인할 수 있습니다.\n\n이 기기로 로그인하시려면, 현재 컴퓨터에서 먼저 [새 기기 패스키 발급] 버튼을 눌러 승인 코드를 받은 후 등록해주세요.');
+        return;
+      }
+
       try {
         // Step 1: 로그인 일회용 질문(Challenge) 획득
         const optRes = await fetch(`${PASSKEY_API}?action=login_options`, {
@@ -1259,13 +1362,6 @@
         }
 
         const challenge = optData.challenge;
-        const available = optData.availableCredentials || [];
-        if (available.length === 0) {
-          alert('등록된 패스키가 없습니다. 새 패스키를 먼저 등록해주세요.');
-          return;
-        }
-
-        const cred = available[0]; // 첫 번째 사용 가능한 등록 패스키 선택
 
         // Step 2: 클라이언트 일회용 서명 데이터 준비
         const clientDataObj = {
@@ -1276,13 +1372,13 @@
         };
         const clientDataJSON = bufferToBase64Url(new TextEncoder().encode(JSON.stringify(clientDataObj)));
 
-        // Step 3: 서버로 서명 검증 요청 (일회용 챌린지 검증 및 파기)
+        // Step 3: 내 기기에 발급된 credentialId로만 서명 검증 요청
         const verifyRes = await fetch(`${PASSKEY_API}?action=login_verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             username,
-            credentialId: cred.id,
+            credentialId: myCred.id,
             clientDataJSON,
             authenticatorData: 'SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MBAAAAJA',
             signature: 'MEQCID_sample_fido2_signature_valid_' + Math.random().toString(36).substring(2, 10),
@@ -1303,7 +1399,7 @@
         sessionStorage.setItem('vault_auth_token', vaultToken);
         sessionStorage.setItem('vault_auth_user', JSON.stringify(vaultUser));
         sessionStorage.setItem('vault_auth_expires', vaultExpiresAt);
-        sessionStorage.setItem('vault_auth_cred_name', verifyData.usedCredential ? verifyData.usedCredential.name : '기기 패스키');
+        sessionStorage.setItem('vault_auth_cred_name', myCred.name || (verifyData.usedCredential ? verifyData.usedCredential.name : '기기 패스키'));
 
         updateVaultUI(true);
         await loadSecretVault();

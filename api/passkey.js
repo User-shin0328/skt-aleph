@@ -19,6 +19,13 @@ if (!global.__PASSKEY_CHALLENGES__) {
 }
 const activeChallenges = global.__PASSKEY_CHALLENGES__;
 
+// 보조 기기(휴대폰 등) 발급 승인 코드 캐시 (메모리 보관: 10분 만료)
+// Map<grantCode, { username, code, createdAt, expiresAt, used: boolean }>
+if (!global.__DEVICE_GRANTS__) {
+  global.__DEVICE_GRANTS__ = new Map();
+}
+const activeDeviceGrants = global.__DEVICE_GRANTS__;
+
 // 폐기된 토큰 블랙리스트
 if (!global.__REVOKED_PASSKEY_TOKENS__) {
   global.__REVOKED_PASSKEY_TOKENS__ = new Set();
@@ -31,37 +38,23 @@ function getDefaultDb() {
     users: {
       runner_shin: {
         username: 'runner_shin',
-        displayName: '신재원 (본인 계정)',
+        displayName: '신재원 (소유자 본인 계정)',
         registeredAt: '2026-09-19T10:00:00.000Z',
-        // 패스키 2개 기본 등록 (기기 분실 대비 다중 패스키 구성)
+        // 오직 현재 컴퓨터(마스터 PC) 단 1개만 인가된 기기로 등록
         credentials: [
           {
-            id: 'cred_shin_primary_mac_touchid',
-            name: '신재원 맥북 프로 (Touch ID 내장 인증기)',
-            deviceType: 'platform',
-            storageType: 'Apple Secure Enclave & iCloud 키체인',
+            id: 'cred_master_pc_shin',
+            name: '신재원 마스터 컴퓨터 (현재 인가 기기)',
+            deviceType: 'master-pc',
+            storageType: '현재 컴퓨터 로컬 브라우저 보안 저장소',
             createdAt: '2026-09-19T10:15:00.000Z',
-            signCount: 14,
+            signCount: 1,
             // P-256 ECDSA 공개키 (JWK 포맷)
             publicKeyJwk: {
               kty: 'EC',
               crv: 'P-256',
               x: 'W4sF5v7K9Y1pM3rT6vB8nQ2xL5zC7eA4dF1gH9jK3mP',
               y: 'Q8wE2rT5yU7iO9pA1sD3fG5hJ7kL9zX2c4vB6nM8qE1'
-            }
-          },
-          {
-            id: 'cred_shin_backup_yubikey5c',
-            name: '신재원 예비 물리 보안키 (YubiKey 5C NFC)',
-            deviceType: 'cross-platform',
-            storageType: 'FIDO2 FIPS 140-2 레벨3 보안 하드웨어',
-            createdAt: '2026-09-20T14:30:00.000Z',
-            signCount: 3,
-            publicKeyJwk: {
-              kty: 'EC',
-              crv: 'P-256',
-              x: 'M7nP2qR5sT8vW1xZ4bC6dE9fG2hJ5kL8mP1rT4vW7yA',
-              y: 'B3dF6hJ9kL2nP5rT8vW1xZ4bC7eA0dF3gH6jK9mP2sQ'
             }
           }
         ],
@@ -155,6 +148,14 @@ function loadDatabase() {
           db.users.runner_shin.secretVault = defaultDb.users.runner_shin.secretVault;
         }
         saveDatabase(db);
+      }
+      // 마스터 컴퓨터 패스키 단일 인가 마이그레이션
+      if (db.users && db.users.runner_shin) {
+        const hasMaster = db.users.runner_shin.credentials.some(c => c.id === 'cred_master_pc_shin');
+        if (!hasMaster) {
+          db.users.runner_shin.credentials = defaultDb.users.runner_shin.credentials;
+          saveDatabase(db);
+        }
       }
       return db;
     }
@@ -571,6 +572,133 @@ module.exports = async function handler(req, res) {
     }
 
     // -------------------------------------------------------------------------
+    // [Action] issue_device_grant: 마스터 컴퓨터에서 보조 기기(휴대폰 등)용 1회용 승인 코드 발급
+    // -------------------------------------------------------------------------
+    if (action === 'issue_device_grant') {
+      if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
+
+      // 오직 현재 컴퓨터(마스터 PC)에 유효하게 로그인된 세션만 발급 가능
+      const auth = extractAuthUser(req);
+      if (!auth || auth.username !== 'runner_shin') {
+        return res.status(401).json({
+          success: false,
+          error: 'UNAUTHORIZED_MASTER_OPERATION',
+          message: '새 기기 패스키 발급은 현재 컴퓨터(마스터 PC)에 로그인된 상태에서만 가능합니다.'
+        });
+      }
+
+      // 6자리 일회용 승인 코드 생성 (10분 유효)
+      const grantCode = String(Math.floor(100000 + Math.random() * 900000));
+      const now = Date.now();
+      const expiresAt = now + 10 * 60 * 1000;
+
+      activeDeviceGrants.set(grantCode, {
+        username: 'runner_shin',
+        code: grantCode,
+        createdAt: now,
+        expiresAt,
+        used: false
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: '보조 기기(휴대폰 등) 등록 승인 코드가 정상 발급되었습니다.',
+        grantCode,
+        expiresInSeconds: 600
+      });
+    }
+
+    // -------------------------------------------------------------------------
+    // [Action] claim_device_passkey: 새 기기에서 승인 코드를 제출하고 기기 패스키 등록
+    // -------------------------------------------------------------------------
+    if (action === 'claim_device_passkey') {
+      if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
+
+      const {
+        grantCode,
+        credentialId,
+        name = '신재원 보조 기기 (모바일)',
+        deviceType = 'mobile',
+        publicKeyJwk
+      } = req.body || {};
+
+      if (!grantCode) {
+        return res.status(400).json({
+          success: false,
+          error: 'MISSING_GRANT_CODE',
+          message: '마스터 컴퓨터에서 발급받은 6자리 승인 코드가 필요합니다.'
+        });
+      }
+
+      const grant = activeDeviceGrants.get(String(grantCode).trim());
+      if (!grant) {
+        return res.status(403).json({
+          success: false,
+          error: 'INVALID_GRANT_CODE',
+          message: '유효하지 않거나 존재하지 않는 기기 승인 코드입니다. 마스터 컴퓨터에서 새로 발급받아주세요.'
+        });
+      }
+
+      if (grant.used || Date.now() > grant.expiresAt) {
+        activeDeviceGrants.delete(String(grantCode).trim());
+        return res.status(403).json({
+          success: false,
+          error: 'EXPIRED_GRANT_CODE',
+          message: '이미 사용되었거나 10분 유효시간이 지난 승인 코드입니다.'
+        });
+      }
+
+      const user = db.users['runner_shin'];
+      if (!user) {
+        return res.status(404).json({ success: false, error: 'USER_NOT_FOUND' });
+      }
+
+      // 최대 등록 가능 개수(3개) 검사
+      if (user.credentials.length >= 3) {
+        return res.status(400).json({
+          success: false,
+          error: 'MAX_CREDENTIALS_REACHED',
+          message: '최대 등록 가능한 패스키 개수(3개)를 초과했습니다. 불필요한 패스키를 먼저 삭제해주세요.'
+        });
+      }
+
+      // 1회용 코드 소모 처리
+      grant.used = true;
+      activeDeviceGrants.delete(String(grantCode).trim());
+
+      // 신규 기기 크리덴셜 생성
+      const newCredId = credentialId || `cred_mobile_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+      const newCred = {
+        id: newCredId,
+        name: name,
+        deviceType: deviceType,
+        storageType: '인가된 보조 기기 보안 저장소',
+        createdAt: new Date().toISOString(),
+        signCount: 0,
+        publicKeyJwk: publicKeyJwk || {
+          kty: 'EC',
+          crv: 'P-256',
+          x: 'SUB_DEV_X_' + Date.now().toString(36),
+          y: 'SUB_DEV_Y_' + Date.now().toString(36)
+        }
+      };
+
+      user.credentials.push(newCred);
+      saveDatabase(db);
+
+      return res.status(201).json({
+        success: true,
+        message: `새 기기 패스키 [${newCred.name}]가 마스터 컴퓨터 승인을 통해 성공적으로 발급·등록되었습니다.`,
+        credential: {
+          id: newCred.id,
+          name: newCred.name,
+          deviceType: newCred.deviceType,
+          createdAt: newCred.createdAt
+        }
+      });
+    }
+
+    // -------------------------------------------------------------------------
     // [Action] login_options: 로그인용 일회용 챌린지 발급
     // -------------------------------------------------------------------------
     if (action === 'login_options') {
@@ -692,17 +820,17 @@ module.exports = async function handler(req, res) {
       challengeInfo.used = true;
       activeChallenges.delete(receivedChallenge);
 
-      // 2. 등록된 패스키(Credential) 확인 (기기 분실 및 삭제된 키 검증)
+      // 2. 등록된 패스키(Credential) 확인 (기기 분실 및 미인가 기기 검증)
       const cred = user.credentials.find(c => c.id === credentialId);
       if (!cred) {
         // 이미 삭제된 패스키인지 확인
         const isDeleted = user.deletedCredentials && user.deletedCredentials.some(d => d.id === credentialId);
-        return res.status(401).json({
+        return res.status(403).json({
           success: false,
-          error: 'UNKNOWN_OR_DELETED_CREDENTIAL',
+          error: isDeleted ? 'DELETED_CREDENTIAL' : 'DEVICE_NOT_AUTHORIZED',
           message: isDeleted
-            ? '이 패스키는 기기 분실/교체로 인해 삭제된 패스키입니다. 더 이상 로그인할 수 없습니다.'
-            : '서버에 등록되지 않은 알 수 없는 패스키입니다.',
+            ? '이 패스키는 기기 분실로 인해 삭제되었습니다. 더 이상 로그인할 수 없습니다.'
+            : '이 기기에는 등록된 패스키가 없습니다. 소유자의 현재 컴퓨터(마스터 PC)에서 먼저 패스키를 발급받아야 합니다.',
           credentialId
         });
       }
