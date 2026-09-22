@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>포트폴리오 | 집념의 사나이 신재원</title>
+  
+  <!-- Pretendard & JetBrains Mono Fonts -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-black: #09090b;
+      --card-bg: #141418;
+      --sub-bg: #0d0d10;
+      --border-zinc: #27272a;
+      --border-light: #3f3f46;
+      --brown-main: #ba9578;
+      --brown-accent: #a27b5c;
+      --brown-btn: #8c674b;
+      --brown-hover: #a27b5c;
+      --text-white: #f4f4f5;
+      --text-gray: #a1a1aa;
+      --text-darkgray: #71717a;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-white);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 포커스 접근성 */
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--brown-main) !important;
+      outline-offset: 2px !important;
+    }
+
+    .container-box {
+      width: 100%;
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    @media (min-width: 640px) {
+      .container-box {
+        padding: 0 24px;
+      }
+    }
+
+    /* 카드 베이스 */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-zinc);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: border-color 0.2s ease;
+    }
+
+    @media (min-width: 640px) {
+      .card {
+        padding: 32px;
+        margin-bottom: 32px;
+      }
+    }
+
+    /* 스크롤바 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-black);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-zinc);
+      border-radius: 3px;
+    }
+
+    /* 움직임 감소 모드 */
+    .reduced-motion *, .reduced-motion *::before, .reduced-motion *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    .svg-icon {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      vertical-align: -2px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ========================================================
+       통일된 상단 빠른이동 네비게이션 헤더
+       ======================================================== */
+    .app-nav-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(9, 9, 11, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid #27272a;
+      width: 100%;
+    }
+    .app-nav-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 12px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      position: relative;
+    }
+    @media (min-width: 640px) {
+      .app-nav-inner {
+        padding: 0 20px;
+        height: 60px;
+        gap: 16px;
+      }
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #f4f4f5;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+      transition: color 0.15s ease;
+      z-index: 20;
+    }
+    @media (min-width: 640px) {
+      .app-brand {
+        font-size: 15px;
+      }
+    }
+    .app-brand:hover {
+      color: #ba9578;
+    }
+    .app-brand-arrow {
+      color: #ba9578;
+      font-weight: 800;
+    }
+    .app-quick-nav {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      z-index: 10;
+    }
+    @media (min-width: 640px) {
+      .app-quick-nav {
+        gap: 6px;
+      }
+    }
+    .quick-nav-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      background: #141418;
+      border: 1px solid #27272a;
+      color: #a1a1aa;
+    }
+    @media (min-width: 640px) {
+      .quick-nav-item {
+        padding: 6px 10px;
+        font-size: 12px;
+        gap: 5px;
+      }
+    }
+    .quick-nav-item:hover {
+      background: #1f1f24;
+      border-color: #3f3f46;
+      color: #ffffff;
+    }
+    .quick-nav-item.active {
+      background: #2a221b;
+      border-color: #ba9578;
+      color: #ba9578;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(186, 149, 120, 0.2);
+    }
+    .app-nav-tools {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      margin-left: auto;
+      z-index: 20;
+    }
+    @media (min-width: 640px) {
+      .app-nav-tools {
+        gap: 10px;
+      }
+    }
+    @media (max-width: 639px) {
+      .nav-hide-mobile { display: none !important; }
+      .nav-show-mobile { display: inline !important; }
+      .quick-nav-item {
+        padding: 4px 6px;
+        font-size: 10px;
+        gap: 2px;
+      }
+    }
+    @media (min-width: 640px) {
+      .nav-hide-mobile { display: inline !important; }
+      .nav-show-mobile { display: none !important; }
+    }
+    @media (max-width: 440px) {
+      .app-quick-nav {
+        gap: 2px;
+      }
+      .quick-nav-item {
+        padding: 3px 4px !important;
+        font-size: 9.5px !important;
+      }
+    }
+
+    /* 산출물 이동 버튼 디자인 */
+    .artifact-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      padding: 14px 16px;
+      background: #1a1a20;
+      border: 1px solid #2e2e36;
+      border-radius: 8px;
+      color: #f4f4f5;
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .artifact-btn:hover {
+      background: #23201d;
+      border-color: #ba9578;
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+    .artifact-btn:active {
+      transform: translateY(0);
+    }
+    .artifact-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      border-radius: 4px;
+      background: rgba(186, 149, 120, 0.15);
+      color: #ba9578;
+      border: 1px solid rgba(186, 149, 120, 0.3);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-[#4d3626] selection:text-white">
+
+  <!-- 본문 바로가기 -->
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-4 py-2 bg-[#8c674b] text-white rounded-md font-medium text-xs">
+    본문으로 바로가기
+  </a>
+
+  <!-- 상단 네비게이션 헤더 -->
+  <header class="app-nav-bar">
+    <div class="app-nav-inner">
+      <!-- 로고 -->
+      <a href="/" class="app-brand" title="신재원페이지 홈으로">
+        <span class="app-brand-arrow">&gt;</span>
+        <span class="nav-hide-mobile">신재원페이지</span>
+        <span class="nav-show-mobile">신재원</span>
+      </a>
+
+      <!-- 빠른 이동 탭 -->
+      <nav class="app-quick-nav" aria-label="빠른 이동">
+        <a href="/" class="quick-nav-item" title="내 소개 (메인)">
+          <span>🏠</span>
+          <span class="nav-hide-mobile">내 소개</span>
+          <span class="nav-show-mobile">내소개</span>
+        </a>
+        <a href="/portfolio.html" class="quick-nav-item active" aria-current="page" title="과제 9 포트폴리오">
+          <span>💼</span>
+          <span class="nav-hide-mobile">포트폴리오</span>
+          <span class="nav-show-mobile">포폴</span>
+        </a>
+        <a href="/game.html" class="quick-nav-item" title="과제 2 서부 러너 게임">
+          <span>🎮</span>
+          <span>서부러너</span>
+        </a>
+        <a href="/studio.html" class="quick-nav-item" title="과제 3 짤·카드 스튜디오">
+          <span>🎨</span>
+          <span>짤스튜디오</span>
+        </a>
+        <a href="/board.html" class="quick-nav-item" title="과제 4 오늘의 날씨 & 환율">
+          <span>🌤️</span>
+          <span class="nav-hide-mobile">날씨 & 환율</span>
+          <span class="nav-show-mobile">날씨·환율</span>
+        </a>
+        <a href="/compare.html" class="quick-nav-item" title="과제 5 비교 보고서">
+          <span>🤝</span>
+          <span class="nav-hide-mobile">비교 보고서</span>
+          <span class="nav-show-mobile">보고서</span>
+        </a>
+        <a href="/diary.html" class="quick-nav-item" title="과제 7 플랜두씨 다이어리 2 (인증)">
+          <span>🔐</span>
+          <span class="nav-hide-mobile">다이어리 2</span>
+          <span class="nav-show-mobile">다이어리</span>
+        </a>
+      </nav>
+
+      <!-- 헤더 우측 도구 -->
+      <div class="app-nav-tools">
+        <!-- 움직임 줄이기 토글 -->
+        <button 
+          id="motionToggleBtn" 
+          type="button"
+          class="flex items-center gap-1 px-2 py-1 text-[11px] sm:text-xs font-mono text-zinc-300 bg-[#141418] hover:bg-zinc-800 border border-zinc-700 rounded transition-colors"
+          title="페이지 내 애니메이션 효과를 켜거나 끕니다"
+          aria-pressed="false"
+        >
+          <svg class="svg-icon text-[#ba9578]" id="motionIcon" viewBox="0 0 24 24">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span id="motionText" class="nav-hide-mobile">움직임</span>
+        </button>
+
+        <!-- GitHub -->
+        <a 
+          href="https://github.com/User-shin0328/skt-aleph" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="p-1.5 text-[#a1a1aa] hover:text-white rounded hover:bg-zinc-800 transition-colors" 
+          title="GitHub 소스코드 저장소"
+        >
+          <svg class="svg-icon" style="width:16px; height:16px;" viewBox="0 0 24 24">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+            <path d="M9 18c-4.51 2-5-2-7-2"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 영역 -->
+  <main id="main-content" class="flex-grow py-8 sm:py-12">
+    <div class="container-box">
+
+      <!-- ====================================================
+           1. 히어로 섹션: 이름 & 정체성
+           ==================================================== -->
+      <section class="mb-10 sm:mb-12 text-center sm:text-left">
+        <!-- 뱃지 -->
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-[#1c1611] text-[#ba9578] border border-[#ba9578]/40 mb-4">
+          <span class="w-2 h-2 rounded-full bg-[#ba9578] animate-pulse"></span>
+          <span>SECURITY & NETWORK ENGINEER</span>
+          <span class="text-zinc-600">|</span>
+          <span class="text-zinc-400 font-sans">과제 9 포트폴리오</span>
+        </div>
+
+        <!-- 이름 헤드라인 -->
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
+          집념의 사나이 <span class="text-[#ba9578]">신재원</span>입니다.
+        </h1>
+
+        <!-- 서브 카피 -->
+        <p class="text-base sm:text-lg text-zinc-400 max-w-2xl leading-relaxed">
+          사람과의 온기로 팀의 소통을 열고, 끝을 보는 집념으로 결함을 0건으로 만드는 보안 엔지니어입니다.
+          그늘의 시간을 건너와 마침내 제 자리를 찾았고, 이제 현장에서 동료들과 함께 가치를 만들어내고자 합니다.
+        </p>
+      </section>
+
+      <!-- ====================================================
+           2. 자기소개서 섹션 (과제9.txt 카드 5 원문)
+           ==================================================== -->
+      <section class="card border-l-4 border-l-[#ba9578] mb-12">
+        <div class="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-800">
+          <div class="flex items-center gap-2.5">
+            <span class="text-xl">📝</span>
+            <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight">
+              사람과의 온기, 끝을 보는 집념으로 현장의 가치를 만드는 신재원입니다
+            </h2>
+          </div>
+          <span class="text-xs font-mono px-2.5 py-1 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">
+            자기소개서
+          </span>
+        </div>
+
+        <!-- 자기소개서 본문 -->
+        <div class="space-y-5 text-sm sm:text-base text-zinc-300 leading-relaxed">
+          <!-- 1문단: 고비와 결단 -->
+          <p class="p-4 rounded-lg bg-[#0d0d10] border border-zinc-800/80">
+            이전의 저는 맞지 않는 옷을 입은 채 그늘 속에 갇혀 있었습니다. 적성에 맞지 않는 직업은 매일 스스로를 갉아먹었고, 사람에게 깊이 지쳐 세상과의 문을 닫아걸었습니다. 사람을 마주하는 것조차 버겁던 그 고비의 순간, 더 이상 버티는 것만으로는 내 삶을 지킬 수 없다는 절박함이 들었습니다. <strong class="text-[#ba9578] font-semibold">"진짜 내 적성에 맞는 길을 찾아 떠나자."</strong> 그 결단을 시작으로 낡은 틀을 깨고 기술의 세계로 새로운 발걸음을 내디뎠습니다.
+          </p>
+
+          <!-- 2문단: 세 가지 확실한 강점 -->
+          <div class="space-y-3 pt-2">
+            <p class="font-medium text-white">
+              새로운 환경에서 개발을 배우며, 저는 세 가지 확실한 강점을 가진 사람으로 거듭났습니다.
+            </p>
+            
+            <ul class="space-y-3 pl-1">
+              <li class="p-3.5 rounded-lg bg-[#18181d] border border-zinc-800">
+                <span class="font-bold text-[#ba9578] block mb-1">첫째, 먼저 다가서는 인사입니다.</span>
+                사람에게 다쳤던 상처는 역설적으로 동료들과 호흡하며 치유되었습니다. 저는 아침마다 강의실 문을 열며 먼저 환한 인사와 눈웃음을 건넸고, 팀의 얼어붙은 침묵을 깨우며 서로가 편안히 의견을 나눌 수 있는 심리적 안전감을 만들었습니다.
+              </li>
+              <li class="p-3.5 rounded-lg bg-[#18181d] border border-zinc-800">
+                <span class="font-bold text-[#ba9578] block mb-1">둘째, 악조건 속에서도 일을 완수하는 성실성 입니다.</span>
+                손목 통증이 찾아와 타이핑이 고통스러울 때도 파스를 감고 아침 일찍 자리에 앉아 당일 분량을 100% 채워냈습니다. 어떤 변명도 대지 않고 나와 팀에게 한 약속을 지켜내는 일관성은 저의 확고한 무기입니다.
+              </li>
+              <li class="p-3.5 rounded-lg bg-[#18181d] border border-zinc-800">
+                <span class="font-bold text-[#ba9578] block mb-1">셋째, 결함의 뿌리를 끝까지 캐내는 집요한 몰입력 입니다.</span>
+                원인 모를 에러가 발생했을 때 적당히 타협하지 않고, "끝까지 물고 늘어지겠다"는 집념으로 로그와 코드를 밑바닥부터 추적해 결국 근본적인 원인을 해결해냈습니다.
+              </li>
+            </ul>
+          </div>
+
+          <!-- 3문단: 현장으로의 포부 -->
+          <p class="p-4 rounded-lg bg-[#1d1712] border border-[#ba9578]/30 text-zinc-200">
+            단단해진 지금, 저는 책상 앞 '배움만의 생활'을 매듭짓고 진짜 현장으로 나아가고 싶습니다. 배움에는 끝이 없지만, 강의실에 머무는 공부를 넘어 치열한 실무의 일터에서 동료들과 즐겁게 부딪히며 살아 숨 쉬는 문제를 해결하고 싶습니다. 고난을 딛고 사람과 기술의 소중함을 체득한 저 신재원은, 팀에는 따뜻한 활력을 불어넣고 시스템에는 빈틈없는 완결성을 더하는 <strong class="text-[#ba9578] font-bold">보안엔지니어</strong>로서 당당히 기여하겠습니다.
+          </p>
+        </div>
+      </section>
+
+      <!-- ====================================================
+           3. 3대 강점 및 1~8번 과제 산출물 연계 섹션
+           ==================================================== -->
+      <section class="mb-12">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="text-2xl">⚡</span>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              3대 핵심 강점 & 과제 산출물 (1~8번)
+            </h2>
+            <p class="text-xs sm:text-sm text-zinc-400 mt-0.5">
+              리추얼 기록으로 입증된 강점과, 각 강점을 직접 구현해낸 과제 산출물 연결 현황입니다.
+            </p>
+          </div>
+        </div>
+
+        <div class="space-y-8">
+
+          <!-- ------------------------------------------------
+               강점 1: 먼저 다가서는 인사 (연결과 환대)
+               ------------------------------------------------ -->
+          <div class="card border border-zinc-800 hover:border-[#ba9578]/50 transition-colors">
+            <!-- 상단 헤더 -->
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-zinc-800">
+              <div class="flex items-center gap-2.5">
+                <span class="flex items-center justify-center w-7 h-7 rounded-full bg-[#ba9578]/20 text-[#ba9578] font-bold text-sm">
+                  1
+                </span>
+                <h3 class="text-lg font-bold text-white">
+                  먼저 다가서는 인사 <span class="text-[#ba9578] font-normal text-sm">(14회 반복)</span>
+                </h3>
+              </div>
+              <span class="inline-flex items-center px-2.5 py-1 rounded text-xs font-medium bg-[#1e1915] text-[#ba9578] border border-[#ba9578]/30">
+                지킨 가치: 연결과 환대
+              </span>
+            </div>
+
+            <!-- 강점 상세 근거 (장면 / 증언 / 가치) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-6 text-sm">
+              <div class="p-3.5 rounded bg-[#0d0d10] border border-zinc-800">
+                <div class="text-xs font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                  <span>📅</span> 날짜 있는 구체적 장면
+                </div>
+                <p class="text-zinc-200 leading-snug">
+                  <strong>8월 28일 아침:</strong> 침묵이 흐르던 강의실에 들어서며 산뜻한 눈웃음과 가벼운 농담으로 3초 만에 팀 분위기를 틔움.
+                </p>
+              </div>
+
+              <div class="p-3.5 rounded bg-[#0d0d10] border border-zinc-800">
+                <div class="text-xs font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                  <span>💬</span> 동료의 실제 증언
+                </div>
+                <p class="text-zinc-200 leading-snug">
+                  "아침마다 밝게 인사해주시고, 농담으로 기분을 좋게 해주는 분위기 메이커!" <span class="text-zinc-400 text-xs">(8/27, 8/28)</span>
+                </p>
+              </div>
+            </div>
+
+            <!-- 강점 1 아래: 연결 과제 산출물 버튼 그룹 -->
+            <div>
+              <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <span>🔗</span> 이 강점이 발현된 과제 산출물 (버튼을 누르면 이동합니다)
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <!-- 과제 1 -->
+                <a href="/" class="artifact-btn" title="과제 1 공개 포트폴리오로 이동">
+                  <div>
+                    <div class="flex items-center gap-1.5 mb-1">
+                      <span class="artifact-badge">과제 1</span>
+                      <span class="font-bold text-sm text-white">공개 포트폴리오</span>
+                    </div>
+                    <p class="text-xs text-zinc-400">웹 접근성(명암비 9.2:1) & 실시간 방명록</p>
+                  </div>
+                  <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
+                </a>
+
+                <!-- 과제 5 -->
+                <a href="/compare.html" class="artifact-btn" title="과제 5 비교 보고서로 이동">
+                  <div>
+                    <div class="flex items-center gap-1.5 mb-1">
+                      <span class="artifact-badge">과제 5</span>
+                      <span class="font-bold text-sm text-white">비교 보고서</span>
+                    </div>
+                    <p class="text-xs text-zinc-400">동료를 배려한 7대 규격 인수인계 프로토콜</p>
+                  </div>
+                  <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
+                </a>
+
+                <!-- 과제 2 -->
+                <a href="/game.html" class="artifact-btn" title="과제 2 서부러너 게임으로 이동">
+                  <div>
+                    <div class="flex items-center gap-1.5 mb-1">
+                      <span class="artifact-badge">과제 2</span>
+                      <span class="font-bold text-sm text-white">서부러너 게임</span>
+                    </div>
+                    <p class="text-xs text-zinc-400">움직임 조절 및 듀얼 컨트롤 웹 접근성</p>
+                  </div>
+                  <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- ------------------------------------------------
+               강점 2: 악조건 속에서도 일을 완수하는 성실성
+               ------------------------------------------------ -->
+          <div class="card border border-zinc-800 hover:border-[#ba9578]/50 transition-colors">
+            <!-- 상단 헤더 -->
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-zinc-800">
+              <div class="flex items-center gap-2.5">
+                <span class="flex items-center justify-center w-7 h-7 rounded-full bg-[#ba9578]/20 text-[#ba9578] font-bold text-sm">
+                  2
+                </span>
+                <h3 class="text-lg font-bold text-white">
+                  악조건 속에서도 일을 완수하는 성실성 <span class="text-[#ba9578] font-normal text-sm">(11회 반복)</span>
+                </h3>
+              </div>
+              <span class="inline-flex items-center px-2.5 py-1 rounded text-xs font-medium bg-[#1e1915] text-[#ba9578] border border-[#ba9578]/30">
+                지킨 가치: 책임과 일관성
+              </span>
+            </div>
+
+            <!-- 강점 상세 근거 (장면 / 증언 / 가치) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-6 text-sm">
+              <div class="p-3.5 rounded bg-[#0d0d10] border border-zinc-800">
+                <div class="text-xs font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                  <span>📅</span> 날짜 있는 구체적 장면
+                </div>
+                <p class="text-zinc-200 leading-snug">
+                  <strong>9월 4일 하루:</strong> 손목 통증에도 파스를 감고 아침 일찍 출석해 당일 학습 목표와 과제 분량을 100% 달성.
+                </p>
+              </div>
+
+              <div class="p-3.5 rounded bg-[#0d0d10] border border-zinc-800">
+                <div class="text-xs font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                  <span>💬</span> 동료의 실제 증언
+                </div>
+                <p class="text-zinc-200 leading-snug">
+                  "손목이 많이 아프신데도 참고 끝까지 해내는 모습이 큰 귀감이 됩니다." <span class="text-zinc-400 text-xs">(9/4, 9/8)</span>
+                </p>
+              </div>
+            </div>
+
+            <!-- 강점 2 아래: 연결 과제 산출물 버튼 그룹 -->
+            <div>
+              <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <span>🔗</span> 이 강점이 발현된 과제 산출물 (버튼을 누르면 이동합니다)
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- 과제 6 & 7 다이어리 -->
+                <a href="/diary.html" class="artifact-btn" title="과제 6·7 플랜두씨 다이어리로 이동">
+                  <div>
+                    <div class="flex items-center gap-1.5 mb-1">
+                      <span class="artifact-badge">과제 6 & 7</span>
+                      <span class="font-bold text-sm text-white">플랜두씨 다이어리 2</span>
+                    </div>
+                    <p class="text-xs text-zinc-400">5일 연속 러닝 실천 기록 & 보안 권한 격리</p>
+                  </div>
+                  <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
+                </a>
+
+                <!-- 과제 4 날씨 & 환율 보드 -->
+                <a href="/board.html" class="artifact-btn" title="과제 4 날씨 & 환율 정보 보드로 이동">
+                  <div>
+                    <div class="flex items-center gap-1.5 mb-1">
+                      <span class="artifact-badge">과제 4</span>
+                      <span class="font-bold text-sm text-white">실시간 정보 보드</span>
+                    </div>
+                    <p class="text-xs text-zinc-400">오프라인·에러 5대 실패 복구 및 하루한줄 보존</p>
+                  </div>
+                  <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- ------------------------------------------------
+               강점 3: 결함의 뿌리를 끝까지 캐내는 집요한 몰입력
+               ------------------------------------------------ -->
+          <div class="card border border-zinc-800 hover:border-[#ba9578]/50 transition-colors">
+            <!-- 상단 헤더 -->
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-zinc-800">
+              <div class="flex items-center gap-2.5">
+                <span class="flex items-center justify-center w-7 h-7 rounded-full bg-[#ba9578]/20 text-[#ba9578] font-bold text-sm">
+                  3
+                </span>
+                <h3 class="text-lg font-bold text-white">
+                  결함의 뿌리를 끝까지 캐내는 집요한 몰입력 <span class="text-[#ba9578] font-normal text-sm">(9회 반복)</span>
+                </h3>
+              </div>
+              <span class="inline-flex items-center px-2.5 py-1 rounded text-xs font-medium bg-[#1e1915] text-[#ba9578] border border-[#ba9578]/30">
+                지킨 가치: 기술적 완결성
+              </span>
+            </div>
+
+            <!-- 강점 상세 근거 (장면 / 증언 / 가치) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-6 text-sm">
+              <div class="p-3.5 rounded bg-[#0d0d10] border border-zinc-800">
+                <div class="text-xs font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                  <span>📅</span> 날짜 있는 구체적 장면
+                </div>
+                <p class="text-zinc-200 leading-snug">
+                  <strong>9월 3일 오후:</strong> 남들이 지나친 미세 결함을 "끝까지 물고 늘어지겠다"며 코드 끝까지 파고들어 에러 규명.
+                </p>
+              </div>
+
+              <div class="p-3.5 rounded bg-[#0d0d10] border border-zinc-800">
+                <div class="text-xs font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
+                  <span>💬</span> 동료의 실제 증언
+                </div>
+                <p class="text-zinc-200 leading-snug">
+                  "수업 내내 흐트러짐 없이 몰입하고, 막힌 문제를 깔끔히 해결해 줌." <span class="text-zinc-400 text-xs">(9/14, 9/18)</span>
+                </p>
+              </div>
+            </div>
+
+            <!-- 강점 3 아래: 연결 과제 산출물 버튼 그룹 -->
+            <div>
+              <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <span>🔗</span> 이 강점이 발현된 과제 산출물 (버튼을 누르면 이동합니다)
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- 과제 8 패스키 시크릿 볼트 -->
+                <a href="/#passkeyVaultSection" class="artifact-btn" title="과제 8 패스키 시크릿 볼트로 이동">
+                  <div>
+                    <div class="flex items-center gap-1.5 mb-1">
+                      <span class="artifact-badge">과제 8</span>
+                      <span class="font-bold text-sm text-white">WebAuthn 패스키 볼트</span>
+                    </div>
+                    <p class="text-xs text-zinc-400">비밀번호 없는 공개키 암호화 & 마스터 PC 잠금</p>
+                  </div>
+                  <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
+                </a>
+
+                <!-- 과제 3 짤·카드 스튜디오 -->
+                <a href="/studio.html" class="artifact-btn" title="과제 3 짤·카드 스튜디오로 이동">
+                  <div>
+                    <div class="flex items-center gap-1.5 mb-1">
+                      <span class="artifact-badge">과제 3</span>
+                      <span class="font-bold text-sm text-white">짤·카드 스튜디오</span>
+                    </div>
+                    <p class="text-xs text-zinc-400">12건의 극단적 비정상 입력 전수 추적 및 0결함 방어</p>
+                  </div>
+                  <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="mt-auto border-t border-zinc-800 bg-[#0c0c0e] py-8 text-center text-xs text-zinc-500 font-mono">
+    <div class="container-box flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p>&copy; 2026 집념의 사나이 신재원. All rights reserved.</p>
+      <div class="flex items-center gap-4">
+        <a href="/" class="hover:text-zinc-300 transition-colors">내 소개</a>
+        <a href="/portfolio.html" class="text-[#ba9578] hover:underline font-bold">포트폴리오</a>
+        <a href="https://github.com/User-shin0328/skt-aleph" target="_blank" rel="noopener noreferrer" class="hover:text-zinc-300 transition-colors">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 스크립트 (움직임 줄이기 토글 연동) -->
+  <script>
+    // 움직임 줄이기 토글 기능
+    const motionToggleBtn = document.getElementById('motionToggleBtn');
+    const motionText = document.getElementById('motionText');
+    
+    // 로컬 스토리지 확인
+    const isReduced = localStorage.getItem('reducedMotion') === 'true';
+    if (isReduced) {
+      document.body.classList.add('reduced-motion');
+      motionToggleBtn.setAttribute('aria-pressed', 'true');
+      motionText.textContent = '움직임 끔';
+    }
+
+    motionToggleBtn.addEventListener('click', () => {
+      const active = document.body.classList.toggle('reduced-motion');
+      motionToggleBtn.setAttribute('aria-pressed', active);
+      localStorage.setItem('reducedMotion', active);
+      motionText.textContent = active ? '움직임 끔' : '움직임';
+    });
+  </script>
+</body>
+</html>
