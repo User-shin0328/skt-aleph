@@ -3,10 +3,10 @@ https://skt-aleph-gilt.vercel.app/
 https://github.com/User-shin0328/skt-aleph/commit/b7b6840573553d47719fec5edee1caba0305a6a1
 
 
-어디로 가나요 : https://skt-aleph-gilt.vercel.app/diary
-무엇을하나요 : 다이어리
-무엇이 보이면 통과: 다이어리 페이지
+어디로 가나요 : https://skt-aleph-gilt.vercel.app/
+무엇을하나요 : 포트폴리오 페이지
+무엇이 보이면 통과: 이름, 자기소개서, 강점, 강점별 과제산출물
 
-ai에게 맡긴일: 페이지 디자인과 기능 구현 및 데이터베이스 연결
+ai에게 맡긴일: 페이지 디자인과 기능 구현
 내가 판단한 일: 디자인 수정과 기능 수정, 오류수정
-ai 말을 안들은 일: 결과물이 생각한 형식으로 나오지않아 재수정
+ai 말을 안들은 일: ai는 모든걸 다 보여주려고함, 나만 볼수있게 수정하고 내가 인가한 기기만 비공개영역을 볼수있게 다시 수정

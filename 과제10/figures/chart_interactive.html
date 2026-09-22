@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>과제 10 외계행성 데이터 인터랙티브 차트</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #09090b; color: #f4f4f5; font-family: sans-serif; }
+  </style>
+</head>
+<body class="p-8 max-w-5xl mx-auto">
+  <h1 class="text-2xl font-bold text-[#ba9578] mb-2">NASA 외계행성 아카이브 검증 데이터 (N = 2,220)</h1>
+  <p class="text-zinc-400 text-sm mb-6">모항성 금속함량([Fe/H])과 행성 질량(목성질량 $M_J$) 간의 통계적 상관성</p>
+  
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <div class="p-4 bg-[#141418] border border-zinc-800 rounded-lg">
+      <div class="text-xs text-zinc-400 font-mono">PEARSON CORRELATION</div>
+      <div class="text-2xl font-bold text-[#ba9578] mt-1">r = 0.198</div>
+      <div class="text-xs text-emerald-400 mt-1">p < 0.001 (유의수준 99.9% 초과)</div>
+    </div>
+    <div class="p-4 bg-[#141418] border border-zinc-800 rounded-lg">
+      <div class="text-xs text-zinc-400 font-mono">SPEARMAN RANK RHO</div>
+      <div class="text-2xl font-bold text-[#ba9578] mt-1">ρ = 0.214</div>
+      <div class="text-xs text-emerald-400 mt-1">비모수적 순위 강한 정적 상관</div>
+    </div>
+    <div class="p-4 bg-[#141418] border border-zinc-800 rounded-lg">
+      <div class="text-xs text-zinc-400 font-mono">GIANT PLANET ODDS RATIO</div>
+      <div class="text-2xl font-bold text-[#ba9578] mt-1">4.11배</div>
+      <div class="text-xs text-emerald-400 mt-1">부유금속군 vs 빈금속군 승산비</div>
+    </div>
+  </div>
+
+  <div class="bg-[#141418] border border-zinc-800 rounded-lg p-6 mb-8">
+    <h2 class="text-lg font-bold text-white mb-4">금속함량 구간별 거대 가스행성 출현율 비교 (3개 군)</h2>
+    <div class="space-y-4">
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span>빈금속 항성 ([Fe/H] < -0.15)</span>
+          <span class="font-bold">51.88% (193/372)</span>
+        </div>
+        <div class="w-full bg-zinc-800 h-4 rounded overflow-hidden">
+          <div class="bg-blue-500 h-full" style="width: 51.88%"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span>태양 유사 항성 (-0.15 <= [Fe/H] <= +0.15)</span>
+          <span class="font-bold">55.72% (648/1163)</span>
+        </div>
+        <div class="w-full bg-zinc-800 h-4 rounded overflow-hidden">
+          <div class="bg-[#ba9578] h-full" style="width: 55.72%"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between text-sm mb-1">
+          <span>부유 금속 항성 ([Fe/H] > +0.15)</span>
+          <span class="font-bold text-red-400">81.61% (559/685)</span>
+        </div>
+        <div class="w-full bg-zinc-800 h-4 rounded overflow-hidden">
+          <div class="bg-red-500 h-full" style="width: 81.61%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="p-4 bg-[#141418] border border-zinc-800 rounded-lg">
+      <h3 class="font-bold text-sm mb-2 text-white">그림 1. 금속함량 vs 행성 질량 산점도</h3>
+      <img src="fig1_metallicity_vs_mass_scatter.png" alt="Fig 1" class="rounded w-full border border-zinc-700">
+    </div>
+    <div class="p-4 bg-[#141418] border border-zinc-800 rounded-lg">
+      <h3 class="font-bold text-sm mb-2 text-white">그림 2. 구간별 거대행성 출현율</h3>
+      <img src="fig2_giant_planet_fraction_by_metallicity.png" alt="Fig 2" class="rounded w-full border border-zinc-700">
+    </div>
+  </div>
+</body>
+</html>

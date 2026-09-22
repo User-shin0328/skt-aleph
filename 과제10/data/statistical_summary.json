@@ -1,0 +1,36 @@
+{
+  "sample_size": 2220,
+  "mean_metallicity": 0.0379,
+  "std_metallicity": 0.2145,
+  "pearson_r": 0.198,
+  "pearson_t_stat": 9.5133,
+  "pearson_p_value": 0.0,
+  "spearman_rho": 0.2141,
+  "linear_slope": 0.9056,
+  "linear_intercept": -0.5776,
+  "chi2_stat": 148.0148,
+  "odds_ratio": 4.1147,
+  "group_statistics": {
+    "Metal-poor": {
+      "total_count": 372,
+      "giant_count": 193,
+      "giant_fraction_percent": 51.88,
+      "mean_mass": 2.0185,
+      "median_mass": 0.2055
+    },
+    "Solar-like": {
+      "total_count": 1163,
+      "giant_count": 648,
+      "giant_fraction_percent": 55.72,
+      "mean_mass": 1.5711,
+      "median_mass": 0.299
+    },
+    "Metal-rich": {
+      "total_count": 685,
+      "giant_count": 559,
+      "giant_fraction_percent": 81.61,
+      "mean_mass": 1.9511,
+      "median_mass": 0.74
+    }
+  }
+}
