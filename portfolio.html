@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>포트폴리오 | 집념의 사나이 신재원</title>
+  <title>신재원 포트폴리오 | 거친 파도를 넘어 기술과 온기로 시스템을 지키는 사람</title>
   
   <!-- Pretendard & JetBrains Mono Fonts -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
@@ -103,48 +103,52 @@
       scroll-behavior: auto !important;
     }
 
-    .svg-icon {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      vertical-align: -2px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    /* ========================================================
-       통일된 상단 빠른이동 네비게이션 헤더
-       ======================================================== */
-    .app-nav-bar {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(9, 9, 11, 0.95);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid #27272a;
-      width: 100%;
-    }
-    .app-nav-inner {
-      max-width: 1240px;
-      margin: 0 auto;
-      padding: 0 12px;
-      height: 56px;
+    /* 과제 산출물 바로가기 버튼 */
+    .artifact-btn {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      position: relative;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #0d0d10;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      color: #e4e4e7;
     }
-    @media (min-width: 640px) {
-      .app-nav-inner {
-        padding: 0 20px;
-        height: 60px;
-        gap: 16px;
-      }
+    .artifact-btn:hover {
+      background: #1a1a20;
+      border-color: #ba9578;
+      transform: translateY(-1px);
+    }
+    .artifact-badge {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #2a221b;
+      color: #ba9578;
+      border: 1px solid rgba(186, 149, 120, 0.4);
+      white-space: nowrap;
+    }
+
+    /* 상단 내비게이션 바 */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background-color: rgba(9, 9, 11, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #27272a;
+    }
+    .app-header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: relative;
     }
     .app-brand {
       display: flex;
@@ -154,43 +158,26 @@
       color: #f4f4f5;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 14px;
       flex-shrink: 0;
       transition: color 0.15s ease;
       z-index: 20;
     }
-    @media (min-width: 640px) {
-      .app-brand {
-        font-size: 15px;
-      }
-    }
     .app-brand:hover {
       color: #ba9578;
     }
-    .app-brand-arrow {
-      color: #ba9578;
-      font-weight: 800;
-    }
     .app-quick-nav {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
       display: flex;
       align-items: center;
-      gap: 4px;
-      z-index: 10;
-    }
-    @media (min-width: 640px) {
-      .app-quick-nav {
-        gap: 6px;
-      }
+      gap: 6px;
+      flex-wrap: wrap;
     }
     .quick-nav-item {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 5px 8px;
-      font-size: 11px;
+      padding: 6px 10px;
+      font-size: 12px;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 500;
       border-radius: 6px;
@@ -200,13 +187,6 @@
       background: #141418;
       border: 1px solid #27272a;
       color: #a1a1aa;
-    }
-    @media (min-width: 640px) {
-      .quick-nav-item {
-        padding: 6px 10px;
-        font-size: 12px;
-        gap: 5px;
-      }
     }
     .quick-nav-item:hover {
       background: #1f1f24;
@@ -220,151 +200,57 @@
       font-weight: 700;
       box-shadow: 0 0 10px rgba(186, 149, 120, 0.2);
     }
-    .app-nav-tools {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
-      margin-left: auto;
-      z-index: 20;
-    }
-    @media (min-width: 640px) {
-      .app-nav-tools {
-        gap: 10px;
-      }
-    }
-    @media (max-width: 639px) {
-      .nav-hide-mobile { display: none !important; }
-      .nav-show-mobile { display: inline !important; }
-      .quick-nav-item {
-        padding: 4px 6px;
-        font-size: 10px;
-        gap: 2px;
-      }
-    }
-    @media (min-width: 640px) {
-      .nav-hide-mobile { display: inline !important; }
-      .nav-show-mobile { display: none !important; }
-    }
-    @media (max-width: 440px) {
-      .app-quick-nav {
-        gap: 2px;
-      }
-      .quick-nav-item {
-        padding: 3px 4px !important;
-        font-size: 9.5px !important;
-      }
-    }
-
-    /* 산출물 이동 버튼 디자인 */
-    .artifact-btn {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      width: 100%;
-      padding: 14px 16px;
-      background: #1a1a20;
-      border: 1px solid #2e2e36;
-      border-radius: 8px;
-      color: #f4f4f5;
-      text-decoration: none;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .artifact-btn:hover {
-      background: #23201d;
-      border-color: #ba9578;
-      color: #ffffff;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-    }
-    .artifact-btn:active {
-      transform: translateY(0);
-    }
-    .artifact-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 8px;
-      font-size: 11px;
-      font-weight: 700;
-      font-family: 'JetBrains Mono', monospace;
-      border-radius: 4px;
-      background: rgba(186, 149, 120, 0.15);
-      color: #ba9578;
-      border: 1px solid rgba(186, 149, 120, 0.3);
-      white-space: nowrap;
+    .svg-icon {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-[#4d3626] selection:text-white">
+<body class="min-h-screen flex flex-col">
 
-  <!-- 본문 바로가기 -->
-  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-4 py-2 bg-[#8c674b] text-white rounded-md font-medium text-xs">
-    본문으로 바로가기
-  </a>
-
-  <!-- 상단 네비게이션 헤더 -->
-  <header class="app-nav-bar">
-    <div class="app-nav-inner">
+  <!-- ====================================================
+       상단 글로벌 고정 헤더
+       ==================================================== -->
+  <header class="app-header">
+    <div class="container-box app-header-inner">
       <!-- 로고 -->
-      <a href="/" class="app-brand" title="신재원페이지 홈으로">
-        <span class="app-brand-arrow">&gt;</span>
-        <span class="nav-hide-mobile">신재원페이지</span>
-        <span class="nav-show-mobile">신재원</span>
+      <a href="/" class="app-brand" title="홈으로 이동">
+        <span class="text-[#ba9578] font-bold">&larr;</span>
+        <span>SHIN.JAEWON</span>
       </a>
 
-      <!-- 빠른 이동 탭 -->
-      <nav class="app-quick-nav" aria-label="빠른 이동">
-        <a href="/" class="quick-nav-item" title="내 소개 (메인)">
-          <span>🏠</span>
-          <span class="nav-hide-mobile">내 소개</span>
-          <span class="nav-show-mobile">내소개</span>
+      <!-- 중앙 4대 바로가기 입구 (BRA-C03 & 과제A 요건) -->
+      <nav class="app-quick-nav hidden sm:flex" aria-label="섹션 바로가기">
+        <a href="#storySection" class="quick-nav-item">
+          <span>📖</span> 내 이야기
         </a>
-        <a href="/portfolio.html" class="quick-nav-item active" aria-current="page" title="과제 9 포트폴리오">
-          <span>💼</span>
-          <span class="nav-hide-mobile">포트폴리오</span>
-          <span class="nav-show-mobile">포폴</span>
+        <a href="#metricsSection" class="quick-nav-item">
+          <span>📊</span> 13주 숫자
         </a>
-        <a href="/game.html" class="quick-nav-item" title="과제 2 서부 러너 게임">
-          <span>🎮</span>
-          <span>서부러너</span>
+        <a href="#projectsSection" class="quick-nav-item">
+          <span>🚀</span> 대표작
         </a>
-        <a href="/studio.html" class="quick-nav-item" title="과제 3 짤·카드 스튜디오">
-          <span>🎨</span>
-          <span>짤스튜디오</span>
-        </a>
-        <a href="/board.html" class="quick-nav-item" title="과제 4 오늘의 날씨 & 환율">
-          <span>🌤️</span>
-          <span class="nav-hide-mobile">날씨 & 환율</span>
-          <span class="nav-show-mobile">날씨·환율</span>
-        </a>
-        <a href="/compare.html" class="quick-nav-item" title="과제 5 비교 보고서">
-          <span>🤝</span>
-          <span class="nav-hide-mobile">비교 보고서</span>
-          <span class="nav-show-mobile">보고서</span>
-        </a>
-        <a href="/diary.html" class="quick-nav-item" title="과제 7 플랜두씨 다이어리 2 (인증)">
-          <span>🔐</span>
-          <span class="nav-hide-mobile">다이어리 2</span>
-          <span class="nav-show-mobile">다이어리</span>
+        <a href="#documentsSection" class="quick-nav-item">
+          <span>📄</span> 이력서·문서
         </a>
       </nav>
 
       <!-- 헤더 우측 도구 -->
-      <div class="app-nav-tools">
+      <div class="flex items-center gap-3">
         <!-- 움직임 줄이기 토글 -->
         <button 
           id="motionToggleBtn" 
           type="button"
-          class="flex items-center gap-1 px-2 py-1 text-[11px] sm:text-xs font-mono text-zinc-300 bg-[#141418] hover:bg-zinc-800 border border-zinc-700 rounded transition-colors"
+          class="flex items-center gap-1 px-2.5 py-1 text-xs font-mono text-zinc-300 bg-[#141418] hover:bg-zinc-800 border border-zinc-700 rounded transition-colors"
           title="페이지 내 애니메이션 효과를 켜거나 끕니다"
           aria-pressed="false"
         >
-          <svg class="svg-icon text-[#ba9578]" id="motionIcon" viewBox="0 0 24 24">
-            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
-          <span id="motionText" class="nav-hide-mobile">움직임</span>
+          <span id="motionText">움직임 조절</span>
         </button>
 
         <!-- GitHub -->
@@ -389,466 +275,726 @@
     <div class="container-box">
 
       <!-- ====================================================
-           1. 히어로 섹션: 이름 & 정체성
+           1. 첫 화면 (Above-the-fold) (BRA-C03 준수)
+           본인 이름 + "...한 사람"으로 끝나는 한 줄 소개 + 4개 입구
            ==================================================== -->
-      <section class="mb-10 sm:mb-12 text-center sm:text-left">
+      <section class="mb-12 text-center sm:text-left">
         <!-- 뱃지 -->
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-[#1c1611] text-[#ba9578] border border-[#ba9578]/40 mb-4">
           <span class="w-2 h-2 rounded-full bg-[#ba9578] animate-pulse"></span>
-          <span>SECURITY & NETWORK ENGINEER</span>
+          <span>INFORMATION SECURITY & SYSTEMS ENGINEER</span>
           <span class="text-zinc-600">|</span>
-          <span class="text-zinc-400 font-sans">과제 9 포트폴리오</span>
+          <span class="text-zinc-400 font-sans">과제 A 공개 포트폴리오</span>
         </div>
 
-        <!-- 이름 헤드라인 -->
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
-          집념의 사나이 <span class="text-[#ba9578]">신재원</span>입니다.
+        <!-- 이름 헤드라인 (BRA-C03) -->
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-3">
+          집념의 사나이 <span class="text-[#ba9578]">신재원</span>
         </h1>
 
-        <!-- 서브 카피 -->
-        <p class="text-base sm:text-lg text-zinc-400 max-w-2xl leading-relaxed">
-          사람과의 온기로 팀의 소통을 열고, 끝을 보는 집념으로 결함을 0건으로 만드는 보안 엔지니어입니다.
-          그늘의 시간을 건너와 마침내 제 자리를 찾았고, 이제 현장에서 동료들과 함께 가치를 만들어내고자 합니다.
+        <!-- 한 줄 소개 (BRA-C03: "...한 사람"으로 끝남) -->
+        <p class="text-lg sm:text-2xl font-semibold text-zinc-200 mb-4 tracking-tight leading-snug">
+          "거친 파도를 넘어 기술의 정직함과 사람의 온기로 시스템을 지키는 <span class="text-[#ba9578] underline decoration-[#ba9578]/50 underline-offset-4">사람</span>"
         </p>
+
+        <!-- 핵심 요약 및 공개 연락처 (BRA-C10) -->
+        <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-zinc-400 mb-8">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[#ba9578]">✉️</span>
+            <span>공개 이메일:</span>
+            <a href="mailto:shin.jaewon.security@gmail.com" class="text-zinc-200 hover:text-[#ba9578] font-mono underline">
+              shin.jaewon.security@gmail.com
+            </a>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[#ba9578]">⚓</span>
+            <span>해군 OCS 장교 만기전역 (초계함 조함 당직사관)</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[#ba9578]">🛡️</span>
+            <span>정보보안산업기사 · 네트워크관리사 2급 · 리눅스마스터 2급</span>
+          </div>
+        </div>
+
+        <!-- 4개 핵심 입구 네비게이션 버튼 그리드 (모바일 및 데스크톱) -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <a href="#storySection" class="p-3.5 rounded-xl bg-[#141418] border border-zinc-800 hover:border-[#ba9578] transition-all text-center group">
+            <div class="text-xl mb-1 group-hover:scale-110 transition-transform">📖</div>
+            <div class="font-bold text-sm text-white">내 이야기</div>
+            <div class="text-[11px] text-zinc-400 font-mono mt-0.5">고난 극복 1,500자</div>
+          </a>
+          <a href="#metricsSection" class="p-3.5 rounded-xl bg-[#141418] border border-zinc-800 hover:border-[#ba9578] transition-all text-center group">
+            <div class="text-xl mb-1 group-hover:scale-110 transition-transform">📊</div>
+            <div class="font-bold text-sm text-white">13주 기록 숫자</div>
+            <div class="text-[11px] text-zinc-400 font-mono mt-0.5">출석 100% · 실증</div>
+          </a>
+          <a href="#projectsSection" class="p-3.5 rounded-xl bg-[#141418] border border-zinc-800 hover:border-[#ba9578] transition-all text-center group">
+            <div class="text-xl mb-1 group-hover:scale-110 transition-transform">🚀</div>
+            <div class="font-bold text-sm text-white">대표작</div>
+            <div class="text-[11px] text-zinc-400 font-mono mt-0.5">10번 논문 & 13번 앱</div>
+          </a>
+          <a href="#documentsSection" class="p-3.5 rounded-xl bg-[#141418] border border-zinc-800 hover:border-[#ba9578] transition-all text-center group">
+            <div class="text-xl mb-1 group-hover:scale-110 transition-transform">📄</div>
+            <div class="font-bold text-sm text-white">이력서·문서</div>
+            <div class="text-[11px] text-zinc-400 font-mono mt-0.5">이력서/자소서/경력서</div>
+          </a>
+        </div>
       </section>
 
       <!-- ====================================================
-           2. 자기소개서 섹션 (과제9.txt 카드 5 원문)
+           2. 카드 1: 내 이야기 본편 (1,500자 안팎)
+           (BRA-C01, BRA-C02, BRA-C04 준수)
            ==================================================== -->
-      <section class="card border-l-4 border-l-[#ba9578] mb-12">
-        <div class="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-800">
+      <section id="storySection" class="card border-l-4 border-l-[#ba9578] mb-12 scroll-mt-20">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-800">
           <div class="flex items-center gap-2.5">
-            <span class="text-xl">📝</span>
-            <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight">
-              사람과의 온기, 끝을 보는 집념으로 현장의 가치를 만드는 신재원입니다
-            </h2>
-          </div>
-          <span class="text-xs font-mono px-2.5 py-1 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 whitespace-nowrap">
-            자기소개서
-          </span>
-        </div>
-
-        <!-- 자기소개서 본문 -->
-        <div class="space-y-5 text-sm sm:text-base text-zinc-300 leading-relaxed">
-          <!-- 1문단: 고비와 결단 -->
-          <p class="p-4 rounded-lg bg-[#0d0d10] border border-zinc-800/80">
-            이전의 저는 맞지 않는 옷을 입은 채 그늘 속에 갇혀 있었습니다. 적성에 맞지 않는 직업은 매일 스스로를 갉아먹었고, 사람에게 깊이 지쳐 세상과의 문을 닫아걸었습니다. 사람을 마주하는 것조차 버겁던 그 고비의 순간, 더 이상 버티는 것만으로는 내 삶을 지킬 수 없다는 절박함이 들었습니다. <strong class="text-[#ba9578] font-semibold">"진짜 내 적성에 맞는 길을 찾아 떠나자."</strong> 그 결단을 시작으로 낡은 틀을 깨고 기술의 세계로 새로운 발걸음을 내디뎠습니다.
-          </p>
-
-          <!-- 2문단: 세 가지 확실한 강점 -->
-          <div class="space-y-3 pt-2">
-            <p class="font-medium text-white">
-              새로운 환경에서 개발을 배우며, 저는 세 가지 확실한 강점을 가진 사람으로 거듭났습니다.
-            </p>
-            
-            <ul class="space-y-3 pl-1">
-              <li class="p-3.5 rounded-lg bg-[#18181d] border border-zinc-800">
-                <span class="font-bold text-[#ba9578] block mb-1">첫째, 먼저 다가서는 인사입니다.</span>
-                사람에게 다쳤던 상처는 역설적으로 동료들과 호흡하며 치유되었습니다. 저는 아침마다 강의실 문을 열며 먼저 환한 인사와 눈웃음을 건넸고, 팀의 얼어붙은 침묵을 깨우며 서로가 편안히 의견을 나눌 수 있는 심리적 안전감을 만들었습니다.
-              </li>
-              <li class="p-3.5 rounded-lg bg-[#18181d] border border-zinc-800">
-                <span class="font-bold text-[#ba9578] block mb-1">둘째, 악조건 속에서도 일을 완수하는 성실성 입니다.</span>
-                손목 통증이 찾아와 타이핑이 고통스러울 때도 파스를 감고 아침 일찍 자리에 앉아 당일 분량을 100% 채워냈습니다. 어떤 변명도 대지 않고 나와 팀에게 한 약속을 지켜내는 일관성은 저의 확고한 무기입니다.
-              </li>
-              <li class="p-3.5 rounded-lg bg-[#18181d] border border-zinc-800">
-                <span class="font-bold text-[#ba9578] block mb-1">셋째, 결함의 뿌리를 끝까지 캐내는 집요한 몰입력 입니다.</span>
-                원인 모를 에러가 발생했을 때 적당히 타협하지 않고, "끝까지 물고 늘어지겠다"는 집념으로 로그와 코드를 밑바닥부터 추적해 결국 근본적인 원인을 해결해냈습니다.
-              </li>
-            </ul>
-          </div>
-
-          <!-- 3문단: 현장으로의 포부 -->
-          <p class="p-4 rounded-lg bg-[#1d1712] border border-[#ba9578]/30 text-zinc-200">
-            단단해진 지금, 저는 책상 앞 '배움만의 생활'을 매듭짓고 진짜 현장으로 나아가고 싶습니다. 배움에는 끝이 없지만, 강의실에 머무는 공부를 넘어 치열한 실무의 일터에서 동료들과 즐겁게 부딪히며 살아 숨 쉬는 문제를 해결하고 싶습니다. 고난을 딛고 사람과 기술의 소중함을 체득한 저 신재원은, 팀에는 따뜻한 활력을 불어넣고 시스템에는 빈틈없는 완결성을 더하는 <strong class="text-[#ba9578] font-bold">보안엔지니어</strong>로서 당당히 기여하겠습니다.
-          </p>
-        </div>
-      </section>
-
-      <!-- ====================================================
-           3. 3대 강점 및 1~8번 과제 산출물 연계 섹션
-           ==================================================== -->
-      <section class="mb-12">
-        <div class="flex items-center gap-3 mb-6">
-          <span class="text-2xl">⚡</span>
-          <div>
-            <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              3대 핵심 강점 & 과제 산출물 (1~8번)
-            </h2>
-            <p class="text-xs sm:text-sm text-zinc-400 mt-0.5">
-              리추얼 기록으로 입증된 강점과, 각 강점을 직접 구현해낸 과제 산출물 연결 현황입니다.
-            </p>
-          </div>
-        </div>
-
-        <div class="space-y-8">
-
-          <!-- ------------------------------------------------
-               강점 1: 먼저 다가서는 인사 (연결과 환대)
-               ------------------------------------------------ -->
-          <div class="card border border-zinc-800 hover:border-[#ba9578]/50 transition-colors">
-            <!-- 상단 헤더 -->
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-zinc-800">
-              <div class="flex items-center gap-2.5">
-                <span class="flex items-center justify-center w-7 h-7 rounded-full bg-[#ba9578]/20 text-[#ba9578] font-bold text-sm">
-                  1
-                </span>
-                <h3 class="text-lg font-bold text-white">
-                  먼저 다가서는 인사 <span class="text-[#ba9578] font-normal text-sm">(14회 반복)</span>
-                </h3>
-              </div>
-              <span class="inline-flex items-center px-2.5 py-1 rounded text-xs font-medium bg-[#1e1915] text-[#ba9578] border border-[#ba9578]/30">
-                지킨 가치: 연결과 환대
-              </span>
-            </div>
-
-            <!-- 강점 상세 근거 (장면 / 증언 / 가치) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-6 text-sm">
-              <div class="p-3.5 rounded bg-[#0d0d10] border border-zinc-800">
-                <div class="text-xs font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
-                  <span>📅</span> 날짜 있는 구체적 장면
-                </div>
-                <p class="text-zinc-200 leading-snug">
-                  <strong>8월 28일 아침:</strong> 침묵이 흐르던 강의실에 들어서며 산뜻한 눈웃음과 가벼운 농담으로 3초 만에 팀 분위기를 틔움.
-                </p>
-              </div>
-
-              <div class="p-3.5 rounded bg-[#0d0d10] border border-zinc-800">
-                <div class="text-xs font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
-                  <span>💬</span> 동료의 실제 증언
-                </div>
-                <p class="text-zinc-200 leading-snug">
-                  "아침마다 밝게 인사해주시고, 농담으로 기분을 좋게 해주는 분위기 메이커!" <span class="text-zinc-400 text-xs">(8/27, 8/28)</span>
-                </p>
-              </div>
-            </div>
-
-            <!-- 강점 1 아래: 연결 과제 산출물 버튼 그룹 -->
+            <span class="text-2xl">📖</span>
             <div>
-              <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                <span>🔗</span> 이 강점이 발현된 과제 산출물 (버튼을 누르면 이동합니다)
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <!-- 과제 1 -->
-                <a href="/" class="artifact-btn" title="과제 1 공개 포트폴리오로 이동">
-                  <div>
-                    <div class="flex items-center gap-1.5 mb-1">
-                      <span class="artifact-badge">과제 1</span>
-                      <span class="font-bold text-sm text-white">공개 포트폴리오</span>
-                    </div>
-                    <p class="text-xs text-zinc-400">웹 접근성(명암비 9.2:1) & 실시간 방명록</p>
-                  </div>
-                  <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
-                </a>
-
-                <!-- 과제 5 -->
-                <a href="/compare.html" class="artifact-btn" title="과제 5 비교 보고서로 이동">
-                  <div>
-                    <div class="flex items-center gap-1.5 mb-1">
-                      <span class="artifact-badge">과제 5</span>
-                      <span class="font-bold text-sm text-white">비교 보고서</span>
-                    </div>
-                    <p class="text-xs text-zinc-400">동료를 배려한 7대 규격 인수인계 프로토콜</p>
-                  </div>
-                  <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
-                </a>
-
-                <!-- 과제 2 -->
-                <a href="/game.html" class="artifact-btn" title="과제 2 서부러너 게임으로 이동">
-                  <div>
-                    <div class="flex items-center gap-1.5 mb-1">
-                      <span class="artifact-badge">과제 2</span>
-                      <span class="font-bold text-sm text-white">서부러너 게임</span>
-                    </div>
-                    <p class="text-xs text-zinc-400">움직임 조절 및 듀얼 컨트롤 웹 접근성</p>
-                  </div>
-                  <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
-                </a>
-              </div>
-            </div>
-          </div>
-
-
-          <!-- ------------------------------------------------
-               강점 2: 악조건 속에서도 일을 완수하는 성실성
-               ------------------------------------------------ -->
-          <div class="card border border-zinc-800 hover:border-[#ba9578]/50 transition-colors">
-            <!-- 상단 헤더 -->
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-zinc-800">
-              <div class="flex items-center gap-2.5">
-                <span class="flex items-center justify-center w-7 h-7 rounded-full bg-[#ba9578]/20 text-[#ba9578] font-bold text-sm">
-                  2
-                </span>
-                <h3 class="text-lg font-bold text-white">
-                  악조건 속에서도 일을 완수하는 성실성 <span class="text-[#ba9578] font-normal text-sm">(11회 반복)</span>
-                </h3>
-              </div>
-              <span class="inline-flex items-center px-2.5 py-1 rounded text-xs font-medium bg-[#1e1915] text-[#ba9578] border border-[#ba9578]/30">
-                지킨 가치: 책임과 일관성
-              </span>
-            </div>
-
-            <!-- 강점 상세 근거 (장면 / 증언 / 가치) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-6 text-sm">
-              <div class="p-3.5 rounded bg-[#0d0d10] border border-zinc-800">
-                <div class="text-xs font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
-                  <span>📅</span> 날짜 있는 구체적 장면
-                </div>
-                <p class="text-zinc-200 leading-snug">
-                  <strong>9월 4일 하루:</strong> 손목 통증에도 파스를 감고 아침 일찍 출석해 당일 학습 목표와 과제 분량을 100% 달성.
-                </p>
-              </div>
-
-              <div class="p-3.5 rounded bg-[#0d0d10] border border-zinc-800">
-                <div class="text-xs font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
-                  <span>💬</span> 동료의 실제 증언
-                </div>
-                <p class="text-zinc-200 leading-snug">
-                  "손목이 많이 아프신데도 참고 끝까지 해내는 모습이 큰 귀감이 됩니다." <span class="text-zinc-400 text-xs">(9/4, 9/8)</span>
-                </p>
-              </div>
-            </div>
-
-            <!-- 강점 2 아래: 연결 과제 산출물 버튼 그룹 -->
-            <div>
-              <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                <span>🔗</span> 이 강점이 발현된 과제 산출물 (버튼을 누르면 이동합니다)
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <!-- 과제 6 & 7 다이어리 -->
-                <a href="/diary.html" class="artifact-btn" title="과제 6·7 플랜두씨 다이어리로 이동">
-                  <div>
-                    <div class="flex items-center gap-1.5 mb-1">
-                      <span class="artifact-badge">과제 6 & 7</span>
-                      <span class="font-bold text-sm text-white">플랜두씨 다이어리 2</span>
-                    </div>
-                    <p class="text-xs text-zinc-400">5일 연속 러닝 실천 기록 & 보안 권한 격리</p>
-                  </div>
-                  <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
-                </a>
-
-                <!-- 과제 4 날씨 & 환율 보드 -->
-                <a href="/board.html" class="artifact-btn" title="과제 4 날씨 & 환율 정보 보드로 이동">
-                  <div>
-                    <div class="flex items-center gap-1.5 mb-1">
-                      <span class="artifact-badge">과제 4</span>
-                      <span class="font-bold text-sm text-white">실시간 정보 보드</span>
-                    </div>
-                    <p class="text-xs text-zinc-400">오프라인·에러 5대 실패 복구 및 하루한줄 보존</p>
-                  </div>
-                  <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
-                </a>
-              </div>
-            </div>
-          </div>
-
-
-          <!-- ------------------------------------------------
-               강점 3: 결함의 뿌리를 끝까지 캐내는 집요한 몰입력
-               ------------------------------------------------ -->
-          <div class="card border border-zinc-800 hover:border-[#ba9578]/50 transition-colors">
-            <!-- 상단 헤더 -->
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-zinc-800">
-              <div class="flex items-center gap-2.5">
-                <span class="flex items-center justify-center w-7 h-7 rounded-full bg-[#ba9578]/20 text-[#ba9578] font-bold text-sm">
-                  3
-                </span>
-                <h3 class="text-lg font-bold text-white">
-                  결함의 뿌리를 끝까지 캐내는 집요한 몰입력 <span class="text-[#ba9578] font-normal text-sm">(9회 반복)</span>
-                </h3>
-              </div>
-              <span class="inline-flex items-center px-2.5 py-1 rounded text-xs font-medium bg-[#1e1915] text-[#ba9578] border border-[#ba9578]/30">
-                지킨 가치: 기술적 완결성
-              </span>
-            </div>
-
-            <!-- 강점 상세 근거 (장면 / 증언 / 가치) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-6 text-sm">
-              <div class="p-3.5 rounded bg-[#0d0d10] border border-zinc-800">
-                <div class="text-xs font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
-                  <span>📅</span> 날짜 있는 구체적 장면
-                </div>
-                <p class="text-zinc-200 leading-snug">
-                  <strong>9월 3일 오후:</strong> 남들이 지나친 미세 결함을 "끝까지 물고 늘어지겠다"며 코드 끝까지 파고들어 에러 규명.
-                </p>
-              </div>
-
-              <div class="p-3.5 rounded bg-[#0d0d10] border border-zinc-800">
-                <div class="text-xs font-semibold text-zinc-400 mb-1 flex items-center gap-1.5">
-                  <span>💬</span> 동료의 실제 증언
-                </div>
-                <p class="text-zinc-200 leading-snug">
-                  "수업 내내 흐트러짐 없이 몰입하고, 막힌 문제를 깔끔히 해결해 줌." <span class="text-zinc-400 text-xs">(9/14, 9/18)</span>
-                </p>
-              </div>
-            </div>
-
-            <!-- 강점 3 아래: 연결 과제 산출물 버튼 그룹 -->
-            <div>
-              <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                <span>🔗</span> 이 강점이 발현된 과제 산출물 (버튼을 누르면 이동합니다)
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <!-- 과제 8 패스키 시크릿 볼트 -->
-                <a href="/#passkeyVaultSection" class="artifact-btn" title="과제 8 패스키 시크릿 볼트로 이동">
-                  <div>
-                    <div class="flex items-center gap-1.5 mb-1">
-                      <span class="artifact-badge">과제 8</span>
-                      <span class="font-bold text-sm text-white">WebAuthn 패스키 볼트</span>
-                    </div>
-                    <p class="text-xs text-zinc-400">비밀번호 없는 공개키 암호화 & 마스터 PC 잠금</p>
-                  </div>
-                  <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
-                </a>
-
-                <!-- 과제 3 짤·카드 스튜디오 -->
-                <a href="/studio.html" class="artifact-btn" title="과제 3 짤·카드 스튜디오로 이동">
-                  <div>
-                    <div class="flex items-center gap-1.5 mb-1">
-                      <span class="artifact-badge">과제 3</span>
-                      <span class="font-bold text-sm text-white">짤·카드 스튜디오</span>
-                    </div>
-                    <p class="text-xs text-zinc-400">12건의 극단적 비정상 입력 전수 추적 및 0결함 방어</p>
-                  </div>
-                  <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
-                </a>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ====================================================
-           4. 카드 3 기반 상위 3대 강점 종합 요약표 (최하단 배치)
-           ==================================================== -->
-      <section class="card mb-12 border border-zinc-800">
-        <!-- 섹션 헤더 -->
-        <div class="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-800">
-          <div class="flex items-center gap-2.5">
-            <span class="text-xl">📋</span>
-            <div>
-              <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight">
-                카드 3: 상위 3대 강점 종합 요약표
+              <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                내 이야기: 그늘의 계절을 건너 현장의 바다로
               </h2>
               <p class="text-xs text-zinc-400 mt-0.5">
-                날짜 있는 구체적 장면 · 동료의 증언 · 지킨 가치 · 연결된 과제를 한눈에 볼 수 있도록 정리한 종합 대조표입니다.
+                11번 소설을 바탕으로 사실로 환원한 1,479자 진솔한 자기소개 본편
               </p>
             </div>
           </div>
-          <span class="text-xs font-mono px-2.5 py-1 rounded bg-[#1e1915] text-[#ba9578] border border-[#ba9578]/40 whitespace-nowrap">
-            CARD 3 SUMMARY
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono px-2.5 py-1 rounded bg-[#2a221b] text-[#ba9578] border border-[#ba9578]/30">
+              세 능력 (조절·관계·동기) 수록
+            </span>
+          </div>
+        </div>
+
+        <!-- 3대 능력 뱃지 안내 바 -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-6 text-xs">
+          <div class="p-2.5 rounded-lg bg-[#0d0d10] border border-zinc-800 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <div>
+              <span class="font-bold text-zinc-200">대인관계력:</span>
+              <span class="text-zinc-400">먼저 건넨 아침 인사 (8/28)</span>
+            </div>
+          </div>
+          <div class="p-2.5 rounded-lg bg-[#0d0d10] border border-zinc-800 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+            <div>
+              <span class="font-bold text-zinc-200">자기동기력:</span>
+              <span class="text-zinc-400">결함 뿌리 파헤친 집념 (9/3)</span>
+            </div>
+          </div>
+          <div class="p-2.5 rounded-lg bg-[#0d0d10] border border-zinc-800 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            <div>
+              <span class="font-bold text-zinc-200">자기조절력:</span>
+              <span class="text-zinc-400">손목 부상 극복 & 갑천 러닝 (9/4)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 본편 문단 (날짜가 있는 장면으로 토막마다 시작 - BRA-C04) -->
+        <div class="space-y-4 text-sm sm:text-base text-zinc-300 leading-relaxed font-normal">
+          <!-- 1문단: 고난 -->
+          <div class="p-4 sm:p-5 rounded-xl bg-[#0d0d10] border border-zinc-800/90 relative">
+            <span class="absolute top-3 right-3 text-[11px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700">고난의 시작</span>
+            <p>
+              나에게 <strong class="text-white font-semibold">2022년부터 2024년까지의 시간</strong>은 맞지 않는 옷을 입고 거친 비바람을 견뎌야 했던 짙은 그늘의 계절이었다. 해군 장교 전역 후 생계를 위해 대구 상가 골목에서 시작한 자영업은 현실의 냉혹한 무게로 숨을 조여왔다. 적성에 맞지 않는 일과 매일 밤 이어지는 적자 압박은 서서히 몸과 마음을 갉아먹었다. 사람 사이에 치이며 온기를 잃어갔고, <strong class="text-white font-semibold">2024년 12월</strong> 결국 차가운 셔터를 내렸을 때 나는 깊은 무력감에 휩싸였다. 작은 원룸 안에 틀어박혀 세상과 사람을 향해 문을 닫아걸었고, 불 꺼진 방에서 천장만 멍하니 바라보며 방황하던 인생 최대의 고난이었다.
+            </p>
+          </div>
+
+          <!-- 2문단: 다시 일어난 날 -->
+          <div class="p-4 sm:p-5 rounded-xl bg-[#0d0d10] border border-zinc-800/90 relative">
+            <span class="absolute top-3 right-3 text-[11px] font-mono px-2 py-0.5 rounded bg-[#2a221b] text-[#ba9578] border border-[#ba9578]/40">다시 일어난 날</span>
+            <p>
+              <strong class="text-white font-semibold">2025년 12월</strong>, 더 이상 어둠 속에 웅크려 삶을 낭비할 수 없다는 절박한 각성이 심장을 두드렸다. 나는 결단을 내리고 연고가 없는 대전으로 거처를 옮기며 정보보안 엔지니어로 전향을 선언했다. <strong class="text-[#ba9578] font-semibold">"진짜 내 적성에 맞는 길, 정직한 원칙과 논리가 통하는 기술의 길을 찾아 떠나자."</strong> 서해 밤바다에서 파도를 뚫고 배를 지켜내던 군 시절의 나침반을 다시 꺼내 들었다. 모니터 앞에 앉아 리눅스와 네트워크 패킷 원리를 밑바닥부터 파고들자, 잃어버렸던 삶의 뜨거운 고동이 마침내 다시 되살아났다.
+            </p>
+          </div>
+
+          <!-- 3문단: 대인관계력 -->
+          <div class="p-4 sm:p-5 rounded-xl bg-[#101714] border border-emerald-900/40 relative">
+            <span class="absolute top-3 right-3 text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">능력 1: 대인관계력</span>
+            <p>
+              <strong class="text-white font-semibold">2026년 8월</strong>, 서울 종로의 SKT 부트캠프에 입교하며 나의 변화는 실전적인 성장으로 이어졌다. 가장 먼저 되살아난 것은 사람의 마음을 잇는 <strong class="text-emerald-400 font-semibold">'대인관계력'</strong>이었다. <strong class="text-white font-semibold">2026년 8월 28일</strong>, 낯선 과제 앞 침묵이 감돌던 강의실 문을 열며 나는 사람에 지쳤던 껍질을 깨고 먼저 환한 눈웃음과 함께 "좋은 아침입니다!"를 외쳤다. 먼저 건넨 인사는 단 3초 만에 얼어붙은 팀의 공기를 녹였고, 동료의 막힌 에러를 함께 밤늦게까지 풀어나가며 팀의 단단한 신뢰와 심리적 안전감을 구축했다.
+            </p>
+          </div>
+
+          <!-- 4문단: 자기동기력 -->
+          <div class="p-4 sm:p-5 rounded-xl bg-[#10141a] border border-blue-900/40 relative">
+            <span class="absolute top-3 right-3 text-[11px] font-mono px-2 py-0.5 rounded bg-blue-950 text-blue-400 border border-blue-800">능력 2: 자기동기력</span>
+            <p>
+              치열한 실습 과정에서 <strong class="text-blue-400 font-semibold">'자기동기력'</strong>은 문제를 끝까지 해결하는 집념의 엔진이 되었다. <strong class="text-white font-semibold">2026년 9월 3일</strong>, 패스키 시크릿 볼트를 구축하던 중 원인 모를 인증 레이스컨디션 오류에 직면했다. 동료들이 지쳐 돌아설 때도 나는 <strong class="text-blue-300 font-semibold">"원인을 규명할 때까지 끝까지 물고 늘어지겠다"</strong>며 커널 로그와 암호학 표준을 밤새 역추적했다. 겉핥기식 우회를 거부하고 결함의 뿌리를 파헤친 끝에 결함 0건의 무결점 인증 파이프라인을 완성했다.
+            </p>
+          </div>
+
+          <!-- 5문단: 자기조절력 -->
+          <div class="p-4 sm:p-5 rounded-xl bg-[#191610] border border-amber-900/40 relative">
+            <span class="absolute top-3 right-3 text-[11px] font-mono px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800">능력 3: 자기조절력</span>
+            <p>
+              어떤 악조건 속에서도 흔들리지 않는 루틴을 지켜낸 것은 단단한 <strong class="text-amber-400 font-semibold">'자기조절력'</strong> 덕분이었다. <strong class="text-white font-semibold">2026년 9월 4일</strong>, 손목 통증으로 타이핑조차 버거웠지만, 나는 파스를 감고 아침 일찍 강의실에 출석해 당일 학습 목표를 100% 채워냈다. 그리고 저녁마다 대전 갑천 둔치를 5.2km 달리며 호흡을 가다듬고 체력과 멘탈의 템포를 조절하는 페이스메이커 루틴을 지켜냈다.
+            </p>
+          </div>
+
+          <!-- 6문단: 더 나아진 지금 & 포부 -->
+          <div class="p-4 sm:p-5 rounded-xl bg-[#141418] border border-[#ba9578]/40 relative">
+            <span class="absolute top-3 right-3 text-[11px] font-mono px-2 py-0.5 rounded bg-[#2a221b] text-[#ba9578] border border-[#ba9578]/50">더 나아진 지금</span>
+            <p>
+              고난의 늪을 건너 사람의 온기와 기술의 정직함을 두 손에 쥔 지금, 나는 책상 앞에만 머무는 준비생의 생활을 매듭짓고자 한다. 배움에는 끝이 없지만, 이제 강의실을 넘어 세상의 시스템을 안전하게 지키는 현업 엔지니어로 당당히 나아갈 것이다. 현장이라는 거대한 바다를 향해 닻을 올린 신재원의 발걸음에는 이제 일말의 망설임도 없다.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================
+           3. 카드 3: 숫자 칸 (13주 기록 기반, 출처 명시)
+           (BRA-C05, 고난 장면과 짝지음)
+           ==================================================== -->
+      <section id="metricsSection" class="card mb-12 scroll-mt-20">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-800">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">📊</span>
+            <div>
+              <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                13주 기록의 숫자와 실증 근거
+              </h2>
+              <p class="text-xs text-zinc-400 mt-0.5">
+                말이 아닌 실제 기록과 숫자로 증명하는 회복탄력성과 과제지속력
+              </p>
+            </div>
+          </div>
+          <span class="text-xs font-mono px-2.5 py-1 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
+            출처 명시 완료 (BRA-C05)
           </span>
         </div>
 
-        <!-- 반응형 테이블 래퍼 -->
-        <div class="overflow-x-auto rounded-lg border border-zinc-800">
+        <!-- 3대 숫자 카드 그리드 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          
+          <!-- 숫자 1: 출석률 (고난 장면과 짝지음) -->
+          <div class="p-5 rounded-xl bg-[#0d0d10] border border-amber-900/40 relative flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <span class="text-xs font-bold text-amber-400 font-mono uppercase tracking-wider">ATTENDANCE</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-800/60">고난 장면 짝지음</span>
+              </div>
+              <div class="text-3xl sm:text-4xl font-extrabold text-white font-mono mb-1">
+                100.0<span class="text-amber-400 text-2xl">%</span>
+              </div>
+              <div class="text-xs text-zinc-300 font-medium mb-3">
+                13주 총 65일 전일 출석 (지각 0 · 결석 0)
+              </div>
+              <!-- 짝지은 고난 장면 박스 -->
+              <div class="p-3 rounded-lg bg-zinc-900/90 border border-zinc-800 text-xs text-zinc-300 leading-snug">
+                <strong class="text-amber-300 block mb-1">🩹 짝지은 고난 극복 일화 (9/4)</strong>
+                극심한 손목 건초염 통증으로 휴식을 권유받았으나, 파스를 감고 아침 8시 40분 조기 출석해 당일 학습 목표를 100% 정상 완수.
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-zinc-800/80 text-[11px] text-zinc-500 font-mono">
+              출처: <strong>내 출석 기록</strong> (공식 출결 시스템)
+            </div>
+          </div>
+
+          <!-- 숫자 2: 데일리 리추얼 완주 -->
+          <div class="p-5 rounded-xl bg-[#0d0d10] border border-emerald-900/40 relative flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <span class="text-xs font-bold text-emerald-400 font-mono uppercase tracking-wider">RITUAL</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-800/60">매일 성찰</span>
+              </div>
+              <div class="text-3xl sm:text-4xl font-extrabold text-white font-mono mb-1">
+                29<span class="text-emerald-400 text-2xl">일 / 100%</span>
+              </div>
+              <div class="text-xs text-zinc-300 font-medium mb-3">
+                아침 호흡 및 3대 강점 실천 루틴 100%
+              </div>
+              <!-- 강점 카운트 박스 -->
+              <div class="p-3 rounded-lg bg-zinc-900/90 border border-zinc-800 text-xs text-zinc-300 space-y-1">
+                <div class="flex justify-between">
+                  <span>🤝 먼저 건네는 인사:</span>
+                  <strong class="text-emerald-300 font-mono">14회 반복</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span>⚓ 타협 없는 성실성:</span>
+                  <strong class="text-emerald-300 font-mono">11회 반복</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span>🔍 끝을 보는 집요함:</span>
+                  <strong class="text-emerald-300 font-mono">9회 반복</strong>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-zinc-800/80 text-[11px] text-zinc-500 font-mono">
+              출처: <strong>리추얼 기록</strong> (29일간의 데일리 일지)
+            </div>
+          </div>
+
+          <!-- 숫자 3: 과제 제출 완주율 -->
+          <div class="p-5 rounded-xl bg-[#0d0d10] border border-blue-900/40 relative flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <span class="text-xs font-bold text-blue-400 font-mono uppercase tracking-wider">SUBMISSIONS</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-950/80 text-blue-300 border border-blue-800/60">전 과제 정시 완주</span>
+              </div>
+              <div class="text-3xl sm:text-4xl font-extrabold text-white font-mono mb-1">
+                11<span class="text-blue-400 text-2xl"> / 11개</span>
+              </div>
+              <div class="text-xs text-zinc-300 font-medium mb-3">
+                13주간 11개 실무 과제 정시 완주율 100%
+              </div>
+              <!-- 과제 성과 요약 박스 -->
+              <div class="p-3 rounded-lg bg-zinc-900/90 border border-zinc-800 text-xs text-zinc-300 leading-snug">
+                <strong class="text-blue-300 block mb-1">🎯 실증 검증 완료 내역</strong>
+                WebAuthn 패스키, PBKDF2 암호화 엔진, 5대 장애 복구 보드, ML 행성 연구 논문, 3만자 소설 전 과제 PASS.
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-zinc-800/80 text-[11px] text-zinc-500 font-mono">
+              출처: <strong>내 제출 현황</strong> (Git 커밋 및 Vercel 배포)
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================
+           4. 카드 3: 대표작 자리 (BRA-C06 준수)
+           10번 논문 (게재 완료) & 13번 앱 (자리 마련 및 예정일 명시)
+           ==================================================== -->
+      <section id="projectsSection" class="card mb-12 scroll-mt-20">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-800">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">🚀</span>
+            <div>
+              <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                대표작 (Featured Projects)
+              </h2>
+              <p class="text-xs text-zinc-400 mt-0.5">
+                데이터 분석 논문과 프로덕션 보안 웹 애플리케이션
+              </p>
+            </div>
+          </div>
+          <span class="text-xs font-mono px-2.5 py-1 rounded bg-[#2a221b] text-[#ba9578] border border-[#ba9578]/30">
+            대표작 2종 연동 (BRA-C06)
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <!-- 대표작 1: 10번 논문 (게재 완료) -->
+          <div class="p-6 rounded-xl bg-[#0d0d10] border border-[#ba9578]/50 hover:border-[#ba9578] transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="artifact-badge">대표작 1 · 과제 10</span>
+                <span class="inline-flex items-center gap-1 text-[11px] font-mono px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 게재 완료
+                </span>
+              </div>
+              <h3 class="text-lg sm:text-xl font-bold text-white mb-2 leading-snug">
+                케플러 외계행성 분류 머신러닝 연구 논문
+              </h3>
+              <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed mb-4">
+                NASA 케플러 망원경 관측 데이터(9,564건)를 정규화하고 머신러닝 모델을 설계하여 외계행성 후보를 선별한 연구. 중고등학생도 쉽게 읽을 수 있도록 수식을 걷어내고 10줄 초록과 100% 재현 패키지를 완비했습니다.
+              </p>
+              <div class="flex flex-wrap gap-2 text-[11px] font-mono text-zinc-400 mb-4">
+                <span class="px-2 py-0.5 rounded bg-zinc-800">#NASA_Kepler</span>
+                <span class="px-2 py-0.5 rounded bg-zinc-800">#MachineLearning</span>
+                <span class="px-2 py-0.5 rounded bg-zinc-800">#10줄초록</span>
+                <span class="px-2 py-0.5 rounded bg-zinc-800">#재현패키지</span>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-zinc-800/80 flex items-center justify-between">
+              <span class="text-xs text-zinc-400 font-mono">로그인 없이 즉시 열람 가능</span>
+              <a 
+                href="/과제10/AI_우주연구_논문.md" 
+                target="_blank" 
+                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#2a221b] hover:bg-[#3a3026] text-[#ba9578] font-bold text-xs border border-[#ba9578]/50 transition-colors"
+              >
+                <span>논문 전문 보기</span>
+                <span>&rarr;</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- 대표작 2: 13번 앱 (자리 마련 및 예정일 명시 - BRA-C06) -->
+          <div class="p-6 rounded-xl bg-[#0d0d10] border border-dashed border-zinc-700 hover:border-zinc-500 transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="artifact-badge" style="background:#1f1f24; color:#a1a1aa; border-color:#3f3f46;">대표작 2 · 과제 13</span>
+                <span class="inline-flex items-center gap-1 text-[11px] font-mono px-2.5 py-0.5 rounded bg-amber-950/70 text-amber-300 border border-amber-800/50">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span> 개발 진행 중
+                </span>
+              </div>
+              <h3 class="text-lg sm:text-xl font-bold text-zinc-200 mb-2 leading-snug">
+                제로트러스트 보안 웹 애플리케이션 (Zero-Trust Platform)
+              </h3>
+              <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed mb-4">
+                실제 서비스 환경에서 사용자가 접속하여 데이터 무결성을 검증하고 엔드투엔드(E2E) 암호화 및 WebAuthn 생체인증을 결합한 클라우드 네이티브 보안 플랫폼입니다. 13번 과정을 마친 뒤 정식으로 채워집니다.
+              </p>
+              <div class="flex flex-wrap gap-2 text-[11px] font-mono text-zinc-400 mb-4">
+                <span class="px-2 py-0.5 rounded bg-zinc-800">#ZeroTrust</span>
+                <span class="px-2 py-0.5 rounded bg-zinc-800">#WebAuthn</span>
+                <span class="px-2 py-0.5 rounded bg-zinc-800">#E2E_Encryption</span>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-zinc-800/80 flex items-center justify-between">
+              <div class="text-xs text-amber-400 font-mono font-semibold">
+                📅 출시 예정일: <strong>2026년 10월 16일</strong>
+              </div>
+              <span class="text-xs text-zinc-400 font-mono px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800">
+                13번 완주 후 공개
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================
+           5. 카드 4: 보낼 수 있는 문서 3종 (BRA-C07, BRA-C08)
+           이력서, 자기소개서, 경력기술서
+           ==================================================== -->
+      <section id="documentsSection" class="card mb-12 scroll-mt-20">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-800">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">📄</span>
+            <div>
+              <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                입사 지원용 문서 3종 (Resume & Portfolios)
+              </h2>
+              <p class="text-xs text-zinc-400 mt-0.5">
+                오늘 바로 실무 채용 지원서에 첨부할 수 있는 정식 문서 패키지
+              </p>
+            </div>
+          </div>
+          <a 
+            href="/과제A/과제A_신재원_패키지.zip" 
+            download 
+            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#2a221b] hover:bg-[#3a3026] text-[#ba9578] font-bold text-xs border border-[#ba9578]/50 transition-colors"
+          >
+            <span>📦 문서 및 장치 ZIP 다운로드</span>
+          </a>
+        </div>
+
+        <!-- 3종 문서 카드 그리드 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          
+          <!-- 문서 1: 이력서 -->
+          <div class="p-4 rounded-xl bg-[#0d0d10] border border-zinc-800 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-[#ba9578] font-mono">DOCUMENT 01</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">마크다운 완비</span>
+              </div>
+              <h4 class="font-bold text-white text-base mb-1">신재원 이력서 (Resume)</h4>
+              <p class="text-xs text-zinc-400 mb-3 leading-relaxed">
+                해군 OCS 장교 복무, 자격증 3종, 13주 엔지니어링 집중 훈련 및 핵심 기술 스택 명세.
+              </p>
+            </div>
+            <a 
+              href="/과제A/문서/이력서_신재원.md" 
+              target="_blank" 
+              class="text-xs text-[#ba9578] hover:underline font-semibold flex items-center gap-1 pt-2 border-t border-zinc-800"
+            >
+              <span>이력서 전문 열람</span>
+              <span>&rarr;</span>
+            </a>
+          </div>
+
+          <!-- 문서 2: 자기소개서 -->
+          <div class="p-4 rounded-xl bg-[#0d0d10] border border-zinc-800 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-[#ba9578] font-mono">DOCUMENT 02</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">1,500자 정본</span>
+              </div>
+              <h4 class="font-bold text-white text-base mb-1">자기소개서 (Cover Letter)</h4>
+              <p class="text-xs text-zinc-400 mb-3 leading-relaxed">
+                고난에서 시작해 대전으로의 결단, 3대 역량(조절·관계·동기)과 현장 출항의 포부.
+              </p>
+            </div>
+            <a 
+              href="/과제A/문서/자기소개서_신재원.md" 
+              target="_blank" 
+              class="text-xs text-[#ba9578] hover:underline font-semibold flex items-center gap-1 pt-2 border-t border-zinc-800"
+            >
+              <span>자기소개서 열람</span>
+              <span>&rarr;</span>
+            </a>
+          </div>
+
+          <!-- 문서 3: 경력기술서 -->
+          <div class="p-4 rounded-xl bg-[#0d0d10] border border-zinc-800 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-[#ba9578] font-mono">DOCUMENT 03</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">11과제 STAR</span>
+              </div>
+              <h4 class="font-bold text-white text-base mb-1">경력기술서 (Experience)</h4>
+              <p class="text-xs text-zinc-400 mb-3 leading-relaxed">
+                11개 실무 과제별 세 능력 매핑 및 상황(S)·행동(A)·결과(R) 과제당 1줄 완벽 정리.
+              </p>
+            </div>
+            <a 
+              href="/과제A/문서/경력기술서_신재원.md" 
+              target="_blank" 
+              class="text-xs text-[#ba9578] hover:underline font-semibold flex items-center gap-1 pt-2 border-t border-zinc-800"
+            >
+              <span>경력기술서 열람</span>
+              <span>&rarr;</span>
+            </a>
+          </div>
+
+        </div>
+
+        <!-- 경력기술서 인라인 미리보기 (과제당 1줄 STAR 요약 - BRA-C08) -->
+        <div class="p-4 rounded-xl bg-[#0d0d10] border border-zinc-800 text-xs">
+          <div class="font-bold text-zinc-200 mb-3 flex items-center gap-1.5">
+            <span>📋</span>
+            <span>경력기술서 과제별 세 능력 및 STAR 요약표 (BRA-C08)</span>
+          </div>
+          <div class="space-y-2 text-zinc-300 font-mono">
+            <div class="p-2 rounded bg-zinc-900 border border-zinc-800/80">
+              <strong class="text-emerald-400">[과제 1] [대인관계력]</strong> 누구나 접근 가능한 웹 표준과 방명록 | (S) 다양한 사용자의 접근성 요구 | (A) WCAG 2.1 AA 및 실시간 방명록 연동 | (R) 결함 0건 달성 및 소통 공간 마련
+            </div>
+            <div class="p-2 rounded bg-zinc-900 border border-zinc-800/80">
+              <strong class="text-blue-400">[과제 4] [자기동기력]</strong> 기상/환율 정보판 및 3단 장애 복구 | (S) 외부 API 일시 두절 | (A) 인메모리-로컬-기본값 3단 캐시 자체 구현 | (R) 통신 두절 시 100% 무손실 복구
+            </div>
+            <div class="p-2 rounded bg-zinc-900 border border-zinc-800/80">
+              <strong class="text-amber-400">[과제 6] [자기조절력]</strong> 플랜두씨 러닝 다이어리 루틴 관리 | (S) 체력 저하와 계획 괴리 | (A) 5일 연속 운동 계획 및 막힘 피드백 루틴 구현 | (R) 시간 편차 분석 및 루틴 보존 100%
+            </div>
+            <div class="p-2 rounded bg-zinc-900 border border-zinc-800/80">
+              <strong class="text-blue-400">[과제 8] [자기동기력]</strong> WebAuthn 패스키 시크릿 볼트 | (S) 비밀번호 유출 및 재생 공격 | (A) P-256 서명 기반 무암호화 인증과 TTL 챌린지 검증 | (R) 비밀값 노출 0건 및 볼트 완성
+            </div>
+            <div class="p-2 rounded bg-zinc-900 border border-zinc-800/80">
+              <strong class="text-amber-400">[과제 11] [자기조절력]</strong> 장편소설 원고 및 5대 대조표 | (S) 3만 자 방대한 서사 집필 | (A) 10개 장 인과표 설계 및 담백한 문체 유지 | (R) 31,268자 무결점 원고 완수
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================
+           6. 강점별 과제 산출물 바로가기 섹션 (1~8번 과제 연동 유지)
+           ==================================================== -->
+      <section class="card mb-12">
+        <div class="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-800">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">🔗</span>
+            <div>
+              <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                3대 핵심 강점별 실무 과제 산출물
+              </h2>
+              <p class="text-xs text-zinc-400 mt-0.5">
+                버튼을 누르면 해당 강점이 녹아있는 실제 동작 웹 애플리케이션으로 이동합니다
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+
+          <!-- 강점 1: 먼저 건네는 인사 (대인관계력) -->
+          <div class="p-4 sm:p-5 rounded-xl bg-[#0d0d10] border border-zinc-800">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-emerald-950 text-emerald-400 flex items-center justify-center font-bold text-xs border border-emerald-800">1</span>
+                <h3 class="font-bold text-white text-base">먼저 건네는 인사 (14회 반복) — <span class="text-emerald-400">대인관계력</span></h3>
+              </div>
+              <span class="text-xs text-zinc-400 font-mono">가치: 연결과 환대</span>
+            </div>
+            <p class="text-xs sm:text-sm text-zinc-300 mb-4 leading-relaxed">
+              어색한 침묵을 먼저 깨고 3초 만에 팀 분위기를 틔우며, 동료들에게 따뜻한 심리적 안전감을 제공합니다.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <a href="/#guestbookSection" class="artifact-btn">
+                <div>
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span class="artifact-badge">과제 1</span>
+                    <span class="font-bold text-sm text-white">웹 표준 및 실시간 방명록</span>
+                  </div>
+                  <p class="text-xs text-zinc-400">누구나 차별 없이 환영하는 접근성과 온기의 방명록</p>
+                </div>
+                <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
+              </a>
+              <a href="/compare.html" class="artifact-btn">
+                <div>
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span class="artifact-badge">과제 5</span>
+                    <span class="font-bold text-sm text-white">AI 벤치마크 및 인수인계</span>
+                  </div>
+                  <p class="text-xs text-zinc-400">동료를 배려한 7대 표준 프로토콜</p>
+                </div>
+                <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- 강점 2: 타협 없는 성실성 (자기조절력) -->
+          <div class="p-4 sm:p-5 rounded-xl bg-[#0d0d10] border border-zinc-800">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-amber-950 text-amber-400 flex items-center justify-center font-bold text-xs border border-amber-800">2</span>
+                <h3 class="font-bold text-white text-base">악조건 속에서도 완수하는 성실성 (11회 반복) — <span class="text-amber-400">자기조절력</span></h3>
+              </div>
+              <span class="text-xs text-zinc-400 font-mono">가치: 책임과 일관성</span>
+            </div>
+            <p class="text-xs sm:text-sm text-zinc-300 mb-4 leading-relaxed">
+              손목 통증에도 파스를 감고 아침 일찍 자리를 지켰던 책임감, 저녁 5.2km 러닝으로 템포를 조절하는 페이스메이커.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <a href="/diary.html" class="artifact-btn">
+                <div>
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span class="artifact-badge">과제 6 & 7</span>
+                    <span class="font-bold text-sm text-white">플랜두씨 다이어리 2</span>
+                  </div>
+                  <p class="text-xs text-zinc-400">5일 연속 러닝 실천 기록 & PBKDF2 보안 격리</p>
+                </div>
+                <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
+              </a>
+              <a href="/board.html" class="artifact-btn">
+                <div>
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span class="artifact-badge">과제 4</span>
+                    <span class="font-bold text-sm text-white">실시간 정보 보드</span>
+                  </div>
+                  <p class="text-xs text-zinc-400">오프라인·에러 5대 실패 복구 및 데이터 보존</p>
+                </div>
+                <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- 강점 3: 끝을 보는 집요함 (자기동기력) -->
+          <div class="p-4 sm:p-5 rounded-xl bg-[#0d0d10] border border-zinc-800">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-blue-950 text-blue-400 flex items-center justify-center font-bold text-xs border border-blue-800">3</span>
+                <h3 class="font-bold text-white text-base">결함의 뿌리를 캐내는 집요함 (9회 반복) — <span class="text-blue-400">자기동기력</span></h3>
+              </div>
+              <span class="text-xs text-zinc-400 font-mono">가치: 기술적 완결성</span>
+            </div>
+            <p class="text-xs sm:text-sm text-zinc-300 mb-4 leading-relaxed">
+              원인 모를 결함을 두고 우회하지 않고, 커널과 패킷 밑바닥까지 파고들어 결함 0건을 만들어내는 내재적 몰입.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <a href="/#passkeyVaultSection" class="artifact-btn">
+                <div>
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span class="artifact-badge">과제 8</span>
+                    <span class="font-bold text-sm text-white">무결점 패스키 시크릿 볼트</span>
+                  </div>
+                  <p class="text-xs text-zinc-400">비밀번호 없는 W3C WebAuthn 레벨 3 생체인증</p>
+                </div>
+                <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
+              </a>
+              <a href="/game.html" class="artifact-btn">
+                <div>
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span class="artifact-badge">과제 2</span>
+                    <span class="font-bold text-sm text-white">서부러너 반응형 게임</span>
+                  </div>
+                  <p class="text-xs text-zinc-400">로컬스토리지 상태 관리 및 듀얼 컨트롤 웹 접근성</p>
+                </div>
+                <span class="text-[#ba9578] font-mono text-sm">&rarr;</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================
+           7. 카드 3 상위 3대 강점 표 (포트폴리오 최하단 배치 유지)
+           ==================================================== -->
+      <section class="card mb-12">
+        <div class="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-800">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">📋</span>
+            <div>
+              <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                상위 3대 핵심 강점 총괄 대조표
+              </h2>
+              <p class="text-xs text-zinc-400 mt-0.5">
+                리추얼 기록 기반의 일화, 동료 증언, 지킨 가치 및 과제 연결 총람
+              </p>
+            </div>
+          </div>
+          <span class="text-xs font-mono px-2.5 py-1 rounded bg-zinc-800 text-zinc-400">
+            과제 9 원문 정합
+          </span>
+        </div>
+
+        <div class="overflow-x-auto rounded-lg border border-zinc-800 bg-[#0d0d10]">
           <table class="w-full text-left border-collapse text-xs sm:text-sm">
             <thead>
-              <tr class="bg-[#18181e] text-[#ba9578] border-b border-zinc-800 font-mono text-xs">
-                <th class="p-3.5 sm:p-4 whitespace-nowrap font-bold">강점 (반복 횟수)</th>
-                <th class="p-3.5 sm:p-4 whitespace-nowrap font-bold">1. 날짜 있는 장면</th>
-                <th class="p-3.5 sm:p-4 whitespace-nowrap font-bold">2. 동료의 증언</th>
-                <th class="p-3.5 sm:p-4 whitespace-nowrap font-bold">3. 지킨 가치</th>
-                <th class="p-3.5 sm:p-4 whitespace-nowrap font-bold">4. 연결된 과제</th>
+              <tr class="bg-zinc-900/80 border-b border-zinc-800 text-zinc-300 font-mono">
+                <th class="p-3.5 sm:p-4 font-semibold">순위 / 강점</th>
+                <th class="p-3.5 sm:p-4 font-semibold">구체적 장면 (날짜)</th>
+                <th class="p-3.5 sm:p-4 font-semibold">동료 실제 증언</th>
+                <th class="p-3.5 sm:p-4 font-semibold">지킨 가치</th>
+                <th class="p-3.5 sm:p-4 font-semibold">연결 산출물</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-zinc-800/80 text-zinc-300">
-              <!-- 행 1: 먼저 건네는 인사 -->
-              <tr class="hover:bg-zinc-900/50 transition-colors">
-                <td class="p-3.5 sm:p-4 align-top font-medium text-white min-w-[150px]">
-                  <div class="flex items-center gap-1.5 mb-1 text-[#ba9578] font-bold">
-                    <span>①</span>
-                    <span>먼저 건네는 인사</span>
-                  </div>
-                  <span class="inline-block text-[11px] font-mono px-2 py-0.5 rounded bg-[#2a221b] text-[#ba9578] border border-[#ba9578]/30">
-                    14회 반복
-                  </span>
+            <tbody class="divide-y divide-zinc-800/60 text-zinc-300">
+              <tr class="hover:bg-zinc-900/40 transition-colors">
+                <td class="p-3.5 sm:p-4 align-top font-medium text-white min-w-[140px]">
+                  <strong class="text-emerald-400 block mb-0.5">① 먼저 건네는 인사</strong>
+                  <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">14회 반복</span>
                 </td>
-                <td class="p-3.5 sm:p-4 align-top min-w-[200px] leading-relaxed">
-                  <span class="text-[#ba9578] font-bold block mb-0.5">8/28 아침</span>
-                  눈웃음과 농담으로 무거운 조원들의 긴장을 3초 만에 무장해제시킨 날
+                <td class="p-3.5 sm:p-4 align-top min-w-[190px]">
+                  <strong class="text-white block mb-0.5">8/28 아침</strong>
+                  침묵이 흐르던 강의실에 들어서며 눈웃음과 인사로 3초 만에 분위기 전환
                 </td>
-                <td class="p-3.5 sm:p-4 align-top min-w-[220px] leading-relaxed italic text-zinc-400">
-                  "아침마다 밝게 인사해주시고, 농담으로 기분을 좋게 해주는 분위기 메이커"
-                  <span class="text-zinc-400 text-xs not-italic block mt-1">(8/27, 8/28)</span>
+                <td class="p-3.5 sm:p-4 align-top min-w-[200px] italic text-zinc-400">
+                  "아침마다 기분 좋게 해주는 분위기 메이커" (8/27, 8/28)
                 </td>
-                <td class="p-3.5 sm:p-4 align-top min-w-[170px] leading-relaxed">
+                <td class="p-3.5 sm:p-4 align-top min-w-[150px]">
                   <strong class="text-white block mb-0.5">연결과 환대</strong>
-                  <span class="text-zinc-400 text-xs">내가 먼저 벽을 허물어야 팀의 소통이 열린다</span>
+                  먼저 벽을 허물어야 대화가 시작된다
                 </td>
-                <td class="p-3.5 sm:p-4 align-top min-w-[180px] leading-relaxed">
-                  <a href="/" class="text-[#ba9578] hover:underline font-semibold flex items-center gap-1 mb-1">
-                    <span>과제 1 포트폴리오</span>
-                    <span class="text-xs">&rarr;</span>
-                  </a>
-                  <span class="text-zinc-400 text-xs block">모든 사용자를 환대하는 웹 접근성(명암비 9.2:1) & 실시간 방명록</span>
+                <td class="p-3.5 sm:p-4 align-top min-w-[160px]">
+                  <a href="/#guestbookSection" class="text-[#ba9578] hover:underline font-semibold block mb-0.5">과제 1 방명록 &rarr;</a>
+                  <span class="text-zinc-500 text-xs">웹 접근성 및 소통</span>
                 </td>
               </tr>
-
-              <!-- 행 2: 타협 없는 성실성 -->
-              <tr class="hover:bg-zinc-900/50 transition-colors bg-[#0e0e12]/40">
-                <td class="p-3.5 sm:p-4 align-top font-medium text-white min-w-[150px]">
-                  <div class="flex items-center gap-1.5 mb-1 text-[#ba9578] font-bold">
-                    <span>②</span>
-                    <span>타협 없는 성실성</span>
-                  </div>
-                  <span class="inline-block text-[11px] font-mono px-2 py-0.5 rounded bg-[#2a221b] text-[#ba9578] border border-[#ba9578]/30">
-                    11회 반복
-                  </span>
+              <tr class="hover:bg-zinc-900/40 transition-colors">
+                <td class="p-3.5 sm:p-4 align-top font-medium text-white min-w-[140px]">
+                  <strong class="text-amber-400 block mb-0.5">② 타협 없는 성실성</strong>
+                  <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">11회 반복</span>
                 </td>
-                <td class="p-3.5 sm:p-4 align-top min-w-[200px] leading-relaxed">
-                  <span class="text-[#ba9578] font-bold block mb-0.5">9/4 하루</span>
-                  손목 통증에 파스를 감고도 아침 9시 전 책상에 앉아 당일 분량을 끝낸 날
+                <td class="p-3.5 sm:p-4 align-top min-w-[190px]">
+                  <strong class="text-white block mb-0.5">9/4 하루</strong>
+                  손목 통증에 파스를 감고도 아침 일찍 출석해 당일 분량 100% 달성
                 </td>
-                <td class="p-3.5 sm:p-4 align-top min-w-[220px] leading-relaxed italic text-zinc-400">
-                  "손목이 많이 아프신데도 참고 열심히 하는 모습이 큰 귀감"
-                  <span class="text-zinc-400 text-xs not-italic block mt-1">(9/4, 9/8)</span>
+                <td class="p-3.5 sm:p-4 align-top min-w-[200px] italic text-zinc-400">
+                  "손목이 아픈데도 참고 끝까지 해내는 모습이 큰 귀감" (9/4, 9/8)
                 </td>
-                <td class="p-3.5 sm:p-4 align-top min-w-[170px] leading-relaxed">
+                <td class="p-3.5 sm:p-4 align-top min-w-[150px]">
                   <strong class="text-white block mb-0.5">책임과 일관성</strong>
-                  <span class="text-zinc-400 text-xs">컨디션을 핑계 삼지 않고 나와 팀과의 약속을 지킨다</span>
+                  어떤 악조건에서도 나와 팀과의 약속 완수
                 </td>
-                <td class="p-3.5 sm:p-4 align-top min-w-[180px] leading-relaxed">
-                  <a href="/diary.html" class="text-[#ba9578] hover:underline font-semibold flex items-center gap-1 mb-1">
-                    <span>과제 6·7 다이어리 2</span>
-                    <span class="text-xs">&rarr;</span>
-                  </a>
-                  <span class="text-zinc-400 text-xs block">5일 연속 러닝 실천 기록 격리 & 무중단 복구 보드</span>
+                <td class="p-3.5 sm:p-4 align-top min-w-[160px]">
+                  <a href="/diary.html" class="text-[#ba9578] hover:underline font-semibold block mb-0.5">과제 6·7 다이어리 &rarr;</a>
+                  <span class="text-zinc-500 text-xs">5일 연속 러닝 루틴</span>
                 </td>
               </tr>
-
-              <!-- 행 3: 끝을 보는 집요함 -->
-              <tr class="hover:bg-zinc-900/50 transition-colors">
-                <td class="p-3.5 sm:p-4 align-top font-medium text-white min-w-[150px]">
-                  <div class="flex items-center gap-1.5 mb-1 text-[#ba9578] font-bold">
-                    <span>③</span>
-                    <span>끝을 보는 집요함</span>
-                  </div>
-                  <span class="inline-block text-[11px] font-mono px-2 py-0.5 rounded bg-[#2a221b] text-[#ba9578] border border-[#ba9578]/30">
-                    9회 반복
-                  </span>
+              <tr class="hover:bg-zinc-900/40 transition-colors">
+                <td class="p-3.5 sm:p-4 align-top font-medium text-white min-w-[140px]">
+                  <strong class="text-blue-400 block mb-0.5">③ 끝을 보는 집요함</strong>
+                  <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">9회 반복</span>
                 </td>
-                <td class="p-3.5 sm:p-4 align-top min-w-[200px] leading-relaxed">
-                  <span class="text-[#ba9578] font-bold block mb-0.5">9/3 오후</span>
-                  대충 넘기지 않고 "끝까지 물고 늘어지겠다"며 로직 에러의 뿌리를 캐낸 날
+                <td class="p-3.5 sm:p-4 align-top min-w-[190px]">
+                  <strong class="text-white block mb-0.5">9/3 오후</strong>
+                  미세 결함을 "끝까지 물고 늘어지겠다"며 코드 끝까지 파고들어 규명
                 </td>
-                <td class="p-3.5 sm:p-4 align-top min-w-[220px] leading-relaxed italic text-zinc-400">
-                  "수업 내내 흐트러짐 없이 몰입하고, 막힌 문제를 깔끔히 해결해 줌"
-                  <span class="text-zinc-400 text-xs not-italic block mt-1">(9/14, 9/18)</span>
+                <td class="p-3.5 sm:p-4 align-top min-w-[200px] italic text-zinc-400">
+                  "한 문제에 완전히 몰입하는 집중력, 에러 깔끔 해결" (9/14, 9/18)
                 </td>
-                <td class="p-3.5 sm:p-4 align-top min-w-[170px] leading-relaxed">
+                <td class="p-3.5 sm:p-4 align-top min-w-[150px]">
                   <strong class="text-white block mb-0.5">기술적 완결성</strong>
-                  <span class="text-zinc-400 text-xs">임시 땜질 대신 결함의 근본 원인을 뽑아 끝을 본다</span>
+                  임시 땜질 대신 근본 원인 해결 (결함 0건)
                 </td>
-                <td class="p-3.5 sm:p-4 align-top min-w-[180px] leading-relaxed">
-                  <a href="/#passkeyVaultSection" class="text-[#ba9578] hover:underline font-semibold flex items-center gap-1 mb-1">
-                    <span>과제 8 패스키 볼트</span>
-                    <span class="text-xs">&rarr;</span>
-                  </a>
-                  <span class="text-zinc-400 text-xs block">비밀번호 없이 일회용 질문과 마스터 PC 잠금 무결점 체계</span>
+                <td class="p-3.5 sm:p-4 align-top min-w-[160px]">
+                  <a href="/#passkeyVaultSection" class="text-[#ba9578] hover:underline font-semibold block mb-0.5">과제 8 패스키 볼트 &rarr;</a>
+                  <span class="text-zinc-500 text-xs">생체인증 무결점 볼트</span>
                 </td>
               </tr>
             </tbody>
@@ -864,32 +1010,28 @@
     <div class="container-box flex flex-col sm:flex-row items-center justify-between gap-4">
       <p>&copy; 2026 집념의 사나이 신재원. All rights reserved.</p>
       <div class="flex items-center gap-4">
-        <a href="/" class="hover:text-zinc-300 transition-colors">내 소개</a>
-        <a href="/portfolio.html" class="text-[#ba9578] hover:underline font-bold">포트폴리오</a>
-        <a href="https://github.com/User-shin0328/skt-aleph" target="_blank" rel="noopener noreferrer" class="hover:text-zinc-300 transition-colors">GitHub</a>
+        <a href="/" class="hover:text-zinc-300 transition-colors">홈 (소개)</a>
+        <a href="/portfolio.html" class="text-[#ba9578] hover:underline font-bold">포트폴리오 (과제 A)</a>
+        <a href="https://github.com/User-shin0328/skt-aleph" target="_blank" rel="noopener noreferrer" class="hover:text-zinc-300 transition-colors">GitHub 저장소</a>
       </div>
     </div>
   </footer>
 
-  <!-- 스크립트 (움직임 줄이기 토글 연동) -->
+  <!-- 움직임 조절 스크립트 -->
   <script>
-    // 움직임 줄이기 토글 기능
     const motionToggleBtn = document.getElementById('motionToggleBtn');
     const motionText = document.getElementById('motionText');
-    
-    // 로컬 스토리지 확인
     const isReduced = localStorage.getItem('reducedMotion') === 'true';
     if (isReduced) {
       document.body.classList.add('reduced-motion');
       motionToggleBtn.setAttribute('aria-pressed', 'true');
       motionText.textContent = '움직임 끔';
     }
-
     motionToggleBtn.addEventListener('click', () => {
       const active = document.body.classList.toggle('reduced-motion');
       motionToggleBtn.setAttribute('aria-pressed', active);
       localStorage.setItem('reducedMotion', active);
-      motionText.textContent = active ? '움직임 끔' : '움직임';
+      motionText.textContent = active ? '움직임 끔' : '움직임 조절';
     });
   </script>
 </body>

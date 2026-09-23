@@ -1,0 +1,16 @@
+{
+  "metrics_summary": {
+    "approved_candidates_count": 3,
+    "attendance_rate": "100.0%",
+    "completion_rate": "100.0%",
+    "ritual_days": 29
+  },
+  "output_files": [
+    "candidates.json",
+    "candidates.md",
+    "site_data.json",
+    "site_data.js"
+  ],
+  "sha256": "d53b94d879f2ba528de8c6eeb2f2b62ba7596e1c93cf2d5840169eb3df76f721",
+  "status": "SUCCESS"
+}
