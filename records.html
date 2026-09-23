@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>13주 실증 기록 | 신재원 포트폴리오</title>
+  
+  <!-- Pretendard & JetBrains Mono Fonts -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-black: #09090b;
+      --card-bg: #141418;
+      --sub-bg: #0d0d10;
+      --border-zinc: #27272a;
+      --border-light: #3f3f46;
+      --brown-main: #ba9578;
+      --brown-accent: #a27b5c;
+      --text-white: #f4f4f5;
+      --text-gray: #a1a1aa;
+      --text-darkgray: #71717a;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-white);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--brown-main) !important;
+      outline-offset: 2px !important;
+    }
+
+    .container-box {
+      width: 100%;
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    @media (min-width: 640px) {
+      .container-box {
+        padding: 0 24px;
+      }
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-zinc);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: border-color 0.2s ease;
+    }
+
+    @media (min-width: 640px) {
+      .card {
+        padding: 32px;
+        margin-bottom: 32px;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-black);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-zinc);
+      border-radius: 3px;
+    }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background-color: rgba(9, 9, 11, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #27272a;
+    }
+    .app-header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 60px;
+      padding-top: 6px;
+      padding-bottom: 6px;
+      gap: 12px;
+      position: relative;
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #f4f4f5;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+      transition: color 0.15s ease;
+      z-index: 20;
+    }
+    .app-brand:hover {
+      color: #ba9578;
+    }
+    .app-quick-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      white-space: nowrap;
+      scrollbar-width: none;
+      padding: 4px 0;
+    }
+    .app-quick-nav::-webkit-scrollbar {
+      display: none;
+    }
+    .quick-nav-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      background: #141418;
+      border: 1px solid #27272a;
+      color: #a1a1aa;
+    }
+    .quick-nav-item:hover {
+      background: #1f1f24;
+      border-color: #3f3f46;
+      color: #ffffff;
+    }
+    .quick-nav-item.active {
+      background: #2a221b;
+      border-color: #ba9578;
+      color: #ba9578;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(186, 149, 120, 0.2);
+    }
+    .svg-icon {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- 상단 글로벌 고정 헤더 -->
+  <header class="app-header">
+    <div class="container-box app-header-inner">
+      <!-- 로고 -->
+      <a href="/" class="app-brand" title="홈으로 이동">
+        <span class="text-[#ba9578] font-bold">&larr;</span>
+        <span>SHIN.JAEWON</span>
+      </a>
+
+      <!-- 중앙 바로가기 메뉴 -->
+      <nav class="app-quick-nav" aria-label="사이트 메뉴">
+        <a href="/portfolio.html" class="quick-nav-item">
+          내 이야기
+        </a>
+        <a href="/records.html" class="quick-nav-item active">
+          13주 실증 기록
+        </a>
+        <a href="/projects.html" class="quick-nav-item">
+          대표작
+        </a>
+        <a href="/documents.html" class="quick-nav-item">
+          입사 지원 문서
+        </a>
+        <a href="/updater.html" class="quick-nav-item">
+          지속 갱신 장치
+        </a>
+      </nav>
+
+      <!-- 헤더 우측 도구 -->
+      <div class="flex items-center gap-3">
+        <!-- GitHub -->
+        <a 
+          href="https://github.com/User-shin0328/skt-aleph" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="p-1.5 text-[#a1a1aa] hover:text-white rounded hover:bg-zinc-800 transition-colors" 
+          title="GitHub 소스코드 저장소"
+        >
+          <svg class="svg-icon" style="width:16px; height:16px;" viewBox="0 0 24 24">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+            <path d="M9 18c-4.51 2-5-2-7-2"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 영역 -->
+  <main id="main-content" class="flex-grow py-8 sm:py-12">
+    <div class="container-box">
+
+      <!-- 섹션 헤더 -->
+      <section class="mb-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-[#1c1611] text-[#ba9578] border border-[#ba9578]/40 mb-3">
+          <span>METRICS & EVIDENCE</span>
+          <span class="text-zinc-600">|</span>
+          <span class="text-zinc-400 font-sans">과제 A 실증 데이터</span>
+        </div>
+        <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mb-2">
+          13주 기록의 숫자와 실증 근거
+        </h1>
+        <p class="text-sm sm:text-base text-zinc-400">
+          말이 아닌 실제 기록과 숫자로 증명하는 회복탄력성과 과제지속력 (출처 명시 완료 · BRA-C05 준수)
+        </p>
+      </section>
+
+      <!-- 13주 핵심 지표 카드 3종 -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+
+        <!-- 카드 1: 출석률 (고난 장면 짝지음) -->
+        <div class="card border border-zinc-800 bg-[#141418] hover:border-[#ba9578]/60 transition-colors flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs font-mono text-zinc-400 mb-3">
+              <span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 font-semibold">ATTENDANCE</span>
+              <span class="text-emerald-400 font-bold">고난 장면 짝지음</span>
+            </div>
+            <div class="text-3xl sm:text-4xl font-black text-white font-mono mb-2">
+              100.0%
+            </div>
+            <p class="text-xs sm:text-sm text-zinc-300 mb-4 font-medium">
+              13주 총 65일 전일 출석 (지각 0 · 결석 0)
+            </p>
+
+            <!-- 고난 극복 짝지음 박스 -->
+            <div class="p-3.5 rounded-lg bg-[#0d0d10] border border-zinc-800 text-xs text-zinc-300 leading-relaxed mb-4">
+              <div class="font-mono text-[#ba9578] font-semibold mb-1">
+                짝지은 고난 극복 일화 (2026-09-04)
+              </div>
+              <p>
+                극심한 손목 건초염 통증으로 휴식을 권유받았으나, 파스를 감고 아침 8시 40분 조기 출석해 당일 학습 목표를 100% 정상 완수.
+              </p>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-zinc-800/80 text-[11px] font-mono text-zinc-400">
+            출처: 내 출석 기록 (공식 출결 시스템)
+          </div>
+        </div>
+
+        <!-- 카드 2: 데일리 리추얼 -->
+        <div class="card border border-zinc-800 bg-[#141418] hover:border-[#ba9578]/60 transition-colors flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs font-mono text-zinc-400 mb-3">
+              <span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 font-semibold">RITUAL</span>
+              <span class="text-blue-400 font-bold">매일 성찰</span>
+            </div>
+            <div class="text-3xl sm:text-4xl font-black text-white font-mono mb-2">
+              29일 / 100%
+            </div>
+            <p class="text-xs sm:text-sm text-zinc-300 mb-4 font-medium">
+              아침 호흡 및 3대 강점 실천 루틴 100% 완주
+            </p>
+
+            <!-- 강점 실천 집계 내역 -->
+            <div class="p-3.5 rounded-lg bg-[#0d0d10] border border-zinc-800 text-xs text-zinc-300 space-y-2 mb-4">
+              <div class="flex justify-between items-center">
+                <span class="text-zinc-400">먼저 건네는 인사</span>
+                <span class="font-mono text-emerald-400 font-bold">14회 실천</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-zinc-400">타협 없는 성실성</span>
+                <span class="font-mono text-amber-400 font-bold">11회 실천</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-zinc-400">끝을 보는 집요함</span>
+                <span class="font-mono text-blue-400 font-bold">9회 실천</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-zinc-800/80 text-[11px] font-mono text-zinc-400">
+            출처: 리추얼 기록 (29일간의 데일리 일지)
+          </div>
+        </div>
+
+        <!-- 카드 3: 과제 완주율 -->
+        <div class="card border border-zinc-800 bg-[#141418] hover:border-[#ba9578]/60 transition-colors flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs font-mono text-zinc-400 mb-3">
+              <span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 font-semibold">SUBMISSIONS</span>
+              <span class="text-[#ba9578] font-bold">전 과제 정시 완주</span>
+            </div>
+            <div class="text-3xl sm:text-4xl font-black text-white font-mono mb-2">
+              11 / 11개
+            </div>
+            <p class="text-xs sm:text-sm text-zinc-300 mb-4 font-medium">
+              13주간 11개 실무 과제 정시 완주율 100%
+            </p>
+
+            <!-- 검증 산출물 목록 -->
+            <div class="p-3.5 rounded-lg bg-[#0d0d10] border border-zinc-800 text-xs text-zinc-300 leading-relaxed mb-4">
+              <div class="font-mono text-zinc-400 mb-1">실증 검증 완료 내역:</div>
+              <p class="text-zinc-300">
+                WebAuthn 패스키, PBKDF2 암호화 엔진, 5대 장애 복구 보드, ML 행성 연구 논문, 3만자 소설 등 전 과제 무결점 통과
+              </p>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-zinc-800/80 text-[11px] font-mono text-zinc-400">
+            출처: 내 제출 현황 (GitHub 커밋 이력 및 Vercel 배포 시스템)
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 상위 3대 핵심 강점 총괄 대조표 -->
+      <section class="card mb-12">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-zinc-800">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              상위 3대 핵심 강점 총괄 대조표
+            </h2>
+            <p class="text-xs text-zinc-400 mt-1">
+              리추얼 기록 기반의 일화, 동료 증언, 지킨 가치 및 과제 연결 총람
+            </p>
+          </div>
+          <span class="text-xs font-mono px-2.5 py-1 rounded bg-zinc-800 text-zinc-400 self-start sm:self-auto">
+            과제 9 원문 정합
+          </span>
+        </div>
+
+        <div class="overflow-x-auto rounded-lg border border-zinc-800 bg-[#0d0d10]">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr class="bg-zinc-900/80 border-b border-zinc-800 text-zinc-300 font-mono">
+                <th class="p-3.5 sm:p-4 font-semibold">순위 / 강점</th>
+                <th class="p-3.5 sm:p-4 font-semibold">구체적 장면 (날짜)</th>
+                <th class="p-3.5 sm:p-4 font-semibold">동료 실제 증언</th>
+                <th class="p-3.5 sm:p-4 font-semibold">지킨 가치</th>
+                <th class="p-3.5 sm:p-4 font-semibold">연결 산출물</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-800/60 text-zinc-300">
+              <tr class="hover:bg-zinc-900/40 transition-colors">
+                <td class="p-3.5 sm:p-4 align-top font-medium text-white min-w-[140px]">
+                  <strong class="text-emerald-400 block mb-0.5">1. 먼저 건네는 인사</strong>
+                  <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">14회 반복</span>
+                </td>
+                <td class="p-3.5 sm:p-4 align-top min-w-[190px]">
+                  <strong class="text-white block mb-0.5">8/28 아침</strong>
+                  침묵이 흐르던 강의실에 들어서며 눈웃음과 인사로 3초 만에 분위기 전환
+                </td>
+                <td class="p-3.5 sm:p-4 align-top min-w-[200px] italic text-zinc-400">
+                  "아침마다 기분 좋게 해주는 분위기 메이커" (8/27, 8/28)
+                </td>
+                <td class="p-3.5 sm:p-4 align-top min-w-[150px]">
+                  <strong class="text-white block mb-0.5">연결과 환대</strong>
+                  먼저 벽을 허물어야 대화가 시작된다
+                </td>
+                <td class="p-3.5 sm:p-4 align-top min-w-[160px]">
+                  <a href="/#guestbookSection" class="text-[#ba9578] hover:underline font-semibold block mb-0.5">과제 1 방명록 &rarr;</a>
+                  <span class="text-zinc-500 text-xs">웹 접근성 및 소통</span>
+                </td>
+              </tr>
+              <tr class="hover:bg-zinc-900/40 transition-colors">
+                <td class="p-3.5 sm:p-4 align-top font-medium text-white min-w-[140px]">
+                  <strong class="text-amber-400 block mb-0.5">2. 타협 없는 성실성</strong>
+                  <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">11회 반복</span>
+                </td>
+                <td class="p-3.5 sm:p-4 align-top min-w-[190px]">
+                  <strong class="text-white block mb-0.5">9/4 하루</strong>
+                  손목 통증에 파스를 감고도 아침 일찍 출석해 당일 분량 100% 달성
+                </td>
+                <td class="p-3.5 sm:p-4 align-top min-w-[200px] italic text-zinc-400">
+                  "손목이 아픈데도 참고 끝까지 해내는 모습이 큰 귀감" (9/4, 9/8)
+                </td>
+                <td class="p-3.5 sm:p-4 align-top min-w-[150px]">
+                  <strong class="text-white block mb-0.5">책임과 일관성</strong>
+                  어떤 악조건에서도 나와 팀과의 약속 완수
+                </td>
+                <td class="p-3.5 sm:p-4 align-top min-w-[160px]">
+                  <a href="/diary.html" class="text-[#ba9578] hover:underline font-semibold block mb-0.5">과제 6·7 다이어리 &rarr;</a>
+                  <span class="text-zinc-500 text-xs">5일 연속 러닝 루틴</span>
+                </td>
+              </tr>
+              <tr class="hover:bg-zinc-900/40 transition-colors">
+                <td class="p-3.5 sm:p-4 align-top font-medium text-white min-w-[140px]">
+                  <strong class="text-blue-400 block mb-0.5">3. 끝을 보는 집요함</strong>
+                  <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">9회 반복</span>
+                </td>
+                <td class="p-3.5 sm:p-4 align-top min-w-[190px]">
+                  <strong class="text-white block mb-0.5">9/3 오후</strong>
+                  미세 결함을 "끝까지 물고 늘어지겠다"며 코드 끝까지 파고들어 규명
+                </td>
+                <td class="p-3.5 sm:p-4 align-top min-w-[200px] italic text-zinc-400">
+                  "한 문제에 완전히 몰입하는 집중력, 에러 깔끔 해결" (9/14, 9/18)
+                </td>
+                <td class="p-3.5 sm:p-4 align-top min-w-[150px]">
+                  <strong class="text-white block mb-0.5">기술적 완결성</strong>
+                  임시 땜질 대신 근본 원인 해결 (결함 0건)
+                </td>
+                <td class="p-3.5 sm:p-4 align-top min-w-[160px]">
+                  <a href="/#passkeyVaultSection" class="text-[#ba9578] hover:underline font-semibold block mb-0.5">과제 8 패스키 볼트 &rarr;</a>
+                  <span class="text-zinc-500 text-xs">생체인증 무결점 볼트</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="mt-auto border-t border-zinc-800 bg-[#0c0c0e] py-8 text-center text-xs text-zinc-500 font-mono">
+    <div class="container-box flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p>&copy; 2026 집념의 사나이 신재원. All rights reserved.</p>
+      <div class="flex items-center gap-4">
+        <a href="/" class="hover:text-zinc-300 transition-colors">홈</a>
+        <a href="/portfolio.html" class="hover:text-zinc-300 transition-colors">내 이야기</a>
+        <a href="/records.html" class="text-[#ba9578] hover:underline font-bold">13주 실증 기록</a>
+        <a href="/projects.html" class="hover:text-zinc-300 transition-colors">대표작</a>
+        <a href="/documents.html" class="hover:text-zinc-300 transition-colors">입사 지원 문서</a>
+        <a href="/updater.html" class="hover:text-zinc-300 transition-colors">지속 갱신 장치</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>입사 지원 문서 3종 | 신재원 포트폴리오</title>
+  
+  <!-- Pretendard & JetBrains Mono Fonts -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-black: #09090b;
+      --card-bg: #141418;
+      --sub-bg: #0d0d10;
+      --border-zinc: #27272a;
+      --border-light: #3f3f46;
+      --brown-main: #ba9578;
+      --brown-accent: #a27b5c;
+      --text-white: #f4f4f5;
+      --text-gray: #a1a1aa;
+      --text-darkgray: #71717a;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-white);
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--brown-main) !important;
+      outline-offset: 2px !important;
+    }
+
+    .container-box {
+      width: 100%;
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    @media (min-width: 640px) {
+      .container-box {
+        padding: 0 24px;
+      }
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-zinc);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: border-color 0.2s ease;
+    }
+
+    @media (min-width: 640px) {
+      .card {
+        padding: 32px;
+        margin-bottom: 32px;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-black);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-zinc);
+      border-radius: 3px;
+    }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background-color: rgba(9, 9, 11, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #27272a;
+    }
+    .app-header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 60px;
+      padding-top: 6px;
+      padding-bottom: 6px;
+      gap: 12px;
+      position: relative;
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #f4f4f5;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+      transition: color 0.15s ease;
+      z-index: 20;
+    }
+    .app-brand:hover {
+      color: #ba9578;
+    }
+    .app-quick-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      white-space: nowrap;
+      scrollbar-width: none;
+      padding: 4px 0;
+    }
+    .app-quick-nav::-webkit-scrollbar {
+      display: none;
+    }
+    .quick-nav-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      background: #141418;
+      border: 1px solid #27272a;
+      color: #a1a1aa;
+    }
+    .quick-nav-item:hover {
+      background: #1f1f24;
+      border-color: #3f3f46;
+      color: #ffffff;
+    }
+    .quick-nav-item.active {
+      background: #2a221b;
+      border-color: #ba9578;
+      color: #ba9578;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(186, 149, 120, 0.2);
+    }
+    .tab-btn {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      color: #a1a1aa;
+      background: #0d0d10;
+      border: 1px solid #27272a;
+    }
+    .tab-btn.active {
+      color: #ba9578;
+      background: #2a221b;
+      border-color: #ba9578;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- 상단 글로벌 고정 헤더 -->
+  <header class="app-header">
+    <div class="container-box app-header-inner">
+      <!-- 로고 -->
+      <a href="/" class="app-brand" title="홈으로 이동">
+        <span class="text-[#ba9578] font-bold">&larr;</span>
+        <span>SHIN.JAEWON</span>
+      </a>
+
+      <!-- 중앙 바로가기 메뉴 -->
+      <nav class="app-quick-nav" aria-label="사이트 메뉴">
+        <a href="/portfolio.html" class="quick-nav-item">
+          내 이야기
+        </a>
+        <a href="/records.html" class="quick-nav-item">
+          13주 실증 기록
+        </a>
+        <a href="/projects.html" class="quick-nav-item">
+          대표작
+        </a>
+        <a href="/documents.html" class="quick-nav-item active">
+          입사 지원 문서
+        </a>
+        <a href="/updater.html" class="quick-nav-item">
+          지속 갱신 장치
+        </a>
+      </nav>
+
+      <!-- 헤더 우측 도구 -->
+      <div class="flex items-center gap-3">
+        <!-- GitHub -->
+        <a 
+          href="https://github.com/User-shin0328/skt-aleph" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="p-1.5 text-[#a1a1aa] hover:text-white rounded hover:bg-zinc-800 transition-colors" 
+          title="GitHub 소스코드 저장소"
+        >
+          <svg style="width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;" viewBox="0 0 24 24">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+            <path d="M9 18c-4.51 2-5-2-7-2"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 영역 -->
+  <main id="main-content" class="flex-grow py-8 sm:py-12">
+    <div class="container-box">
+
+      <!-- 섹션 헤더 -->
+      <section class="mb-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-[#1c1611] text-[#ba9578] border border-[#ba9578]/40 mb-3">
+          <span>CAREER DOCUMENTS</span>
+          <span class="text-zinc-600">|</span>
+          <span class="text-zinc-400 font-sans">과제 A 실무 문서</span>
+        </div>
+        <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mb-2">
+          입사 지원용 문서 3종
+        </h1>
+        <p class="text-sm sm:text-base text-zinc-400">
+          오늘 즉시 기업 실무 지원에 투입할 수 있는 표준 규격 문서 패키지 (BRA-C07, BRA-C08 준수)
+        </p>
+      </section>
+
+      <!-- 다운로드 배너 카드 -->
+      <section class="card border border-zinc-800 bg-[#141418] mb-10">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 text-xs font-mono text-zinc-400 mb-1">
+              <span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 font-semibold">PACKAGE</span>
+              <span>과제 A 통합 제출 패키지</span>
+            </div>
+            <h3 class="text-lg font-bold text-white">
+              과제A 신재원 검증 패키지 (ZIP)
+            </h3>
+            <p class="text-xs text-zinc-400 mt-1">
+              이력서, 자기소개서, 경력기술서 원본 및 계속 새로 쓰는 장치(소스·README·실행결과) 전체 수록
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <a 
+              href="https://github.com/User-shin0328/skt-aleph/raw/main/%EA%B3%BC%EC%A0%9CA/%EA%B3%BC%EC%A0%9CA_%EC%8B%A0%EC%9E%AC%EC%9B%90_%ED%8C%A8%ED%82%A4%EC%A7%80.zip" 
+              class="px-4 py-2.5 rounded-lg bg-[#ba9578] hover:bg-[#a27b5c] text-black font-semibold text-xs sm:text-sm font-mono transition-colors"
+            >
+              ZIP 패키지 다운로드
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3종 문서 탭 전환 내비게이션 -->
+      <section class="mb-6">
+        <div class="flex items-center gap-2 overflow-x-auto pb-2">
+          <button id="tabBtn1" class="tab-btn active" onclick="switchDocTab('doc1')">
+            1. 이력서 (Resume)
+          </button>
+          <button id="tabBtn2" class="tab-btn" onclick="switchDocTab('doc2')">
+            2. 자기소개서 (Cover Letter)
+          </button>
+          <button id="tabBtn3" class="tab-btn" onclick="switchDocTab('doc3')">
+            3. 경력기술서 (STAR 표)
+          </button>
+        </div>
+      </section>
+
+      <!-- 문서 1: 이력서 -->
+      <section id="doc1" class="card border border-zinc-800 bg-[#141418] mb-12">
+        <div class="border-b border-zinc-800 pb-4 mb-6">
+          <div class="text-xs font-mono text-[#ba9578] font-bold mb-1">DOCUMENT 01 · RESUME</div>
+          <h2 class="text-xl sm:text-2xl font-bold text-white">신재원 표준 이력서</h2>
+          <p class="text-xs text-zinc-400 mt-1">기본 인적사항, 핵심 기술 스택, 자격 사항 및 13주 이력</p>
+        </div>
+
+        <div class="space-y-6 text-xs sm:text-sm text-zinc-300">
+          <!-- 기본 인적사항 -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-lg bg-[#0d0d10] border border-zinc-800">
+            <div>
+              <span class="text-zinc-500 font-mono block text-xs">성명:</span>
+              <span class="text-white font-semibold text-base">신재원</span>
+            </div>
+            <div>
+              <span class="text-zinc-500 font-mono block text-xs">공개 이메일:</span>
+              <a href="mailto:shin.jaewon.security@gmail.com" class="text-zinc-200 underline font-mono">shin.jaewon.security@gmail.com</a>
+            </div>
+            <div>
+              <span class="text-zinc-500 font-mono block text-xs">병역 사항:</span>
+              <span class="text-zinc-200">해군 OCS 학사장교 만기전역 (초계함 조함 당직사관)</span>
+            </div>
+            <div>
+              <span class="text-zinc-500 font-mono block text-xs">보유 자격:</span>
+              <span class="text-zinc-200">정보보안산업기사, 네트워크관리사 2급, 리눅스마스터 2급</span>
+            </div>
+          </div>
+
+          <!-- 전문 분야 및 기술 스택 -->
+          <div>
+            <h3 class="text-sm font-bold text-white font-mono mb-2">보유 기술 스택</h3>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2.5 py-1 rounded bg-zinc-800/80 text-zinc-300 font-mono text-xs">Linux / Shell</span>
+              <span class="px-2.5 py-1 rounded bg-zinc-800/80 text-zinc-300 font-mono text-xs">Network / Packet Analysis</span>
+              <span class="px-2.5 py-1 rounded bg-zinc-800/80 text-zinc-300 font-mono text-xs">W3C WebAuthn</span>
+              <span class="px-2.5 py-1 rounded bg-zinc-800/80 text-zinc-300 font-mono text-xs">PBKDF2 / Web Crypto API</span>
+              <span class="px-2.5 py-1 rounded bg-zinc-800/80 text-zinc-300 font-mono text-xs">Python / Scikit-Learn</span>
+              <span class="px-2.5 py-1 rounded bg-zinc-800/80 text-zinc-300 font-mono text-xs">Git / CI/CD</span>
+            </div>
+          </div>
+
+          <!-- 13주 집중 훈련 이력 -->
+          <div>
+            <h3 class="text-sm font-bold text-white font-mono mb-2">교육 이력</h3>
+            <div class="p-4 rounded-lg bg-[#0d0d10] border border-zinc-800">
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-bold text-white">SKT 부트캠프 시스템 & 엔지니어링 과정</span>
+                <span class="text-zinc-500 font-mono text-xs">2026.08 ~ 2026.09 (완주)</span>
+              </div>
+              <p class="text-xs text-zinc-400">
+                13주 65일 전일 출석 (출석률 100%), 11개 실무 과제 정시 완주 (완주율 100%), 29일 데일리 리추얼 완주
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 문서 2: 자기소개서 -->
+      <section id="doc2" class="card border border-zinc-800 bg-[#141418] mb-12 hidden">
+        <div class="border-b border-zinc-800 pb-4 mb-6">
+          <div class="text-xs font-mono text-[#ba9578] font-bold mb-1">DOCUMENT 02 · COVER LETTER</div>
+          <h2 class="text-xl sm:text-2xl font-bold text-white">자기소개서 본편</h2>
+          <p class="text-xs text-zinc-400 mt-1">소설을 사실로 환원한 1,479자 진솔한 자기소개서 전문 (BRA-C01, BRA-C02 준수)</p>
+        </div>
+
+        <div class="p-5 rounded-lg bg-[#0d0d10] border border-zinc-800 text-xs sm:text-sm text-zinc-300 leading-relaxed space-y-4">
+          <p>
+            나에게 2022년부터 2024년까지의 시간은 맞지 않는 옷을 입고 거친 비바람을 견뎌야 했던 짙은 그늘의 계절이었다. 해군 장교 전역 후 생계를 위해 대구 상가 골목에서 시작한 자영업은 현실의 냉혹한 무게로 숨을 조여왔다. 적성에 맞지 않는 일과 매일 밤 이어지는 적자 압박은 서서히 몸과 마음을 갉아먹었다. 사람 사이에 치이며 온기를 잃어갔고, 2024년 12월 결국 차가운 셔터를 내렸을 때 나는 깊은 무력감에 휩싸였다. 작은 원룸 안에 틀어박혀 세상과 사람을 향해 문을 닫아걸었고, 불 꺼진 방에서 천장만 멍하니 바라보며 방황하던 인생 최대의 고난이었다.
+          </p>
+          <p>
+            2025년 12월, 더 이상 어둠 속에 웅크려 삶을 낭비할 수 없다는 절박한 각성이 심장을 두드렸다. 나는 결단을 내리고 연고가 없는 대전으로 거처를 옮기며 정보보안 엔지니어로 전향을 선언했다. "진짜 내 적성에 맞는 길, 정직한 원칙과 논리가 통하는 기술의 길을 찾아 떠나자." 서해 밤바다에서 파도를 뚫고 배를 지켜내던 군 시절의 나침반을 다시 꺼내 들었다. 모니터 앞에 앉아 리눅스와 네트워크 패킷 원리를 밑바닥부터 파고들자, 잃어버렸던 삶의 뜨거운 고동이 마침내 다시 되살아났다.
+          </p>
+          <p>
+            2026년 8월, 대전의 SKT 부트캠프에 입교하며 나의 변화는 실전적인 성장으로 이어졌다. 가장 먼저 되살아난 것은 사람의 마음을 잇는 '대인관계력'이었다. 2026년 8월 28일, 낯선 과제 앞 침묵이 감돌던 강의실 문을 열며 나는 사람에 지쳤던 껍질을 깨고 먼저 환한 눈웃음과 함께 "좋은 아침입니다!"를 외쳤다. 먼저 건넨 인사는 단 3초 만에 얼어붙은 팀의 공기를 녹였고, 동료의 막힌 에러를 함께 밤늦게까지 풀어나가며 팀의 단단한 신뢰와 심리적 안전감을 구축했다.
+          </p>
+          <p>
+            치열한 실습 과정에서 '자기동기력'은 문제를 끝까지 해결하는 집념의 엔진이 되었다. 2026년 9월 3일, 패스키 시크릿 볼트를 구축하던 중 원인 모를 인증 레이스컨디션 오류에 직면했다. 동료들이 지쳐 돌아설 때도 나는 "원인을 규명할 때까지 끝까지 물고 늘어지겠다"며 커널 로그와 암호학 표준을 밤새 역추적했다. 겉핥기식 우회를 거부하고 결함의 뿌리를 파헤친 끝에 결함 0건의 무결점 인증 파이프라인을 완성했다.
+          </p>
+          <p>
+            어떤 악조건 속에서도 흔들리지 않는 루틴을 지켜낸 것은 단단한 '자기조절력' 덕분이었다. 2026년 9월 4일, 손목 통증으로 타이핑조차 버거웠지만, 나는 파스를 감고 아침 일찍 강의실에 출석해 당일 학습 목표를 100% 채워냈다. 그리고 저녁마다 대전 갑천 둔치를 5.2km 달리며 호흡을 가다듬고 체력과 멘탈의 템포를 조절하는 페이스메이커 루틴을 지켜냈다.
+          </p>
+          <p>
+            고난의 늪을 건너 사람의 온기와 기술의 정직함을 두 손에 쥔 지금, 나는 책상 앞에만 머무는 준비생의 생활을 매듭짓고자 한다. 배움에는 끝이 없지만, 이제 강의실을 넘어 세상의 시스템을 안전하게 지키는 현업 엔지니어로 당당히 나아갈 것이다. 현장이라는 거대한 바다를 향해 닻을 올린 신재원의 발걸음에는 이제 일말의 망설임도 없다.
+          </p>
+        </div>
+      </section>
+
+      <!-- 문서 3: 경력기술서 (과제별 세 능력 및 STAR) -->
+      <section id="doc3" class="card border border-zinc-800 bg-[#141418] mb-12 hidden">
+        <div class="border-b border-zinc-800 pb-4 mb-6">
+          <div class="text-xs font-mono text-[#ba9578] font-bold mb-1">DOCUMENT 03 · PORTFOLIO SPECIFICATION</div>
+          <h2 class="text-xl sm:text-2xl font-bold text-white">경력기술서 (STAR 상세 명세표)</h2>
+          <p class="text-xs text-zinc-400 mt-1">11개 실무 과제별 세 능력 분류 및 상황(S)·행동(A)·결과(R) 기술 (BRA-C08 준수)</p>
+        </div>
+
+        <div class="overflow-x-auto rounded-lg border border-zinc-800 bg-[#0d0d10]">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-zinc-900/80 border-b border-zinc-800 text-zinc-300 font-mono">
+                <th class="p-3 font-semibold">과제 번호 및 과제명</th>
+                <th class="p-3 font-semibold">핵심 능력</th>
+                <th class="p-3 font-semibold min-w-[280px]">상황 (Situation) & 행동 (Action)</th>
+                <th class="p-3 font-semibold min-w-[200px]">결과 (Result)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-800/60 text-zinc-300">
+              <!-- 과제 8 -->
+              <tr class="hover:bg-zinc-900/30">
+                <td class="p-3 align-top font-mono text-white font-semibold">
+                  과제 8 · 패스키 시크릿 볼트
+                </td>
+                <td class="p-3 align-top">
+                  <span class="px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 font-mono">자기동기력</span>
+                </td>
+                <td class="p-3 align-top leading-relaxed">
+                  <strong>[S]</strong> 간헐적 WebAuthn 인증 레이스컨디션 오류 발생.<br>
+                  <strong>[A]</strong> 임시 땜질 대신 커널 시스템 콜과 W3C 표준 스펙을 밤새 역추적하여 원인 규명.
+                </td>
+                <td class="p-3 align-top text-emerald-400">
+                  결함 0건의 무결점 비밀번호 프리 생체인증 아키텍처 완성.
+                </td>
+              </tr>
+              <!-- 과제 6,7 -->
+              <tr class="hover:bg-zinc-900/30">
+                <td class="p-3 align-top font-mono text-white font-semibold">
+                  과제 6·7 · 다이어리 및 리추얼
+                </td>
+                <td class="p-3 align-top">
+                  <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 font-mono">자기조절력</span>
+                </td>
+                <td class="p-3 align-top leading-relaxed">
+                  <strong>[S]</strong> 손목 건초염 통증 및 학습 피로 누적 상황.<br>
+                  <strong>[A]</strong> 파스를 감고 조기 출석 완수 및 저녁 갑천 5.2km 러닝 루틴으로 페이스 조절.
+                </td>
+                <td class="p-3 align-top text-emerald-400">
+                  29일 연속 리추얼 100% 달성 및 65일 무결석 출석 완주.
+                </td>
+              </tr>
+              <!-- 과제 1 -->
+              <tr class="hover:bg-zinc-900/30">
+                <td class="p-3 align-top font-mono text-white font-semibold">
+                  과제 1 · 프로필 & 방명록
+                </td>
+                <td class="p-3 align-top">
+                  <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-mono">대인관계력</span>
+                </td>
+                <td class="p-3 align-top leading-relaxed">
+                  <strong>[S]</strong> 침묵이 흐르는 첫 강의실의 서먹한 분위기.<br>
+                  <strong>[A]</strong> 먼저 밝은 인사로 다가가 심리적 안전감을 형성하고 피드백 교환 채널 구축.
+                </td>
+                <td class="p-3 align-top text-emerald-400">
+                  동료 14회 인사 실천 피드백 및 적극적인 상호 코드 리뷰 활성화.
+                </td>
+              </tr>
+              <!-- 과제 10 -->
+              <tr class="hover:bg-zinc-900/30">
+                <td class="p-3 align-top font-mono text-white font-semibold">
+                  과제 10 · 외계행성 분류 논문
+                </td>
+                <td class="p-3 align-top">
+                  <span class="px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 font-mono">자기동기력</span>
+                </td>
+                <td class="p-3 align-top leading-relaxed">
+                  <strong>[S]</strong> 방대한 NASA 케플러 관측 데이터 분석 난제.<br>
+                  <strong>[A]</strong> 데이터 전처리 파이프라인 구축 및 중고생도 이해할 수 있는 10줄 초록 규격 정립.
+                </td>
+                <td class="p-3 align-top text-emerald-400">
+                  머신러닝 기반 후보 선별 모델 구현 및 100% 재현 패키지 완비.
+                </td>
+              </tr>
+              <!-- 과제 5 -->
+              <tr class="hover:bg-zinc-900/30">
+                <td class="p-3 align-top font-mono text-white font-semibold">
+                  과제 5 · 5대 장애 복구 보드
+                </td>
+                <td class="p-3 align-top">
+                  <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 font-mono">자기조절력</span>
+                </td>
+                <td class="p-3 align-top leading-relaxed">
+                  <strong>[S]</strong> 서비스 장애 복구 시나리오 실습.<br>
+                  <strong>[A]</strong> 당황하지 않고 체크리스트 기반의 단계별 장애 격리 및 시스템 복구 프로토콜 수행.
+                </td>
+                <td class="p-3 align-top text-emerald-400">
+                  전 장애 항목 100% 성공 복구 및 시스템 가용성 유지.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="mt-auto border-t border-zinc-800 bg-[#0c0c0e] py-8 text-center text-xs text-zinc-500 font-mono">
+    <div class="container-box flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p>&copy; 2026 집념의 사나이 신재원. All rights reserved.</p>
+      <div class="flex items-center gap-4">
+        <a href="/" class="hover:text-zinc-300 transition-colors">홈</a>
+        <a href="/portfolio.html" class="hover:text-zinc-300 transition-colors">내 이야기</a>
+        <a href="/records.html" class="hover:text-zinc-300 transition-colors">13주 실증 기록</a>
+        <a href="/projects.html" class="hover:text-zinc-300 transition-colors">대표작</a>
+        <a href="/documents.html" class="text-[#ba9578] hover:underline font-bold">입사 지원 문서</a>
+        <a href="/updater.html" class="hover:text-zinc-300 transition-colors">지속 갱신 장치</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function switchDocTab(tabId) {
+      document.getElementById('doc1').classList.add('hidden');
+      document.getElementById('doc2').classList.add('hidden');
+      document.getElementById('doc3').classList.add('hidden');
+      document.getElementById('tabBtn1').classList.remove('active');
+      document.getElementById('tabBtn2').classList.remove('active');
+      document.getElementById('tabBtn3').classList.remove('active');
+
+      document.getElementById(tabId).classList.remove('hidden');
+      if (tabId === 'doc1') document.getElementById('tabBtn1').classList.add('active');
+      if (tabId === 'doc2') document.getElementById('tabBtn2').classList.add('active');
+      if (tabId === 'doc3') document.getElementById('tabBtn3').classList.add('active');
+    }
+  </script>
+</body>
+</html>
