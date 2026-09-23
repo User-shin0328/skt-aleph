@@ -151,7 +151,7 @@ def main():
         "generated_at": "2026-09-23T11:40:00+09:00",
         "author": "신재원",
         "headline": "거친 파도를 넘어 기술의 정직함과 사람의 온기로 시스템을 지키는 사람",
-        "contact_email": "shin.jaewon.security@gmail.com",
+        "contact_email": "shinojw@gmail.com",
         "metrics": {
             "attendance": {
                 "label": "13주 출석률",

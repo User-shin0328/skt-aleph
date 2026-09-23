@@ -33,7 +33,7 @@ window.SITE_DATA = {
     }
   ],
   "author": "신재원",
-  "contact_email": "shin.jaewon.security@gmail.com",
+  "contact_email": "shinojw@gmail.com",
   "featured_projects": [
     {
       "badge": "과제 10 대표작",
