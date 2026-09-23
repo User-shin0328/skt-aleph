@@ -244,6 +244,18 @@
         </p>
       </section>
 
+      <!-- 실시간 동기화 상태 배너 (설정 재생성기에서 값 변경 시 표시) -->
+      <div id="syncAlertBanner" class="hidden mb-6 p-4 rounded-xl bg-amber-950/40 border border-amber-500/40 text-xs text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+          <span><strong>설정 페이지 연동됨</strong>: 재생성기에서 설정한 커스텀 수치가 실시간 반영된 상태입니다.</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <a href="/updater.html" class="px-2.5 py-1 rounded bg-[#ba9578] hover:bg-[#a27b5c] text-black font-bold font-mono text-[11px] transition-colors">설정 변경</a>
+          <button onclick="resetOfficialRecords()" class="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-mono text-[11px] transition-colors">공식 기본값 복원</button>
+        </div>
+      </div>
+
       <!-- 13주 핵심 지표 카드 3종 -->
       <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
 
@@ -254,11 +266,11 @@
               <span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 font-semibold">ATTENDANCE</span>
               <span class="text-emerald-400 font-bold">고난 장면 짝지음</span>
             </div>
-            <div class="text-3xl sm:text-4xl font-black text-white font-mono mb-2">
+            <div id="recAttendanceRate" class="text-3xl sm:text-4xl font-black text-white font-mono mb-2">
               100.0%
             </div>
             <p class="text-xs sm:text-sm text-zinc-300 mb-4 font-medium">
-              13주 총 65일 전일 출석 (지각 0 · 결석 0)
+              13주 총 <span id="recAttendanceDays">65</span>일 전일 출석 (지각 0 · 결석 0)
             </p>
 
             <!-- 고난 극복 짝지음 박스 -->
@@ -284,11 +296,11 @@
               <span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 font-semibold">RITUAL</span>
               <span class="text-blue-400 font-bold">매일 성찰</span>
             </div>
-            <div class="text-3xl sm:text-4xl font-black text-white font-mono mb-2">
-              29일 / 100%
+            <div id="recRitualRate" class="text-3xl sm:text-4xl font-black text-white font-mono mb-2">
+              29일 (44.6%)
             </div>
-            <p class="text-xs sm:text-sm text-zinc-300 mb-4 font-medium">
-              아침 호흡 및 3대 강점 실천 루틴 100% 완주
+            <p id="recRitualDesc" class="text-xs sm:text-sm text-zinc-300 mb-4 font-medium">
+              아침 호흡 및 3대 강점 실천 루틴 (총 65일 기준)
             </p>
 
             <!-- 강점 실천 집계 내역 -->
@@ -309,7 +321,7 @@
           </div>
 
           <div class="pt-3 border-t border-zinc-800/80 text-[11px] font-mono text-zinc-400">
-            출처: 리추얼 기록 (29일간의 데일리 일지)
+            출처: 리추얼 기록 (데일리 일지)
           </div>
         </div>
 
@@ -320,11 +332,11 @@
               <span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 font-semibold">SUBMISSIONS</span>
               <span class="text-[#ba9578] font-bold">전 과제 정시 완주</span>
             </div>
-            <div class="text-3xl sm:text-4xl font-black text-white font-mono mb-2">
+            <div id="recSubmissionsCount" class="text-3xl sm:text-4xl font-black text-white font-mono mb-2">
               11 / 11개
             </div>
-            <p class="text-xs sm:text-sm text-zinc-300 mb-4 font-medium">
-              13주간 11개 실무 과제 정시 완주율 100%
+            <p id="recSubmissionsDesc" class="text-xs sm:text-sm text-zinc-300 mb-4 font-medium">
+              13주간 11개 실무 과제 정시 완주율 100.0%
             </p>
 
             <!-- 검증 산출물 목록 -->
@@ -457,5 +469,45 @@
     </div>
   </footer>
 
+  <!-- 설정 페이지(재생성기)와의 실시간 데이터 동기화 스크립트 -->
+  <script>
+    function loadSynchronizedMetrics() {
+      const saved = localStorage.getItem('skt_portfolio_metrics');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          if (data.attRate !== undefined && data.attendance !== undefined) {
+            const attRateEl = document.getElementById('recAttendanceRate');
+            const attDaysEl = document.getElementById('recAttendanceDays');
+            if (attRateEl) attRateEl.textContent = `${data.attRate}%`;
+            if (attDaysEl) attDaysEl.textContent = data.attendance;
+          }
+          if (data.ritual !== undefined && data.ritRate !== undefined) {
+            const ritRateEl = document.getElementById('recRitualRate');
+            const ritDescEl = document.getElementById('recRitualDesc');
+            if (ritRateEl) ritRateEl.textContent = `${data.ritual}일 (${data.ritRate}%)`;
+            if (ritDescEl) ritDescEl.textContent = `아침 호흡 및 3대 강점 실천 루틴 (총 65일 중 ${data.ritual}일 완료, 달성률 ${data.ritRate}%)`;
+          }
+          if (data.submissions !== undefined && data.subRate !== undefined) {
+            const subCountEl = document.getElementById('recSubmissionsCount');
+            const subDescEl = document.getElementById('recSubmissionsDesc');
+            if (subCountEl) subCountEl.textContent = `${data.submissions} / 11개`;
+            if (subDescEl) subDescEl.textContent = `13주간 11개 실무 과제 정시 완주율 ${data.subRate}%`;
+          }
+          const banner = document.getElementById('syncAlertBanner');
+          if (banner) banner.classList.remove('hidden');
+        } catch(e) {
+          console.error(e);
+        }
+      }
+    }
+
+    function resetOfficialRecords() {
+      localStorage.removeItem('skt_portfolio_metrics');
+      location.reload();
+    }
+
+    document.addEventListener('DOMContentLoaded', loadSynchronizedMetrics);
+  </script>
 </body>
 </html>

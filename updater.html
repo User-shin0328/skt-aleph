@@ -315,7 +315,7 @@
             <!-- 2. 리추얼 일수 -->
             <div>
               <label for="inputRitual" class="block text-xs font-mono text-zinc-400 mb-1">
-                데일리 리추얼 수행 일수 (일):
+                데일리 리추얼 수행 일수 (총 65일 기준):
               </label>
               <input 
                 type="number" 
@@ -323,7 +323,7 @@
                 class="form-input" 
                 value="29" 
                 min="1" 
-                max="100"
+                max="65"
               >
             </div>
 
@@ -354,16 +354,33 @@
               </select>
             </div>
 
-            <!-- 재계산 버튼 -->
-            <button 
-              type="button" 
-              onclick="recalculateProfile()"
-              class="w-full mt-2 py-3 px-4 rounded-lg bg-[#ba9578] hover:bg-[#a27b5c] text-black font-bold text-xs sm:text-sm font-mono transition-colors shadow-lg"
-            >
-              새 기록 재계산 및 문단 후보 생성
-            </button>
+            <!-- 버튼 영역: 재계산 및 실증기록 반영 -->
+            <div class="space-y-2 pt-1">
+              <button 
+                type="button" 
+                onclick="recalculateProfile(true)"
+                class="w-full py-3 px-4 rounded-lg bg-[#ba9578] hover:bg-[#a27b5c] text-black font-bold text-xs sm:text-sm font-mono transition-colors shadow-lg flex items-center justify-center gap-2"
+              >
+                <span>⚡ 새 기록 재계산 및 실증기록 반영</span>
+              </button>
+              
+              <button 
+                type="button" 
+                onclick="resetToDefaultMetrics()"
+                class="w-full py-2 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 font-mono text-xs border border-zinc-800 transition-colors"
+              >
+                공식 기본 기록으로 복원
+              </button>
+            </div>
+
+            <!-- 반영 피드백 안내창 -->
+            <div id="saveFeedback" class="hidden p-3 rounded-lg bg-emerald-950/80 border border-emerald-500/40 text-xs text-emerald-300 flex items-center justify-between">
+              <span>✅ <strong>실증 기록 페이지 반영 완료!</strong></span>
+              <a href="/records.html" class="underline font-bold text-emerald-200 hover:text-white">확인 &rarr;</a>
+            </div>
+
             <p class="text-[11px] text-zinc-500 font-mono text-center">
-              동일 입력 시 100% 동일 결과 보장 (SHA-256 검증 호환)
+              수치 변경 시 실증 기록 페이지(/records.html)에 즉시 동기화됩니다.
             </p>
           </div>
 
@@ -495,27 +512,36 @@
     </div>
   </footer>
 
-  <!-- 실시간 재계산 스크립트 -->
+  <!-- 실시간 재계산 및 실증기록 동기화 스크립트 -->
   <script>
-    function recalculateProfile() {
-      const attendance = parseInt(document.getElementById('inputAttendance').value, 10) || 65;
-      const ritual = parseInt(document.getElementById('inputRitual').value, 10) || 29;
-      const submissions = parseInt(document.getElementById('inputSubmissions').value, 10) || 11;
+    function recalculateProfile(saveToStorage = false) {
+      let attendance = parseInt(document.getElementById('inputAttendance').value, 10);
+      if (isNaN(attendance) || attendance < 1) attendance = 1;
+      if (attendance > 65) { attendance = 65; document.getElementById('inputAttendance').value = 65; }
+
+      let ritual = parseInt(document.getElementById('inputRitual').value, 10);
+      if (isNaN(ritual) || ritual < 1) ritual = 1;
+      if (ritual > 65) { ritual = 65; document.getElementById('inputRitual').value = 65; }
+
+      let submissions = parseInt(document.getElementById('inputSubmissions').value, 10);
+      if (isNaN(submissions) || submissions < 1) submissions = 1;
+      if (submissions > 11) { submissions = 11; document.getElementById('inputSubmissions').value = 11; }
+
       const theme = document.getElementById('inputKeyword').value;
 
-      // 출석률 계산
+      // 1. 출석률 계산 (총 65일 기준)
       const attRate = ((attendance / 65) * 100).toFixed(1);
       document.getElementById('statAttendance').textContent = `${attRate}%`;
 
-      // 리추얼 달성률
-      const ritRate = Math.min(100, Math.round((ritual / 29) * 100));
+      // 2. 리추얼 달성률 (총 65일 기준)
+      const ritRate = ((ritual / 65) * 100).toFixed(1);
       document.getElementById('statRitual').textContent = `${ritual}일 (${ritRate}%)`;
 
-      // 과제 완주율
+      // 3. 과제 완주율 (총 11개 기준)
       const subRate = ((submissions / 11) * 100).toFixed(1);
       document.getElementById('statSubmissions').textContent = `${subRate}%`;
 
-      // 테마별 문단 후보 텍스트 실시간 갱신
+      // 4. 테마별 문단 후보 텍스트 실시간 갱신
       if (theme === 'night') {
         document.getElementById('candText1').textContent = 
           `"어떤 악조건과 피로 속에서도 나와의 약속을 지켜내는 '자기조절력'을 실천했습니다. ${attendance}일간의 치열한 일정 속에서 늦은 밤 디버깅 후에도 다음 날 아침 정시 출석 루틴을 흔들림 없이 유지했습니다."`;
@@ -538,7 +564,65 @@
         document.getElementById('candText3').textContent = 
           `"실습이 거듭될수록 문제를 끝까지 파고드는 자기동기력은 포기를 모르는 과제지속력으로 자라났습니다. 2026년 9월 3일, 패스키 볼트 오류 앞에서도 끝까지 물고 늘어져 결함 0건의 무결점 파이프라인을 완성했습니다."`;
       }
+
+      // 5. 로컬스토리지 저장 및 실증기록 페이지 동기화
+      if (saveToStorage) {
+        const payload = {
+          attendance,
+          attRate,
+          ritual,
+          ritRate,
+          submissions,
+          subRate,
+          theme,
+          savedAt: new Date().toISOString()
+        };
+        localStorage.setItem('skt_portfolio_metrics', JSON.stringify(payload));
+        const fb = document.getElementById('saveFeedback');
+        if (fb) {
+          fb.classList.remove('hidden');
+          fb.innerHTML = '<span>✅ <strong>실증 기록 페이지(/records.html) 반영 완료!</strong></span> <a href="/records.html" class="underline font-bold text-emerald-200 hover:text-white">실증 기록 보러가기 &rarr;</a>';
+        }
+      }
     }
+
+    function resetToDefaultMetrics() {
+      localStorage.removeItem('skt_portfolio_metrics');
+      document.getElementById('inputAttendance').value = 65;
+      document.getElementById('inputRitual').value = 29;
+      document.getElementById('inputSubmissions').value = 11;
+      document.getElementById('inputKeyword').value = 'default';
+      recalculateProfile(false);
+      const fb = document.getElementById('saveFeedback');
+      if (fb) {
+        fb.classList.remove('hidden');
+        fb.innerHTML = '<span>🔄 공식 기본 기록으로 복원되었습니다.</span> <a href="/records.html" class="underline font-bold text-emerald-200 hover:text-white">실증 기록 보러가기 &rarr;</a>';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('skt_portfolio_metrics');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          if (data.attendance !== undefined) document.getElementById('inputAttendance').value = data.attendance;
+          if (data.ritual !== undefined) document.getElementById('inputRitual').value = data.ritual;
+          if (data.submissions !== undefined) document.getElementById('inputSubmissions').value = data.submissions;
+          if (data.theme !== undefined) document.getElementById('inputKeyword').value = data.theme;
+          recalculateProfile(false);
+          const fb = document.getElementById('saveFeedback');
+          if (fb) {
+            fb.classList.remove('hidden');
+            fb.innerHTML = '<span>⚡ <strong>동기화된 기록이 적용 중입니다.</strong></span> <a href="/records.html" class="underline font-bold text-emerald-200 hover:text-white">실증 기록 확인 &rarr;</a>';
+          }
+        } catch(e) {
+          console.error(e);
+          recalculateProfile(false);
+        }
+      } else {
+        recalculateProfile(false);
+      }
+    });
   </script>
 </body>
 </html>
