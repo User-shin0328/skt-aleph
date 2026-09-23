@@ -150,7 +150,7 @@ def main():
     site_data = {
         "generated_at": "2026-09-23T11:40:00+09:00",
         "author": "신재원",
-        "headline": "거친 파도를 넘어 기술의 정직함과 사람의 온기로 시스템을 지키는 사람",
+        "headline": "비바람의 계절을 건너며 단단해진 회복탄력성으로 묵묵히 제자리를 지켜내는 사람",
         "contact_email": "shinojw@gmail.com",
         "metrics": {
             "attendance": {
