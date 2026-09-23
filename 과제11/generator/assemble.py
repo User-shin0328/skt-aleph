@@ -49,7 +49,7 @@ def build_novel_body():
             anchor = f"[CH{ch_idx:02d}-P{p_idx:03d}]"
             all_anchors.append(anchor)
             raw_paras.append(para)
-            lines.append(f"{anchor} {para}\n")
+            lines.append(f"{para}\n")
         lines.append("---\n")
     
     lines.append("<!-- NOVEL_BODY_END -->\n")
