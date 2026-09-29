@@ -185,11 +185,11 @@ def main():
             },
             {
                 "id": "proj-app-13",
-                "title": "13번 제로트러스트 보안 웹 애플리케이션",
-                "badge": "과제 13 대표작 (예정)",
-                "status": "배포 예정 (2026년 10월 16일)",
-                "link": "#",
-                "description": "클라우드 네이티브 제로트러스트 환경에서 WebAuthn 생체인증과 엔드투엔드 암호화를 결합한 실시간 데이터 무결성 검증 보안 플랫폼"
+                "title": "ExoForge: 골디락스를 찾아서 (과제 B 대표작)",
+                "badge": "과제 B 대표작 (10번 논문 연계)",
+                "status": "정식 배포 (즉시 실행 가능)",
+                "link": "/exoforge.html",
+                "description": "NASA 2,220개 외계행성 데이터 기반, 모항성 철 함량([Fe/H])이 거대 가스행성과 골디락스 행성의 형성에 미치는 영향을 시뮬레이션과 인터랙티브 차트로 검증하는 웹 애플리케이션"
             }
         ],
         "approved_paragraphs": approved_candidates
