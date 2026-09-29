@@ -277,20 +277,33 @@
         <div class="lg:col-span-7 hud-panel rounded-xl p-4 flex flex-col relative overflow-hidden">
           
           <!-- 뷰포트 상단 HUD 뱃지 -->
-          <div class="flex items-center justify-between mb-2 z-10">
+          <!-- 뷰포트 상단 HUD 뱃지 및 제어 도구 -->
+          <div class="flex flex-wrap items-center justify-between mb-2 z-10 gap-2">
             <div class="flex items-center gap-2">
               <span class="inline-block w-2 h-2 rounded-full bg-emerald-glow animate-ping"></span>
               <span class="font-hud text-xs text-cyan-glow tracking-widest uppercase">ORBITAL SIMULATOR [60 FPS]</span>
             </div>
             <div class="flex items-center gap-2 text-[11px] font-mono text-zinc-400">
-              <span class="flex items-center gap-1">
+              <span class="hidden sm:flex items-center gap-1">
                 <span class="w-3 h-1.5 rounded-full bg-emerald-500/40 border border-emerald-400"></span>
-                <span>골디락스 존 (Habitable Zone)</span>
+                <span>골디락스 존</span>
               </span>
+              <!-- 공전 멈춤 / 재개 토글 버튼 -->
+              <button 
+                onclick="togglePauseSim()" 
+                id="pauseBtn" 
+                class="px-2.5 py-1 rounded bg-space-800 hover:bg-space-700 text-amber-300 hover:text-amber-200 border border-amber-500/50 hover:border-amber-400 transition-colors flex items-center gap-1.5 font-mono text-xs font-bold shadow-sm"
+                title="행성 공전 일시 정지 / 재개 토글"
+              >
+                <span id="pauseIcon">⏸️</span>
+                <span id="pauseText">공전 멈춤</span>
+              </button>
+              <!-- 공전 속도 토글 -->
               <button 
                 onclick="toggleSimSpeed()" 
                 id="speedBtn" 
-                class="px-2 py-0.5 rounded bg-space-800 hover:bg-space-700 text-cyan-300 border border-space-600 transition-colors"
+                class="px-2 py-1 rounded bg-space-800 hover:bg-space-700 text-cyan-300 border border-space-600 transition-colors text-xs font-mono font-bold"
+                title="공전 애니메이션 배속"
               >
                 1.0x
               </button>
@@ -303,15 +316,20 @@
             
             <!-- 캔버스 위 오버레이 안내 -->
             <div id="simOverlayMsg" class="absolute bottom-3 left-3 pointer-events-none text-[11px] font-mono text-cyan-400/80 bg-space-900/80 px-2.5 py-1 rounded border border-cyan-500/30">
-              궤도 공전 애니메이션 실행 중 · 행성에 마우스를 올리면 상세 물리량이 표시됩니다.
+              행성을 클릭하면 질량을 자유롭게 조절할 수 있습니다 · ⏸️ 버튼으로 공전을 멈출 수 있습니다.
             </div>
 
             <!-- 행성 상세 툴팁 (동적 위치) -->
-            <div id="simTooltip" class="hidden absolute pointer-events-none z-20 p-2.5 rounded-lg bg-space-900/95 border border-cyan-400 text-xs font-mono text-zinc-200 shadow-xl max-w-[200px]">
-              <div id="tipName" class="font-bold text-cyan-glow border-b border-space-700 pb-1 mb-1">Planet</div>
-              <div id="tipType" class="text-emerald-400 text-[11px]">Type</div>
-              <div id="tipDist" class="text-zinc-400 text-[10px]">Orbit: 1.0 AU</div>
-              <div id="tipMass" class="text-zinc-400 text-[10px]">Mass: 1.0 M_E</div>
+            <div id="simTooltip" class="hidden absolute pointer-events-none z-20 p-3 rounded-lg bg-space-900/95 border border-cyan-400 text-xs font-mono text-zinc-200 shadow-xl min-w-[220px]">
+              <div class="flex items-center justify-between border-b border-space-700 pb-1 mb-1.5">
+                <span id="tipName" class="font-bold text-cyan-glow">Planet</span>
+                <span id="tipTypeBadge" class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">Type</span>
+              </div>
+              <div id="tipDist" class="text-zinc-300 text-[11px]">궤도 거리: 1.00 AU</div>
+              <div id="tipMassRadius" class="text-zinc-300 text-[11px]">반경: 1.00 R_E | 질량: 1.00 M_E</div>
+              <div id="tipGravity" class="text-amber-300 text-[11px] font-bold mt-1">표면 중력: 1.00 g (9.8 m/s²)</div>
+              <div id="tipIronRatio" class="text-cyan-300 text-[11px]">철 영향 중력비: 1.00x (핵 33%)</div>
+              <div id="tipWater" class="text-emerald-300 text-[11px] font-bold pt-1.5 border-t border-space-700/60 mt-1">💧 물의 존재 가능성: 88%</div>
             </div>
           </div>
 
@@ -385,6 +403,135 @@
               >
                 🔵 부금속 (+0.35)
               </button>
+            </div>
+          </div>
+
+          <!-- 컨트롤 2 (신규): 행성 선택 및 질량 자유 조작소 (범위 제한 없음) & 중력/철 중력비/물 존재성 -->
+          <div class="hud-panel rounded-xl p-4 space-y-3.5 border border-cyan-500/30 bg-[#070c18]/90">
+            <div class="flex items-center justify-between border-b border-space-700/80 pb-2">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-cyan-glow"></span>
+                <span class="text-xs font-hud font-bold text-cyan-glow uppercase tracking-wider">PLANET INSPECTOR &amp; MASS TUNER</span>
+              </div>
+              <span id="selectedPlanetBadge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 font-bold">
+                Planet-A 선택됨
+              </span>
+            </div>
+
+            <!-- 행성 선택 탭 버튼들 -->
+            <div>
+              <div class="text-[10px] font-mono text-zinc-400 mb-1.5 flex justify-between">
+                <span>조작할 행성 선택 (또는 캔버스 행성 클릭):</span>
+                <span class="text-cyan-400 font-bold" id="inspectorDistText">1.05 AU</span>
+              </div>
+              <div id="planetSelectorList" class="flex flex-wrap gap-1.5">
+                <!-- JS에서 동적 생성 -->
+              </div>
+            </div>
+
+            <!-- 1. 질량 자유 설정 컨트롤러 (범위 제한 없음) -->
+            <div class="p-3 rounded-lg bg-space-950 border border-space-700 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-mono text-zinc-300 font-bold">행성 질량 자유 조작:</span>
+                <span class="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-800/40">
+                  자유 입력 모드 (제한 없음)
+                </span>
+              </div>
+
+              <!-- 숫자 직접 입력창 (어떤 숫자든 제한 없이 입력 가능) -->
+              <div class="flex items-center gap-2">
+                <div class="relative flex-grow">
+                  <input 
+                    type="number" 
+                    id="customMassNumberInput" 
+                    step="any"
+                    value="1.0" 
+                    oninput="onCustomMassDirectInput(this.value)"
+                    class="w-full bg-space-900 border border-cyan-500/50 focus:border-cyan-300 rounded px-2.5 py-1.5 text-sm font-mono text-white text-right pr-12 focus:outline-none focus:ring-1 focus:ring-cyan-400 font-bold"
+                    placeholder="임의의 질량 입력"
+                  >
+                  <span class="absolute right-2.5 top-2 text-xs font-mono text-zinc-400 pointer-events-none">M_E</span>
+                </div>
+                <span class="text-xs font-mono text-zinc-400 whitespace-nowrap" id="massJupiterEquiv">
+                  ≈ 0.003 M_J
+                </span>
+              </div>
+
+              <!-- 대수(Log) 슬라이더 (0.01 M_E ~ 3,160 M_E) -->
+              <div>
+                <input 
+                  type="range" 
+                  id="customMassSlider" 
+                  min="-2.0" 
+                  max="3.5" 
+                  step="0.01" 
+                  value="0.0" 
+                  oninput="onCustomMassSliderChange(this.value)"
+                  class="w-full accent-cyan-400"
+                >
+                <div class="flex justify-between text-[10px] font-mono text-zinc-500">
+                  <span>0.01 M_E (소행성)</span>
+                  <span>1.0 M_E (지구)</span>
+                  <span>318 M_E (목성)</span>
+                  <span>3,160 M_E (슈퍼목성)</span>
+                </div>
+              </div>
+
+              <!-- 빠른 질량 프리셋 -->
+              <div class="flex flex-wrap gap-1 pt-1">
+                <button onclick="setMassPreset(0.055)" class="px-1.5 py-0.5 rounded bg-space-800 hover:bg-space-700 text-[10px] font-mono text-zinc-300 border border-space-600">수성(0.05)</button>
+                <button onclick="setMassPreset(1.0)" class="px-1.5 py-0.5 rounded bg-space-800 hover:bg-space-700 text-[10px] font-mono text-cyan-300 border border-cyan-700">지구(1.0)</button>
+                <button onclick="setMassPreset(5.0)" class="px-1.5 py-0.5 rounded bg-space-800 hover:bg-space-700 text-[10px] font-mono text-emerald-300 border border-emerald-700">슈퍼지구(5.0)</button>
+                <button onclick="setMassPreset(17.1)" class="px-1.5 py-0.5 rounded bg-space-800 hover:bg-space-700 text-[10px] font-mono text-purple-300 border border-purple-700">해왕성(17)</button>
+                <button onclick="setMassPreset(317.8)" class="px-1.5 py-0.5 rounded bg-space-800 hover:bg-space-700 text-[10px] font-mono text-amber-300 border border-amber-700">목성(318)</button>
+                <button onclick="setMassPreset(1500.0)" class="px-1.5 py-0.5 rounded bg-space-800 hover:bg-space-700 text-[10px] font-mono text-rose-300 border border-rose-700">초거대목성(1500)</button>
+              </div>
+            </div>
+
+            <!-- 2. 실시간 표면 중력 & 철 함량 중력 비율 디스플레이 -->
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <!-- 표면 중력 -->
+              <div class="p-2.5 rounded-lg bg-space-950 border border-space-700 space-y-1">
+                <div class="text-[11px] font-mono text-zinc-400">표면 중력 (Gravity):</div>
+                <div class="flex items-baseline gap-1">
+                  <span id="inspectorGravityVal" class="text-base font-bold font-mono text-amber-400">1.00 g</span>
+                  <span id="inspectorGravityMS" class="text-[10px] font-mono text-zinc-500">(9.8 m/s²)</span>
+                </div>
+                <div class="text-[10px] font-mono text-zinc-400" id="inspectorGravityDesc">지구 표준 보행 중력</div>
+              </div>
+
+              <!-- 철 함량에 따른 중력 비율 -->
+              <div class="p-2.5 rounded-lg bg-space-950 border border-space-700 space-y-1">
+                <div class="text-[11px] font-mono text-zinc-400">철 함량 중력비율:</div>
+                <div class="flex items-baseline gap-1">
+                  <span id="inspectorFeRatioVal" class="text-base font-bold font-mono text-cyan-glow">1.00x</span>
+                  <span id="inspectorFeCorePercent" class="text-[10px] font-mono text-zinc-500">(핵 33%)</span>
+                </div>
+                <div class="text-[10px] font-mono text-zinc-400" id="inspectorFeRatioDesc">철 함량에 따른 고밀도비</div>
+              </div>
+            </div>
+
+            <!-- 3. 물의 존재 가능성 (Liquid Water Likelihood) -->
+            <div class="p-3 rounded-lg bg-space-950 border border-emerald-500/30 space-y-2">
+              <div class="flex items-center justify-between text-xs font-mono">
+                <span class="text-zinc-300 font-bold flex items-center gap-1">
+                  <span>💧</span>
+                  <span>액체 상태 물의 존재 가능성:</span>
+                </span>
+                <span id="inspectorWaterPercent" class="text-emerald-400 font-bold font-mono text-sm">88%</span>
+              </div>
+              <div class="w-full bg-space-800 h-2 rounded-full overflow-hidden">
+                <div id="inspectorWaterBar" class="bg-gradient-to-r from-cyan-400 to-emerald-400 h-full rounded-full transition-all duration-300" style="width: 88%;"></div>
+              </div>
+              <div class="flex items-center justify-between text-[11px] font-mono">
+                <span class="text-zinc-400">물 상태 판정:</span>
+                <span id="inspectorWaterStateBadge" class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-700 font-bold">
+                  🌊 액체 바다 형성 최적
+                </span>
+              </div>
+              <p id="inspectorWaterDetailText" class="text-[10px] text-zinc-400 leading-relaxed font-mono">
+                골디락스 존(1.05 AU)과 적정 표면 중력(1.00g)으로 대기압을 형성해 액체 상태의 물이 보존될 수 있습니다.
+              </p>
             </div>
           </div>
 
@@ -585,6 +732,24 @@
                 <span class="text-zinc-500 block text-[10px]">발견 기법 (Method):</span>
                 <span id="dossierMethod" class="text-cyan-300 font-bold truncate block">Radial Velocity</span>
               </div>
+              <!-- 신규: 표면 중력 -->
+              <div class="p-2.5 rounded bg-space-950/60 border border-space-700">
+                <span class="text-zinc-500 block text-[10px]">표면 중력 (Gravity):</span>
+                <span id="dossierGravity" class="text-amber-300 font-bold">0.96 g</span>
+              </div>
+              <!-- 신규: 철 함량 중력 비율 -->
+              <div class="p-2.5 rounded bg-space-950/60 border border-space-700">
+                <span class="text-zinc-500 block text-[10px]">철 영향 중력비:</span>
+                <span id="dossierFeRatio" class="text-cyan-300 font-bold">1.04x</span>
+              </div>
+              <!-- 신규: 물의 존재 가능성 -->
+              <div class="col-span-2 p-2.5 rounded bg-space-950/60 border border-emerald-900/50 flex items-center justify-between">
+                <div>
+                  <span class="text-zinc-500 block text-[10px]">액체 물 존재 가능성:</span>
+                  <span id="dossierWaterState" class="text-emerald-300 font-bold text-xs">💧 판정 중</span>
+                </div>
+                <span id="dossierWaterScore" class="text-sm font-bold text-emerald-400 font-mono">--%</span>
+              </div>
             </div>
 
           </div>
@@ -757,6 +922,8 @@
     let currentTab = 'tab1';
     let simAnimationId = null;
     let simSpeed = 1.0;
+    let isSimPaused = false;
+    let selectedPlanetIdx = 0;
     let currentFeH = 0.00;
     let currentPlanets = [];
     let scatterChart = null;
@@ -871,6 +1038,22 @@
     function onFeHChange(val) {
       currentFeH = parseFloat(val);
       updateFeHIndicators(currentFeH);
+      if (currentPlanets && currentPlanets.length > 0) {
+        currentPlanets.forEach(p => {
+          const phys = calculatePlanetPhysics(p, currentFeH);
+          p.radius = phys.radius;
+          p.type = phys.type;
+          p.color = phys.color;
+          p.gravityG = phys.gravityG;
+          p.gravityMS = phys.gravityMS;
+          p.feGravityRatio = phys.feGravityRatio;
+          p.corePercent = phys.corePercent;
+          p.waterLikelihood = phys.waterLikelihood;
+          p.waterState = phys.waterState;
+          p.waterDesc = phys.waterDesc;
+        });
+        updateInspectorUI();
+      }
     }
 
     function applyFeHPreset(val, label) {
@@ -901,92 +1084,197 @@
       document.getElementById('giantProbBar').style.width = `${prob.toFixed(1)}%`;
     }
 
+    // ----------------------------------------------------
+    // [C] 행성 물리 계산 엔진 (표면 중력, 철 중력비, 물 존재성)
+    // ----------------------------------------------------
+    function calculatePlanetPhysics(p, feh) {
+      const massE = p.massE; // 지구 질량 단위 (자유 범위: 0.001 ~ 무한대)
+      const dist = p.dist;   // AU 단위
+
+      // 1. 철 핵 비율 (Iron Core Mass Fraction): 태양 기준 33%, 부금속 +0.5dex -> ~50%, 빈금속 -0.5dex -> ~22%
+      const fCore = Math.min(0.65, Math.max(0.15, 0.33 * Math.pow(10, 0.35 * feh)));
+      const corePercent = Math.round(fCore * 100);
+
+      // 2. 철 함량에 따른 밀도 보정 비율 (지구 표준 밀도 = 1.00)
+      const rhoRatio = 0.67 + 1.0 * fCore;
+      // 동일 질량 대비 표면 중력 가중비: g_fe / g_std = (rho / rho_std)^(2/3)
+      const feGravityRatio = Math.pow(rhoRatio, 2 / 3);
+
+      // 3. 질량-반지름 관계식 (Mass-Radius Physics)
+      let radius = 1.0;
+      let type = 'Terrestrial';
+      let color = '#34D399';
+
+      if (massE <= 0.15) {
+        type = 'Dwarf Planet';
+        radius = Math.max(0.2, Math.pow(massE, 0.33) * Math.pow(1 / rhoRatio, 1 / 3));
+        color = '#94A3B8';
+      } else if (massE <= 2.2) {
+        type = 'Terrestrial';
+        radius = Math.pow(massE, 0.274) * Math.pow(1 / rhoRatio, 1 / 3);
+        color = (dist >= 0.85 && dist <= 1.45) ? '#10B981' : '#34D399';
+      } else if (massE <= 10.0) {
+        type = 'Super-Earth';
+        radius = 1.25 * Math.pow(massE / 2.0, 0.28) * Math.pow(1 / rhoRatio, 1 / 3);
+        color = '#00F2FE';
+      } else if (massE <= 80.0) {
+        type = 'Neptune-like';
+        radius = 2.4 * Math.pow(massE / 10.0, 0.42);
+        color = '#8B5CF6';
+      } else if (massE <= 4000.0) {
+        type = dist < 0.6 ? 'Hot Jupiter' : 'Gas Giant';
+        radius = Math.min(15.0, 9.5 * Math.pow(massE / 318.0, 0.06));
+        color = dist < 0.6 ? '#EF4444' : '#F59E0B';
+      } else {
+        type = 'Super-Jupiter';
+        radius = Math.min(13.0, 11.2 * Math.pow(4000.0 / massE, 0.05));
+        color = '#EC4899';
+      }
+
+      // 4. 표면 중력 g (g_earth 단위) 및 m/s²
+      const gravityG = massE / Math.pow(radius, 2);
+      const gravityMS = gravityG * 9.807;
+
+      // 5. 물의 존재 가능성 평가 (0 ~ 100%)
+      let orbitFactor = 0;
+      if (dist >= 0.85 && dist <= 1.45) {
+        const diff = Math.abs(dist - 1.05);
+        orbitFactor = 1.0 - (diff / 0.45) * 0.25; // 0.75 ~ 1.0
+      } else if (dist < 0.85) {
+        orbitFactor = Math.max(0, 0.75 - Math.pow((0.85 - dist) / 0.55, 1.5));
+      } else {
+        orbitFactor = Math.max(0, 0.75 - Math.pow((dist - 1.45) / 2.0, 1.2));
+      }
+
+      let gravFactor = 0;
+      if (gravityG >= 0.5 && gravityG <= 2.2) {
+        gravFactor = 1.0;
+      } else if (gravityG < 0.5) {
+        gravFactor = Math.max(0.05, gravityG / 0.5);
+      } else {
+        gravFactor = Math.max(0.1, 1.0 - (gravityG - 2.2) / 6.0);
+      }
+
+      let waterLikelihood = 0;
+      let waterState = '🪐 가스 심연 (초고압 대기)';
+      let waterDesc = '';
+
+      if (type.includes('Giant') || type.includes('Neptune') || type === 'Super-Jupiter') {
+        waterLikelihood = 0;
+        waterState = '🪐 가스 심연 (초고압 대기)';
+        waterDesc = '두터운 수소·헬륨 가스층과 고온 고압으로 인해 단단한 표면이나 액체 바다가 존재할 수 없습니다.';
+      } else {
+        waterLikelihood = Math.round(orbitFactor * gravFactor * 100);
+        if (dist < 0.75) {
+          waterState = '♨️ 초고온 증발 (수증기 온실 폭주)';
+          waterDesc = `모항성에 너무 가까워(거리 ${dist.toFixed(2)} AU) 모든 물이 끓어올라 증발했으며 두터운 수증기 온실 대기가 형성됩니다.`;
+        } else if (dist > 1.6) {
+          waterState = '🧊 영구 동결 (얼음 행성/외곽 빙하)';
+          waterDesc = `모항성과의 거리(${dist.toFixed(2)} AU)가 멀어 표면 온도가 극도로 낮으며, 물은 영구적인 얼음 지각 형태로만 존재합니다.`;
+        } else if (gravityG < 0.45) {
+          waterState = '💨 대기 희박 (물 증발/유실)';
+          waterDesc = `골디락스 존에 위치하나 표면 중력(${gravityG.toFixed(2)}g)이 너무 약해(달·수성 수준) 대기와 수증기를 우주로 유출시켰습니다.`;
+        } else if (waterLikelihood >= 70) {
+          waterState = '🌊 액체 바다 형성 최적 조건';
+          waterDesc = `골디락스 존(거리 ${dist.toFixed(2)} AU)과 적정 표면 중력(${gravityG.toFixed(2)}g)을 갖추어 광활한 액체 상태의 바다가 안정적으로 보존될 수 있습니다!`;
+        } else {
+          waterState = '💧 부분적 액체 호수/지하수 가능';
+          waterDesc = `표면 환경 조건상 극지방이나 지하 대수층에 제한적으로 액체 상태의 물이 존재할 가능성이 있습니다.`;
+        }
+      }
+
+      return {
+        radius: parseFloat(radius.toFixed(2)),
+        type,
+        color,
+        fCore,
+        corePercent,
+        feGravityRatio: parseFloat(feGravityRatio.toFixed(2)),
+        gravityG: parseFloat(gravityG.toFixed(2)),
+        gravityMS: parseFloat(gravityMS.toFixed(1)),
+        waterLikelihood,
+        waterState,
+        waterDesc
+      };
+    }
+
+    // ----------------------------------------------------
+    // [D] 항성계 생성 (FORGE) 및 조작 로직
+    // ----------------------------------------------------
     function forgeNewSystem() {
       currentPlanets = [];
       const feh = currentFeH;
       const density = Math.pow(10, feh);
 
-      // 행성 수 결정 (3~6개)
-      const count = Math.floor(Math.random() * 3) + 4; // 4~6개
-
-      // 거대행성 생성 확률
+      // 행성 수 결정 (4~6개)
+      const count = Math.floor(Math.random() * 3) + 4;
       const logit = -0.58 + 1.41 * feh;
       const giantProb = 1 / (1 + Math.exp(-logit));
 
-      // 궤도 배치 (0.3 AU ~ 3.5 AU)
       let baseDistances = [0.38, 0.72, 1.05, 1.60, 2.80, 4.20];
-      
       let giantsCount = 0;
       let goldiCount = 0;
       let hasGoldiEarth = false;
       let bestEarthScore = 0;
 
       for (let i = 0; i < count; i++) {
-        const dist = baseDistances[i] * (0.85 + Math.random() * 0.3);
+        const dist = baseDistances[i] * (0.88 + Math.random() * 0.24);
         const isGoldilocksZone = dist >= 0.85 && dist <= 1.45;
 
-        // 행성 유형 확률 결정
         const roll = Math.random();
-        let type = 'Terrestrial';
-        let radius = 1.0;
-        let massE = 1.0;
-        let color = '#10B981';
+        let initialMassE = 1.0;
 
         if (roll < giantProb * 0.75 && dist > 1.2) {
-          type = 'Gas Giant';
-          radius = 9.0 + Math.random() * 5.0; // 9~14 R_E
-          massE = 100 + Math.random() * 400;
-          color = '#F59E0B';
+          initialMassE = 100 + Math.random() * 400;
           giantsCount++;
         } else if (roll < giantProb * 0.95 && dist <= 0.6) {
-          type = 'Hot Jupiter';
-          radius = 11.0 + Math.random() * 4.0;
-          massE = 150 + Math.random() * 300;
-          color = '#EF4444';
+          initialMassE = 150 + Math.random() * 300;
           giantsCount++;
         } else if (dist > 2.0 && Math.random() > 0.4) {
-          type = 'Neptune-like';
-          radius = 3.0 + Math.random() * 2.5;
-          massE = 15 + Math.random() * 35;
-          color = '#8B5CF6';
+          initialMassE = 15 + Math.random() * 35;
         } else if (density > 1.2 && Math.random() > 0.4) {
-          type = 'Super-Earth';
-          radius = 1.6 + Math.random() * 0.8;
-          massE = 3.0 + Math.random() * 6.0;
-          color = '#00F2FE';
-          if (isGoldilocksZone) {
-            goldiCount++;
-            hasGoldiEarth = true;
-          }
+          initialMassE = 3.0 + Math.random() * 6.0;
         } else {
-          type = 'Terrestrial';
-          radius = 0.7 + Math.random() * 0.6;
-          massE = 0.4 + Math.random() * 1.5;
-          color = '#34D399';
-          if (isGoldilocksZone) {
-            goldiCount++;
-            hasGoldiEarth = true;
-          }
+          initialMassE = 0.5 + Math.random() * 1.5;
         }
 
-        // 공전 주기 T (일): T = 365.25 * (dist^1.5)
         const periodDays = Math.round(365.25 * Math.pow(dist, 1.5));
-        // 애니메이션 공전 각속도
         const speed = (0.03 / Math.sqrt(dist));
 
-        currentPlanets.push({
+        const planetObj = {
           name: `Planet-${String.fromCharCode(65 + i)}`,
-          type,
           dist: parseFloat(dist.toFixed(2)),
-          radius: parseFloat(radius.toFixed(2)),
-          massE: parseFloat(massE.toFixed(1)),
+          massE: parseFloat(initialMassE.toFixed(2)),
           periodDays,
-          color,
           angle: Math.random() * Math.PI * 2,
           speed,
           isGoldilocks: isGoldilocksZone
-        });
+        };
+
+        // 물리량 산출
+        const phys = calculatePlanetPhysics(planetObj, feh);
+        planetObj.radius = phys.radius;
+        planetObj.type = phys.type;
+        planetObj.color = phys.color;
+        planetObj.gravityG = phys.gravityG;
+        planetObj.gravityMS = phys.gravityMS;
+        planetObj.feGravityRatio = phys.feGravityRatio;
+        planetObj.corePercent = phys.corePercent;
+        planetObj.waterLikelihood = phys.waterLikelihood;
+        planetObj.waterState = phys.waterState;
+        planetObj.waterDesc = phys.waterDesc;
+
+        if (planetObj.waterLikelihood >= 60) {
+          goldiCount++;
+          hasGoldiEarth = true;
+        }
+
+        currentPlanets.push(planetObj);
       }
+
+      // 기본 선택 행성 설정 (골디락스 행성이 있으면 그것을 우선 선택, 없으면 2번 행성)
+      const goldiIdx = currentPlanets.findIndex(p => p.isGoldilocks);
+      selectedPlanetIdx = goldiIdx !== -1 ? goldiIdx : Math.min(2, currentPlanets.length - 1);
 
       // 통계 UI 갱신
       document.getElementById('statPlanetCount').textContent = `${count}개`;
@@ -998,18 +1286,42 @@
       const badge = document.getElementById('earthScoreBadge');
 
       if (hasGoldiEarth) {
-        bestEarthScore = Math.floor(75 + Math.random() * 23);
+        bestEarthScore = Math.floor(78 + Math.random() * 20);
         badge.textContent = `적합도: ${bestEarthScore}점 (최상)`;
         badge.className = "px-2 py-0.5 rounded bg-emerald-900 text-emerald-200 font-mono font-bold text-[11px]";
-        reportBox.innerHTML = `<strong>🎉 제2의 지구 유력 후보 발견!</strong><br>골디락스 존 내에 단단한 표면과 대기를 유지할 수 있는 암석형 행성이 안정적으로 형성되었습니다. 모항성의 철 성분이 풍부하여 지질학적 핵(Core)과 자기장을 형성할 충분한 무거운 원소를 확보했습니다!`;
+        reportBox.innerHTML = `<strong>🎉 제2의 지구 유력 후보 발견!</strong><br>골디락스 존 내에 적정 질량과 대기를 유지할 수 있는 암석형 행성이 안정적으로 형성되었습니다. 모항성의 철 성분이 풍부하여 지질학적 핵(Core)과 자기장을 형성할 충분한 무거운 원소를 확보했습니다!`;
       } else if (giantsCount >= 2 && currentPlanets.some(p => p.dist < 1.0 && p.type.includes('Giant'))) {
         badge.textContent = `적합도: 18점 (위험)`;
         badge.className = "px-2 py-0.5 rounded bg-rose-950 text-rose-300 font-mono font-bold text-[11px]";
-        reportBox.innerHTML = `<strong>⚠️ 거대 가스행성의 궤도 침범</strong><br>철 성분이 지나치게 풍부하여 형성된 '뜨거운 목성'이 안쪽으로 이동하면서 골디락스 존의 암석 씨앗들을 튕겨내거나 흡수해 버렸습니다. 생명체 존재 가능성이 매우 희박합니다.`;
+        reportBox.innerHTML = `<strong>⚠️ 거대 가스행성의 궤도 침범</strong><br>철 성분이 풍부하여 형성된 '뜨거운 목성'이 안쪽으로 이동하면서 골디락스 존의 암석 씨앗들을 튕겨내거나 흡수해 버렸습니다. 생명체 존재 가능성이 매우 희박합니다.`;
       } else {
         badge.textContent = `적합도: 45점 (보통)`;
         badge.className = "px-2 py-0.5 rounded bg-amber-950 text-amber-300 font-mono font-bold text-[11px]";
         reportBox.innerHTML = `<strong>❄️ 골디락스 존 미형성</strong><br>골디락스 영역 내에 위치한 행성이 없거나 크기가 너무 작아 대기를 붙잡기 어렵습니다. 하지만 외곽에 얼음 왜소행성이 다수 분포하고 있습니다.`;
+      }
+
+      renderPlanetSelectors();
+      updateInspectorUI();
+    }
+
+    // ----------------------------------------------------
+    // [E] 공전 멈춤/재개 및 속도 토글
+    // ----------------------------------------------------
+    function togglePauseSim() {
+      isSimPaused = !isSimPaused;
+      const btn = document.getElementById('pauseBtn');
+      const icon = document.getElementById('pauseIcon');
+      const text = document.getElementById('pauseText');
+      if (isSimPaused) {
+        icon.textContent = '▶️';
+        text.textContent = '공전 시작';
+        btn.classList.add('bg-emerald-900/60', 'text-emerald-300', 'border-emerald-600');
+        btn.classList.remove('bg-space-800', 'text-amber-300', 'border-amber-500/50');
+      } else {
+        icon.textContent = '⏸️';
+        text.textContent = '공전 멈춤';
+        btn.classList.remove('bg-emerald-900/60', 'text-emerald-300', 'border-emerald-600');
+        btn.classList.add('bg-space-800', 'text-amber-300', 'border-amber-500/50');
       }
     }
 
@@ -1020,7 +1332,134 @@
       document.getElementById('speedBtn').textContent = `${simSpeed.toFixed(1)}x`;
     }
 
-    // 캔버스 렌더링 루프 (60 FPS)
+    // ----------------------------------------------------
+    // [F] 행성 선택 및 질량 자유 조작소 (범위 제한 없음)
+    // ----------------------------------------------------
+    function renderPlanetSelectors() {
+      const container = document.getElementById('planetSelectorList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      currentPlanets.forEach((p, idx) => {
+        const btn = document.createElement('button');
+        const isSel = idx === selectedPlanetIdx;
+        btn.className = `px-2 py-1 rounded text-[11px] font-mono transition-all flex items-center gap-1 border ${
+          isSel 
+            ? 'bg-cyan-500 text-space-950 font-bold border-cyan-400 shadow-md shadow-cyan-500/30' 
+            : 'bg-space-800 text-zinc-300 border-space-600 hover:border-cyan-400'
+        }`;
+        btn.innerHTML = `<span style="color:${isSel ? '#03050a' : p.color}">●</span><span>${p.name}</span>`;
+        btn.onclick = () => selectPlanet(idx);
+        container.appendChild(btn);
+      });
+    }
+
+    function selectPlanet(idx) {
+      if (idx < 0 || idx >= currentPlanets.length) return;
+      selectedPlanetIdx = idx;
+      renderPlanetSelectors();
+      updateInspectorUI();
+    }
+
+    function updateInspectorUI() {
+      if (!currentPlanets || currentPlanets.length === 0) return;
+      const p = currentPlanets[selectedPlanetIdx];
+      if (!p) return;
+
+      document.getElementById('selectedPlanetBadge').textContent = `${p.name} (${p.type})`;
+      document.getElementById('inspectorDistText').textContent = `${p.dist} AU (${p.periodDays}일 공전)`;
+
+      // 1. 질량 숫자 인풋 동기화 (범위 제한 없음)
+      const numInput = document.getElementById('customMassNumberInput');
+      if (document.activeElement !== numInput) {
+        numInput.value = p.massE < 10 ? p.massE.toFixed(2) : (p.massE < 100 ? p.massE.toFixed(1) : Math.round(p.massE));
+      }
+      // 목성 질량 환산
+      const jupiterMass = p.massE / 317.8;
+      document.getElementById('massJupiterEquiv').textContent = `≈ ${jupiterMass >= 1 ? jupiterMass.toFixed(2) : jupiterMass.toFixed(3)} M_J`;
+
+      // 대수 슬라이더 동기화: -2.0 ~ 3.5
+      const logVal = Math.min(3.5, Math.max(-2.0, Math.log10(Math.max(0.01, p.massE))));
+      document.getElementById('customMassSlider').value = logVal;
+
+      // 2. 표면 중력 디스플레이
+      document.getElementById('inspectorGravityVal').textContent = `${p.gravityG.toFixed(2)} g`;
+      document.getElementById('inspectorGravityMS').textContent = `(${p.gravityMS.toFixed(1)} m/s²)`;
+      
+      let gDesc = '지구 표준 보행 중력';
+      if (p.gravityG < 0.4) gDesc = '⚠️ 극저중력 (대기 유출·무중력 상태)';
+      else if (p.gravityG > 3.0) gDesc = '⚠️ 초고중력 (압축 골절·고기압)';
+      else if (p.gravityG >= 0.8 && p.gravityG <= 1.3) gDesc = '✅ 인간 보행 및 대기 유지 최적';
+      else gDesc = '비교적 양호한 중력 환경';
+      document.getElementById('inspectorGravityDesc').textContent = gDesc;
+
+      // 3. 철 함량 중력 비율
+      document.getElementById('inspectorFeRatioVal').textContent = `${p.feGravityRatio.toFixed(2)}x`;
+      document.getElementById('inspectorFeCorePercent').textContent = `(핵 ${p.corePercent}%)`;
+      const diffPercent = Math.round((p.feGravityRatio - 1.0) * 100);
+      const sign = diffPercent >= 0 ? '+' : '';
+      document.getElementById('inspectorFeRatioDesc').textContent = `철 영향 밀도 가중 ${sign}${diffPercent}%`;
+
+      // 4. 물의 존재 가능성
+      document.getElementById('inspectorWaterPercent').textContent = `${p.waterLikelihood}%`;
+      document.getElementById('inspectorWaterBar').style.width = `${p.waterLikelihood}%`;
+      
+      const badge = document.getElementById('inspectorWaterStateBadge');
+      badge.textContent = p.waterState;
+      if (p.waterLikelihood >= 70) {
+        badge.className = "px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-700 font-bold text-[11px]";
+      } else if (p.waterLikelihood >= 35) {
+        badge.className = "px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-700 font-bold text-[11px]";
+      } else {
+        badge.className = "px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-700 font-bold text-[11px]";
+      }
+      document.getElementById('inspectorWaterDetailText').textContent = p.waterDesc;
+    }
+
+    function onCustomMassDirectInput(valStr) {
+      const val = parseFloat(valStr);
+      if (isNaN(val) || val <= 0) return;
+      applyCustomMassToSelected(val);
+    }
+
+    function onCustomMassSliderChange(sliderVal) {
+      const mass = Math.pow(10, parseFloat(sliderVal));
+      document.getElementById('customMassNumberInput').value = mass < 10 ? mass.toFixed(2) : (mass < 100 ? mass.toFixed(1) : Math.round(mass));
+      applyCustomMassToSelected(mass);
+    }
+
+    function setMassPreset(mass) {
+      document.getElementById('customMassNumberInput').value = mass;
+      const logVal = Math.min(3.5, Math.max(-2.0, Math.log10(mass)));
+      document.getElementById('customMassSlider').value = logVal;
+      applyCustomMassToSelected(mass);
+    }
+
+    function applyCustomMassToSelected(newMass) {
+      if (!currentPlanets || currentPlanets.length === 0) return;
+      const p = currentPlanets[selectedPlanetIdx];
+      if (!p) return;
+
+      p.massE = parseFloat(newMass);
+      const phys = calculatePlanetPhysics(p, currentFeH);
+      
+      p.radius = phys.radius;
+      p.type = phys.type;
+      p.color = phys.color;
+      p.gravityG = phys.gravityG;
+      p.gravityMS = phys.gravityMS;
+      p.feGravityRatio = phys.feGravityRatio;
+      p.corePercent = phys.corePercent;
+      p.waterLikelihood = phys.waterLikelihood;
+      p.waterState = phys.waterState;
+      p.waterDesc = phys.waterDesc;
+
+      updateInspectorUI();
+    }
+
+    // ----------------------------------------------------
+    // [G] 캔버스 렌더링 루프 (60 FPS) 및 마우스 인터랙션
+    // ----------------------------------------------------
     function renderSimulation() {
       if (currentTab === 'tab1' && canvas.width > 0 && canvas.height > 0) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1028,7 +1467,7 @@
         const cx = canvas.width / 2;
         const cy = canvas.height / 2;
         const maxRadius = Math.min(cx, cy) - 25;
-        const scale = maxRadius / 4.2; // 4.2 AU 기준 스케일
+        const scale = maxRadius / 4.2;
 
         // 1. 심우주 미세 배경 별빛
         ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
@@ -1038,7 +1477,7 @@
           ctx.fillRect(bx, by, 1, 1);
         }
 
-        // 2. 골디락스 존 (0.85 ~ 1.45 AU) 녹색 네온 링 렌더링
+        // 2. 골디락스 존 (0.85 ~ 1.45 AU) 녹색 네온 링
         const rIn = 0.85 * scale;
         const rOut = 1.45 * scale;
         ctx.beginPath();
@@ -1055,13 +1494,12 @@
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // 3. 모항성 (중앙 항성) 렌더링
+        // 3. 모항성 (중앙 항성)
         const starFeH = currentFeH;
         let starGlowColor = '#F59E0B';
-        if (starFeH < -0.15) starGlowColor = '#EF4444'; // 붉은 저금속
-        else if (starFeH > 0.15) starGlowColor = '#00F2FE'; // 백청색 고금속
+        if (starFeH < -0.15) starGlowColor = '#EF4444';
+        else if (starFeH > 0.15) starGlowColor = '#00F2FE';
 
-        // 외부 코로나 글로우
         const glowGrad = ctx.createRadialGradient(cx, cy, 5, cx, cy, 28);
         glowGrad.addColorStop(0, starGlowColor);
         glowGrad.addColorStop(0.5, 'rgba(245, 158, 11, 0.3)');
@@ -1071,14 +1509,13 @@
         ctx.arc(cx, cy, 28, 0, Math.PI * 2);
         ctx.fill();
 
-        // 항성 중심핵
         ctx.fillStyle = '#FFFFFF';
         ctx.beginPath();
         ctx.arc(cx, cy, 9, 0, Math.PI * 2);
         ctx.fill();
 
         // 4. 행성 궤도선 및 행성체 렌더링
-        currentPlanets.forEach((p) => {
+        currentPlanets.forEach((p, idx) => {
           const orbitR = p.dist * scale;
 
           // 공전 궤도 원선
@@ -1088,15 +1525,28 @@
           ctx.lineWidth = 1;
           ctx.stroke();
 
-          // 위치 업데이트
-          p.angle += p.speed * simSpeed;
+          // 위치 업데이트 (공전 멈춤이 아닐 때만 각도 진행)
+          if (!isSimPaused) {
+            p.angle += p.speed * simSpeed;
+          }
           const px = cx + Math.cos(p.angle) * orbitR;
           const py = cy + Math.sin(p.angle) * orbitR;
           p.currentX = px;
           p.currentY = py;
 
-          // 행성 크기 (화면 픽셀: 3px ~ 9px)
-          const pSize = Math.max(3, Math.min(10, p.radius * 0.65));
+          // 행성 크기 (화면 픽셀: 3px ~ 11px)
+          const pSize = Math.max(3, Math.min(12, p.radius * 0.65));
+
+          // 선택된 행성 타겟 조준 링
+          if (idx === selectedPlanetIdx) {
+            ctx.beginPath();
+            ctx.arc(px, py, pSize + 5, 0, Math.PI * 2);
+            ctx.strokeStyle = '#00F2FE';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([3, 3]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
 
           // 행성 외곽 발광
           ctx.beginPath();
@@ -1110,8 +1560,8 @@
           ctx.fillStyle = p.color;
           ctx.fill();
 
-          // 가스행성 고리 장식 (Gas Giant / Neptune인 경우)
-          if (p.type.includes('Giant')) {
+          // 가스행성 고리 장식
+          if (p.type.includes('Giant') || p.type === 'Super-Jupiter') {
             ctx.beginPath();
             ctx.ellipse(px, py, pSize * 2, pSize * 0.7, Math.PI / 4, 0, Math.PI * 2);
             ctx.strokeStyle = p.color + '88';
@@ -1135,7 +1585,7 @@
         if (p.currentX && p.currentY) {
           const dx = mx - p.currentX;
           const dy = my - p.currentY;
-          if (Math.sqrt(dx * dx + dy * dy) < 14) {
+          if (Math.sqrt(dx * dx + dy * dy) < 16) {
             found = p;
             break;
           }
@@ -1144,15 +1594,35 @@
 
       if (found) {
         tooltip.classList.remove('hidden');
-        tooltip.style.left = `${mx + 12}px`;
-        tooltip.style.top = `${my + 12}px`;
+        tooltip.style.left = `${mx + 14}px`;
+        tooltip.style.top = `${my + 14}px`;
         document.getElementById('tipName').textContent = found.name;
-        document.getElementById('tipType').textContent = `${found.type} (${found.isGoldilocks ? '골디락스 존' : '일반 궤도'})`;
-        document.getElementById('tipDist').textContent = `궤도 거리: ${found.dist} AU (주기: ${found.periodDays}일)`;
-        document.getElementById('tipMass').textContent = `반경: ${found.radius} R_E | 질량: ${found.massE} M_E`;
+        document.getElementById('tipTypeBadge').textContent = `${found.type}`;
+        document.getElementById('tipDist').textContent = `궤도: ${found.dist} AU (${found.periodDays}일 공전)`;
+        document.getElementById('tipMassRadius').textContent = `반경: ${found.radius} R_E | 질량: ${found.massE} M_E`;
+        document.getElementById('tipGravity').textContent = `표면 중력: ${found.gravityG} g (${found.gravityMS} m/s²)`;
+        document.getElementById('tipIronRatio').textContent = `철 영향 중력비: ${found.feGravityRatio}x (핵 ${found.corePercent}%)`;
+        document.getElementById('tipWater').textContent = `💧 물의 존재 가능성: ${found.waterLikelihood}% (${found.waterState})`;
       } else {
         tooltip.classList.add('hidden');
       }
+    });
+
+    // 캔버스 클릭 시 행성 선택 인터랙션
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+
+      currentPlanets.forEach((p, idx) => {
+        if (p.currentX && p.currentY) {
+          const dx = mx - p.currentX;
+          const dy = my - p.currentY;
+          if (Math.sqrt(dx * dx + dy * dy) < 16) {
+            selectPlanet(idx);
+          }
+        }
+      });
     });
 
     // ----------------------------------------------------
@@ -1328,6 +1798,48 @@
       document.getElementById('dossierMassE').textContent = `${d.me} M_E`;
       document.getElementById('dossierOrbPer').textContent = d.p ? `${d.p} 일` : '관측 진행 중';
       document.getElementById('dossierMethod').textContent = d.d;
+
+      // 물리 지표 산출 (표면 중력, 철 중력비, 물 가능성)
+      const gravityG = (d.me && d.r) ? (d.me / Math.pow(d.r, 2)) : 1.0;
+      const feh = typeof d.m === 'number' ? d.m : 0.0;
+      const fCore = Math.min(0.65, Math.max(0.15, 0.33 * Math.pow(10, 0.35 * feh)));
+      const rhoRatio = 0.67 + 1.0 * fCore;
+      const feRatio = Math.pow(rhoRatio, 2 / 3);
+
+      document.getElementById('dossierGravity').textContent = `${gravityG.toFixed(2)} g (${(gravityG * 9.807).toFixed(1)} m/s²)`;
+      document.getElementById('dossierFeRatio').textContent = `${feRatio.toFixed(2)}x (핵 ${Math.round(fCore * 100)}%)`;
+
+      // 물의 존재 가능성 평가
+      let waterLikelihood = 0;
+      let waterState = '🪐 가스 심연 (초고압 대기)';
+      if (d.t === 'Gas Giant' || d.t === 'Neptune-like') {
+        waterLikelihood = 0;
+        waterState = '🪐 가스 심연 (초고압 대기)';
+      } else if (d.hz === 1) {
+        if (gravityG >= 0.5 && gravityG <= 2.2) {
+          waterLikelihood = 88;
+          waterState = '🌊 액체 바다 형성 최적 조건';
+        } else if (gravityG < 0.5) {
+          waterLikelihood = 25;
+          waterState = '💨 대기 희박 (물 유실 위험)';
+        } else {
+          waterLikelihood = 45;
+          waterState = '🪨 고중력 암석 (초고압수 환경)';
+        }
+      } else {
+        if (d.p && d.p < 35) {
+          waterLikelihood = 0;
+          waterState = '♨️ 초고온 증발 (온실 폭주)';
+        } else if (d.p && d.p >= 35) {
+          waterLikelihood = 8;
+          waterState = '🧊 영구 동결 (얼음 지각)';
+        } else {
+          waterLikelihood = 15;
+          waterState = '❓ 궤도 미확정 (추정 불충분)';
+        }
+      }
+      document.getElementById('dossierWaterScore').textContent = `${waterLikelihood}%`;
+      document.getElementById('dossierWaterState').textContent = waterState;
 
       // 뱃지 색상
       const badge = document.getElementById('dossierTypeBadge');
