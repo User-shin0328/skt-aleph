@@ -11,7 +11,7 @@ import json
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_JSON = os.path.join(BASE_DIR, "과제B", "exoplanets_2220.json")
 OUTPUT_ROOT_HTML = os.path.join(BASE_DIR, "exoforge.html")
-OUTPUT_APP_DIR = os.path.join(BASE_DIR, "과제B", "app")
+OUTPUT_APP_DIR = os.path.join(BASE_DIR, "과제B", "web")
 OUTPUT_APP_HTML = os.path.join(OUTPUT_APP_DIR, "index.html")
 
 os.makedirs(OUTPUT_APP_DIR, exist_ok=True)

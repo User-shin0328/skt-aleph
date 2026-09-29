@@ -7,7 +7,7 @@ import os
 import zipfile
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC_APP_HTML = os.path.join(BASE_DIR, "과제B", "app", "index.html")
+SRC_APP_HTML = os.path.join(BASE_DIR, "과제B", "web", "index.html")
 SRC_README = os.path.join(BASE_DIR, "과제B", "README.md")
 SRC_SUBMISSION = os.path.join(BASE_DIR, "과제B", "과제B_제출서.md")
 SRC_DATA = os.path.join(BASE_DIR, "과제B", "exoplanets_2220.json")
