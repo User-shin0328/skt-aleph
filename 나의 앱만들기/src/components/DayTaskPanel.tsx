@@ -194,9 +194,38 @@ export const DayTaskPanel: React.FC = () => {
                           {task.phase === 1 ? '1단계 개념정독' : task.phase === 2 ? '2단계 핵심회독' : '3단계 기출스프린트'}
                         </span>
 
+                        {/* 난이도 뱃지 */}
+                        {task.difficulty && (
+                          <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold border ${
+                            task.difficulty === '상'
+                              ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800'
+                              : task.difficulty === '중'
+                              ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                              : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                          }`}>
+                            난이도 {task.difficulty} {task.difficulty === '상' ? '🔥' : task.difficulty === '중' ? '⚡' : '🌱'}
+                          </span>
+                        )}
+
+                        {/* 빈출도 뱃지 */}
+                        {task.frequency && (
+                          <span
+                            className="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800"
+                            title={`빈출도: ${task.frequency}성 / 5성`}
+                          >
+                            빈출 {'★'.repeat(task.frequency)}
+                          </span>
+                        )}
+
                         <span className="text-[11px] font-mono text-zinc-400">
                           ⏱️ {task.estimatedMinutes}분
                         </span>
+
+                        {task.weightScore && (
+                          <span className="text-[10px] font-mono px-1 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400" title="난이도×빈출도 가중치 점수">
+                            가중치 {task.weightScore}pt
+                          </span>
+                        )}
                       </div>
 
                       <h4 className={`text-sm font-bold text-zinc-900 dark:text-white transition-all ${

@@ -269,9 +269,12 @@ export const StudyCalendar: React.FC = () => {
                           borderLeftColor: subjectColor,
                           backgroundColor: !t.isCompleted ? `${subjectColor}15` : undefined
                         }}
-                        title={`${t.subject} - ${t.chapter}`}
+                        title={`${t.subject} - ${t.chapter}${t.difficulty ? ` (난이도: ${t.difficulty}, 빈출: ${t.frequency}성)` : ''}`}
                       >
-                        <span className="truncate">{t.subject}</span>
+                        <span className="truncate flex items-center gap-0.5">
+                          {t.difficulty === '상' && <span className="text-[9px]" title="고난도 단원">🔥</span>}
+                          <span>{t.subject}</span>
+                        </span>
                         <span className="text-[9px] font-bold opacity-75 ml-1 shrink-0">
                           {t.phase === 1 ? '[1회]' : t.phase === 2 ? '[2회]' : '[기출]'}
                         </span>

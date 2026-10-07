@@ -22,7 +22,7 @@ export const OnboardingModal: React.FC = () => {
   const [restDaysWeekly, setRestDaysWeekly] = useState<number[]>([0, 6]); // 일, 토
   const [curriculumText, setCurriculumText] = useState('');
 
-  // 프리셋 변경 핸들러
+  // 초기화 및 프리셋 변경 핸들러
   const handlePresetSelect = (presetId: string) => {
     setSelectedPresetId(presetId);
     const p = CURRICULUM_PRESETS.find(item => item.id === presetId);
@@ -30,11 +30,20 @@ export const OnboardingModal: React.FC = () => {
       setExamTitle(p.title);
       setDailyHours(p.defaultDailyHours);
       const text = p.subjects.map(s => 
-        `[과목: ${s.name}]\n` + s.chapters.map(c => `- ${c.title}: ${c.keyPoints.join(', ')}`).join('\n')
+        `[과목: ${s.name}]\n` + s.chapters.map(c => `- ${c.title} [난이도: ${c.difficulty} | 빈출: ${'★'.repeat(c.frequency)}]: ${c.keyPoints.join(', ')}`).join('\n')
       ).join('\n\n');
       setCurriculumText(text);
     }
   };
+
+  // 초기 렌더링 시 기본값 설정
+  React.useEffect(() => {
+    if (!curriculumText) {
+      handlePresetSelect('eip');
+    }
+  }, []);
+
+  const selectedPreset = CURRICULUM_PRESETS.find(item => item.id === selectedPresetId) || CURRICULUM_PRESETS[0];
 
   // 요일 토글
   const toggleRestDay = (dayIndex: number) => {
@@ -57,6 +66,7 @@ export const OnboardingModal: React.FC = () => {
       restDaysWeekly,
       customRestDates: [],
       curriculumText,
+      presetId: selectedPresetId,
     }, selectedPresetId);
   };
 
@@ -85,7 +95,7 @@ export const OnboardingModal: React.FC = () => {
             </h3>
           </div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 font-mono">
-            남은 수험 기간을 50% 개념정독, 30% 핵심회독, 20% 기출스프린트로 완벽 역산 배치합니다.
+            남은 수험 기간을 과목별 난이도·빈출도 가중치에 따라 50% 개념정독, 30% 핵심회독, 20% 기출스프린트로 역산 배치합니다.
           </p>
         </div>
 
@@ -94,7 +104,7 @@ export const OnboardingModal: React.FC = () => {
           {/* 프리셋 선택 버튼 그룹 */}
           <div>
             <label className="block text-xs font-mono font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
-              자격증 프리셋 선택:
+              3대 자격증 프리셋 선택:
             </label>
             <div className="grid grid-cols-3 gap-2">
               {CURRICULUM_PRESETS.map((p) => (
@@ -113,6 +123,25 @@ export const OnboardingModal: React.FC = () => {
                 </button>
               ))}
             </div>
+
+            {/* 선택된 자격증의 5개 과목 및 난이도 미리보기 배너 */}
+            {selectedPreset && (
+              <div className="mt-2.5 p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/80 text-[11px] font-mono">
+                <span className="font-bold text-zinc-700 dark:text-zinc-300">📚 5개 정규 과목 및 난이도/빈출 분석:</span>
+                <div className="flex flex-wrap gap-1 mt-1.5">
+                  {selectedPreset.subjects.map((s, idx) => (
+                    <span
+                      key={s.id}
+                      className="px-2 py-0.5 rounded text-[10px] font-bold text-white shadow-xs"
+                      style={{ backgroundColor: s.color }}
+                      title={`${s.name} (${s.chapters.length}개 단원)`}
+                    >
+                      {idx + 1}과목. {s.name.split(' ')[0]}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 시험 명칭 */}
