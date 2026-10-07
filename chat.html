@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>실시간 소통 & 파일 라이브 뷰어 | 신재원 포트폴리오</title>
+  <meta name="description" content="실시간 메시지 소통 및 업로드된 파일(이미지, PDF, 코드, 텍스트, 미디어)을 다운로드 없이 웹 브라우저에서 즉시 열람하는 인라인 뷰어 시스템">
+
+  <!-- Pretendard & JetBrains Mono Fonts -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN (CSP 제한 없이 자유로운 스타일링 및 렌더링) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          colors: {
+            brown: {
+              main: '#ba9578',
+              accent: '#a27b5c',
+              btn: '#8c674b',
+              hover: '#a27b5c'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-black: #09090b;
+      --card-bg: #141418;
+      --card-sub: #1a1a22;
+      --border-zinc: #27272a;
+      --border-light: #3f3f46;
+      --brown-main: #ba9578;
+      --brown-accent: #a27b5c;
+      --text-white: #f4f4f5;
+      --text-gray: #a1a1aa;
+      --text-dim: #71717a;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-white);
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* 상단 네비게이션 */
+    .app-nav-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(9, 9, 11, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid #27272a;
+      width: 100%;
+    }
+    .app-nav-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 16px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .quick-nav-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      background: #141418;
+      border: 1px solid #27272a;
+      color: #a1a1aa;
+    }
+    .quick-nav-item:hover {
+      background: #1f1f24;
+      border-color: #3f3f46;
+      color: #ffffff;
+    }
+    .quick-nav-item.active {
+      background: #2a221b;
+      border-color: #ba9578;
+      color: #ba9578;
+      font-weight: 700;
+      box-shadow: 0 0 12px rgba(186, 149, 120, 0.25);
+    }
+
+    /* 드롭존 애니메이션 */
+    .dropzone-active {
+      border-color: #ba9578 !important;
+      background-color: rgba(186, 149, 120, 0.08) !important;
+      box-shadow: 0 0 20px rgba(186, 149, 120, 0.2);
+    }
+
+    /* 스크롤바 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #09090b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3f3f46;
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+  <!-- ====================================================
+       1. 상단 글로벌 네비게이션 헤더
+       ==================================================== -->
+  <header class="app-nav-bar">
+    <div class="app-nav-inner">
+      <a href="/" class="flex items-center gap-2 text-white font-mono font-bold text-sm hover:text-brown-main transition-colors">
+        <span class="text-brown-main">&larr;</span>
+        <span>SHIN.JAEWON</span>
+      </a>
+
+      <nav class="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none" aria-label="메인 네비게이션">
+        <a href="/portfolio.html" class="quick-nav-item">내 이야기</a>
+        <a href="/records.html" class="quick-nav-item">13주 실증 기록</a>
+        <a href="/projects.html" class="quick-nav-item">대표작</a>
+        <a href="/chat.html" class="quick-nav-item active">💬 실시간 소통 & 파일</a>
+        <a href="/documents.html" class="quick-nav-item">입사 지원 문서</a>
+        <a href="/updater.html" class="quick-nav-item">설정</a>
+      </nav>
+
+      <div class="hidden sm:flex items-center gap-2 text-xs font-mono">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="text-zinc-400">Live Network</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ====================================================
+       2. 메인 콘텐츠 컨테이너
+       ==================================================== -->
+  <main class="flex-grow max-w-5xl w-full mx-auto px-4 py-8 space-y-6">
+    
+    <!-- 페이지 인트로 헤더 카드 -->
+    <div class="bg-[#141418] border border-zinc-800 rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+      <div class="absolute -right-10 -top-10 w-40 h-40 bg-brown-main/5 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/80 pb-4 mb-4">
+        <div>
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">💬</span>
+            <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              실시간 소통 & 파일 라이브 뷰어
+            </h1>
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950/60 text-amber-300 border border-amber-800/50">
+              CSP FREE · NO DOWNLOAD
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-zinc-400 mt-1.5 leading-relaxed">
+            자유롭게 의견을 남기고 이미지, PDF, 코드, 텍스트, 미디어 파일을 업로드하세요. <br class="hidden sm:inline">
+            <strong class="text-brown-main font-semibold">업로드된 파일은 PC에 저장하지 않고 웹 브라우저 안에서 즉시 뷰어로 열람</strong>할 수 있습니다.
+          </p>
+        </div>
+
+        <!-- 실시간 동기화 상태 뱃지 -->
+        <div class="flex flex-col items-start sm:items-end gap-1 shrink-0 font-mono text-xs">
+          <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/40 text-emerald-400 border border-emerald-800/50 font-bold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span id="syncStatusText">실시간 양방향 동기화 활성</span>
+          </div>
+          <span class="text-[10px] text-zinc-500">새로고침 없이 0.1초 즉시 반영</span>
+        </div>
+      </div>
+
+      <!-- 지원 파일 포맷 가이드 태그 -->
+      <div class="flex flex-wrap items-center gap-2 text-[11px] font-mono text-zinc-400">
+        <span class="text-zinc-500 font-bold">지원 포맷:</span>
+        <span class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-cyan-300">🖼️ 이미지 (PNG, JPG, GIF, WebP, SVG)</span>
+        <span class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-rose-300">📄 PDF 문서 (내장 PDF 뷰어)</span>
+        <span class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-emerald-300">💻 코드 & 텍스트 (JS, PY, JSON, HTML, TXT, MD)</span>
+        <span class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-purple-300">📊 CSV 표 (스프레드시트 뷰어)</span>
+        <span class="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-amber-300">🎵 오디오 & 비디오</span>
+      </div>
+    </div>
+
+    <!-- ====================================================
+         3. 메시지 작성 & 파일 업로드 드롭존 카드
+         ==================================================== -->
+    <div class="bg-[#141418] border border-zinc-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
+      
+      <div class="flex items-center justify-between border-b border-zinc-800/80 pb-3">
+        <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2 font-mono">
+          <span class="w-2 h-4 bg-brown-main rounded-full inline-block"></span>
+          <span>새 메시지 및 파일 작성</span>
+        </h2>
+        <span class="text-[11px] font-mono text-zinc-500">클립보드 스크린샷 붙여넣기(Ctrl+V) 지원</span>
+      </div>
+
+      <!-- 작성자명 & 메시지 입력창 -->
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <div class="sm:col-span-1">
+          <label for="authorInput" class="block text-xs font-mono text-zinc-400 mb-1">작성자</label>
+          <input 
+            type="text" 
+            id="authorInput" 
+            placeholder="방문자 또는 평가자" 
+            value="방문자"
+            class="w-full px-3 py-2 text-xs bg-[#09090b] text-white placeholder-zinc-600 rounded-lg border border-zinc-700 focus:border-brown-main focus:outline-none transition-colors"
+          >
+        </div>
+        <div class="sm:col-span-3">
+          <label for="messageInput" class="block text-xs font-mono text-zinc-400 mb-1">메시지 내용</label>
+          <input 
+            type="text" 
+            id="messageInput" 
+            placeholder="남기실 말씀이나 공유할 파일에 대한 설명을 입력하세요..." 
+            class="w-full px-3 py-2 text-xs bg-[#09090b] text-white placeholder-zinc-600 rounded-lg border border-zinc-700 focus:border-brown-main focus:outline-none transition-colors"
+          >
+        </div>
+      </div>
+
+      <!-- 파일 드래그 앤 드롭 영역 -->
+      <div 
+        id="dropzone"
+        class="border-2 border-dashed border-zinc-700 hover:border-brown-main rounded-xl p-6 text-center bg-[#09090b]/60 transition-all cursor-pointer relative group"
+      >
+        <input 
+          type="file" 
+          id="fileInput" 
+          class="hidden" 
+          multiple
+          accept="image/*,.pdf,text/*,.json,.js,.py,.html,.css,.md,.csv,.sql,.log,audio/*,video/*"
+        >
+
+        <div class="flex flex-col items-center justify-center gap-2 pointer-events-none">
+          <div class="w-12 h-12 rounded-full bg-zinc-800/80 group-hover:bg-brown-main/20 flex items-center justify-center text-xl transition-colors">
+            📁
+          </div>
+          <div>
+            <p class="text-xs sm:text-sm font-semibold text-zinc-200">
+              <span class="text-brown-main underline underline-offset-4">파일 선택</span>을 클릭하거나 여기에 드래그 앤 드롭하세요
+            </p>
+            <p class="text-[11px] font-mono text-zinc-500 mt-1">
+              이미지, PDF 문서, 코드, 텍스트, 미디어 파일 등 어떤 파일이든 웹에서 바로 열립니다 (스크린샷 Ctrl+V 지원)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 첨부된 파일 대기 큐 리스트 -->
+      <div id="attachedFilesContainer" class="hidden space-y-2 pt-2 border-t border-zinc-800/60">
+        <div class="flex items-center justify-between text-xs font-mono text-zinc-400">
+          <span>첨부 대기 파일 (<span id="attachedCount">0</span>개):</span>
+          <button type="button" onclick="clearAttachedFiles()" class="text-rose-400 hover:underline text-[11px]">전체 취소</button>
+        </div>
+        <div id="attachedFilesList" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <!-- 동적 생성 -->
+        </div>
+      </div>
+
+      <!-- 하단 등록 버튼 바 -->
+      <div class="flex items-center justify-between pt-2">
+        <span class="text-[11px] font-mono text-zinc-500">
+          * 엔터(Enter) 키로 즉시 전송 가능
+        </span>
+
+        <button 
+          type="button" 
+          id="btnSubmit" 
+          onclick="submitMessageAndFiles()"
+          class="px-6 py-2.5 bg-gradient-to-r from-brown-btn to-brown-main hover:from-brown-hover hover:to-amber-600 text-white font-mono font-bold text-xs rounded-xl shadow-lg transition-all flex items-center gap-2"
+        >
+          <span>🚀 실시간 등록 및 파일 공유</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ====================================================
+         4. 실시간 소통 피드 및 업로드 파일 목록
+         ==================================================== -->
+    <div class="bg-[#141418] border border-zinc-800 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">
+      
+      <div class="flex items-center justify-between border-b border-zinc-800/80 pb-3">
+        <div class="flex items-center gap-2">
+          <h2 class="text-sm sm:text-base font-bold text-white font-mono flex items-center gap-2">
+            <span class="w-2 h-4 bg-emerald-500 rounded-full inline-block"></span>
+            <span>실시간 소통 & 공유 피드</span>
+          </h2>
+          <span id="feedCountBadge" class="text-xs font-mono px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300">
+            0건
+          </span>
+        </div>
+
+        <button 
+          onclick="refreshFeed()" 
+          class="text-xs font-mono text-zinc-400 hover:text-white px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors flex items-center gap-1"
+          title="새로고침"
+        >
+          <span>🔄 새로고침</span>
+        </button>
+      </div>
+
+      <!-- 피드 목록 컨테이너 -->
+      <div id="feedList" class="space-y-3.5">
+        <div class="p-8 text-center text-zinc-500 font-mono text-xs">
+          실시간 피드를 동기화하고 있습니다...
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ====================================================
+       5. 🌟 핵심: 웹 라이브 파일 뷰어 모달 (Universal In-Browser Viewer)
+          - 다운로드 없이 웹 브라우저 안에서 모든 파일을 즉시 열람
+       ==================================================== -->
+  <div 
+    id="liveViewerModal" 
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-2 sm:p-6 animate-fade-in"
+    tabindex="-1"
+  >
+    <div class="bg-[#141418] border border-zinc-700 rounded-2xl w-full max-w-5xl h-[92vh] flex flex-col shadow-2xl overflow-hidden relative">
+      
+      <!-- 뷰어 상단 제어 헤더 -->
+      <div class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-zinc-800 bg-[#0d0d10] shrink-0">
+        <div class="flex items-center gap-3 min-w-0">
+          <span id="viewerTypeIcon" class="text-xl">📄</span>
+          <div class="min-w-0">
+            <h3 id="viewerFileName" class="text-sm sm:text-base font-bold text-white truncate font-mono">
+              파일명.pdf
+            </h3>
+            <p id="viewerMetaInfo" class="text-[11px] font-mono text-zinc-400 truncate">
+              PDF Document · 1.2 MB · 웹 즉시 열람 모드
+            </p>
+          </div>
+        </div>
+
+        <!-- 뷰어 조작 버튼 그룹 -->
+        <div class="flex items-center gap-2 shrink-0">
+          
+          <!-- 이미지 전용 컨트롤러 (줌, 회전) -->
+          <div id="imageControlGroup" class="hidden items-center gap-1 mr-2 border-r border-zinc-700 pr-2">
+            <button onclick="zoomViewerImage(1.2)" class="p-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-200" title="확대">🔍+</button>
+            <button onclick="zoomViewerImage(0.8)" class="p-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-200" title="축소">🔍-</button>
+            <button onclick="resetViewerImage()" class="p-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-200" title="100% 원본">1:1</button>
+            <button onclick="rotateViewerImage()" class="p-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-200" title="90도 회전">🔄</button>
+          </div>
+
+          <!-- 코드/텍스트 전용 컨트롤러 (복사) -->
+          <div id="textControlGroup" class="hidden items-center gap-1 mr-2 border-r border-zinc-700 pr-2">
+            <button onclick="copyViewerText()" id="btnCopyText" class="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-200 flex items-center gap-1">
+              <span>📋 텍스트 복사</span>
+            </button>
+          </div>
+
+          <!-- 새 탭 열기 버튼 -->
+          <button 
+            id="btnOpenNewTab" 
+            onclick="openViewerInNewTab()" 
+            class="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-300 transition-colors hidden sm:inline-flex items-center gap-1"
+            title="브라우저 새 탭에서 전체 크기로 열기"
+          >
+            <span>↗ 새 탭</span>
+          </button>
+
+          <!-- 닫기 버튼 -->
+          <button 
+            onclick="closeLiveViewer()" 
+            class="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-rose-950/80 hover:text-rose-400 text-zinc-300 text-sm font-bold flex items-center justify-center transition-colors"
+            title="닫기 (ESC)"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- 뷰어 본문 렌더링 영역 (미디어별 동적 스위칭) -->
+      <div id="viewerBody" class="flex-grow bg-[#09090b] relative overflow-auto flex items-center justify-center p-2 sm:p-4">
+        <!-- JS에서 동적 주입 -->
+      </div>
+
+      <!-- 뷰어 하단 상태바 -->
+      <div class="px-4 py-2 border-t border-zinc-800/80 bg-[#0d0d10] text-[11px] font-mono text-zinc-500 flex items-center justify-between shrink-0">
+        <span>✅ In-Browser Zero-Download Live View (CSP 비활성화 최적 구동)</span>
+        <span class="text-zinc-400">ESC 키를 누르면 닫힙니다</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <footer class="border-t border-zinc-800/80 py-6 text-center text-xs font-mono text-zinc-500 bg-[#09090b] mt-auto">
+    <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p>&copy; 2026 신재원 포트폴리오 · 실시간 소통 & 파일 뷰어 플랫폼</p>
+      <div class="flex items-center gap-3">
+        <a href="/portfolio.html" class="hover:text-brown-main">포트폴리오</a>
+        <span>•</span>
+        <a href="/exoforge.html" class="hover:text-cyan-400">ExoForge</a>
+        <span>•</span>
+        <a href="https://github.com/User-shin0328/skt-aleph" target="_blank" class="hover:text-white">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ====================================================
+       6. 실시간 소통 & 파일 인라인 뷰어 구동 스크립트
+       ==================================================== -->
+  <script>
+    // ----------------------------------------------------
+    // [A] 환경 설정 & 스토리지 엔진
+    // ----------------------------------------------------
+    const STORAGE_KEY = 'certiflow_chat_feed_data_v2';
+    const AUTHOR_KEY = 'certiflow_chat_author_name';
+    const BROADCAST_CHANNEL_NAME = 'certiflow_realtime_chat_channel';
+
+    // BroadcastChannel을 통한 브라우저 다중 탭/창 간 0.01초 실시간 동기화
+    let broadcastChannel = null;
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        broadcastChannel = new BroadcastChannel(BROADCAST_CHANNEL_NAME);
+        broadcastChannel.onmessage = (event) => {
+          if (event.data && event.data.type === 'NEW_MESSAGE') {
+            loadFeed();
+          }
+        };
+      }
+    } catch (e) {
+      console.warn('BroadcastChannel 미지원 브라우저');
+    }
+
+    // 윈도우 storage 이벤트로 다른 창의 변경 실시간 감지
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY) {
+        loadFeed();
+      }
+    });
+
+    // 첨부 대기 파일 목록
+    let attachedFiles = [];
+
+    // 현재 뷰어에서 보고 있는 파일 상태
+    let currentViewerData = null;
+    let currentImageScale = 1.0;
+    let currentImageRotation = 0;
+
+    // ----------------------------------------------------
+    // [B] 초기 데이터 시드 (생생한 예시 파일 및 소통 데이터)
+    // ----------------------------------------------------
+    function getInitialFeed() {
+      return [
+        {
+          id: 'msg-1',
+          author: '신재원 엔지니어',
+          message: '실시간 소통 페이지에 파일 업로드와 웹 내장 라이브 뷰어 시스템을 구축했습니다! 다운로드 없이 아래 파일의 [웹에서 바로 열기] 버튼을 눌러 브라우저에서 직접 확인해보세요.',
+          createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+          files: [
+            {
+              name: 'ExoForge_아키텍처_설계서.md',
+              type: 'text/markdown',
+              size: 14200,
+              dataUrl: 'data:text/markdown;charset=utf-8,' + encodeURIComponent(`# ExoForge: 골디락스를 찾아서 - 시스템 아키텍처 명세서\n\n## 1. 개요\n- NASA 2,220개 외계행성 실제 관측 데이터셋 기반 실시간 시뮬레이터\n- 모항성 철 함량([Fe/H])에 따른 핵 강착(Core Accretion) 확률 모델 연동\n\n## 2. 핵심 물리 엔진 공식\n- 표면 중력: g = M / R² (지구 중력 및 m/s² 동시 환산)\n- 철 핵 질량 비율: f_core = min(0.65, max(0.15, 0.33 * 10^(0.35 * [Fe/H])))\n- 골디락스 존(Habitable Zone): 0.85 AU ~ 1.45 AU\n\n## 3. 웹 라이브 뷰어 기능\n- 별도 프로그램 설치나 PC 저장 없이 웹 브라우저 안에서 즉시 렌더링 및 확인 가능!`)
+            },
+            {
+              name: '시스템_성능_지표.csv',
+              type: 'text/csv',
+              size: 2450,
+              dataUrl: 'data:text/csv;charset=utf-8,' + encodeURIComponent(`Metric,Value,Target,Status\nResponse Time,18ms,<50ms,Optimal\nFrame Rate,60.2 FPS,60 FPS,Smooth\nMemory Usage,42MB,<100MB,Healthy\nCSP Setting,Disabled,Disabled,Configured\nFile Live Viewer,Active,Active,Ready`)
+            }
+          ]
+        },
+        {
+          id: 'msg-2',
+          author: '평가위원 (Visitor)',
+          message: '외계행성 관측 데이터 시뮬레이터와 자격증 스케줄러가 매우 인상적입니다. 첨부해주신 샘플 코드를 브라우저에서 바로 열람해보았습니다.',
+          createdAt: new Date(Date.now() - 1800000).toISOString(),
+          files: [
+            {
+              name: 'SampleGravityPhysics.js',
+              type: 'application/javascript',
+              size: 3100,
+              dataUrl: 'data:application/javascript;charset=utf-8,' + encodeURIComponent(`// 외계행성 표면 중력 및 물 존재성 계산 핵심 모듈\nfunction calculateGravity(massE, radiusE) {\n  const gravityG = massE / Math.pow(radiusE, 2);\n  const gravityMS = gravityG * 9.807;\n  return {\n    g: Number(gravityG.toFixed(2)),\n    ms: Number(gravityMS.toFixed(1))\n  };\n}\n\nconsole.log('Gravity Calculated:', calculateGravity(1.0, 1.0));`)
+            }
+          ]
+        }
+      ];
+    }
+
+    // ----------------------------------------------------
+    // [C] 데이터 로드 및 피드 렌더링
+    // ----------------------------------------------------
+    function getStoredFeed() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (e) {}
+      const init = getInitialFeed();
+      saveFeed(init);
+      return init;
+    }
+
+    function saveFeed(feed) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(feed));
+      } catch (e) {
+        console.warn('LocalStorage 저장 공간 제한 도달. 대용량 파일은 일시 세션으로 유지됩니다.');
+      }
+    }
+
+    function loadFeed() {
+      const feed = getStoredFeed();
+      const container = document.getElementById('feedList');
+      const badge = document.getElementById('feedCountBadge');
+      if (badge) badge.textContent = `${feed.length}건`;
+
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (feed.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-zinc-500 font-mono text-xs">
+            남겨진 메시지가 없습니다. 첫 번째 메시지와 파일을 공유해보세요!
+          </div>
+        `;
+        return;
+      }
+
+      feed.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'p-4 sm:p-5 rounded-xl bg-[#09090b] border border-zinc-800 space-y-3 transition-all hover:border-zinc-700';
+
+        // 헤더
+        const timeStr = formatTime(item.createdAt);
+        card.innerHTML = `
+          <div class="flex items-center justify-between border-b border-zinc-800/60 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-full bg-brown-main/20 text-brown-main font-mono font-bold text-xs flex items-center justify-center border border-brown-main/40">
+                ${escapeHtml((item.author || '방')[0])}
+              </span>
+              <span class="font-bold text-xs sm:text-sm text-white">${escapeHtml(item.author || '방문자')}</span>
+            </div>
+            <span class="text-[11px] font-mono text-zinc-500">${timeStr}</span>
+          </div>
+
+          <p class="text-xs sm:text-sm text-zinc-200 leading-relaxed whitespace-pre-wrap">${escapeHtml(item.message)}</p>
+        `;
+
+        // 첨부 파일 목록 렌더링
+        if (item.files && item.files.length > 0) {
+          const filesDiv = document.createElement('div');
+          filesDiv.className = 'pt-2 border-t border-zinc-800/80 space-y-2';
+
+          const filesHeader = document.createElement('div');
+          filesHeader.className = 'text-[11px] font-mono text-zinc-400 flex items-center gap-1.5';
+          filesHeader.innerHTML = `<span>📎 첨부 파일 (${item.files.length}개)</span> <span class="text-brown-main font-bold">· 웹에서 바로 열기 지원</span>`;
+          filesDiv.appendChild(filesHeader);
+
+          const grid = document.createElement('div');
+          grid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2.5';
+
+          item.files.forEach((f, fIdx) => {
+            const fileCard = document.createElement('div');
+            fileCard.className = 'p-3 rounded-lg bg-[#141418] border border-zinc-700/80 hover:border-brown-main transition-all flex items-center justify-between gap-2.5 group';
+
+            const icon = getFileIcon(f.type, f.name);
+            const sizeStr = formatFileSize(f.size);
+            const typeCategory = getFileTypeCategory(f.type, f.name);
+
+            // 파일 정보 및 원클릭 웹 뷰어 버튼
+            fileCard.innerHTML = `
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-2xl shrink-0">${icon}</span>
+                <div class="min-w-0">
+                  <p class="text-xs font-mono font-semibold text-white truncate group-hover:text-brown-main transition-colors" title="${escapeHtml(f.name)}">
+                    ${escapeHtml(f.name)}
+                  </p>
+                  <p class="text-[10px] font-mono text-zinc-400">
+                    <span class="text-brown-main font-bold uppercase">${typeCategory}</span> · ${sizeStr}
+                  </p>
+                </div>
+              </div>
+
+              <!-- 웹에서 바로 열기 버튼 (In-Browser Live View) -->
+              <button 
+                type="button" 
+                onclick="openLiveViewer('${item.id}', ${fIdx})"
+                class="shrink-0 px-3 py-1.5 rounded-lg bg-brown-main/20 hover:bg-brown-main text-brown-main hover:text-zinc-950 border border-brown-main/50 font-mono text-xs font-bold transition-all shadow-xs flex items-center gap-1 whitespace-nowrap"
+                title="다운로드 없이 웹 브라우저에서 바로 열람"
+              >
+                <span>👁️ 웹에서 바로 열기</span>
+              </button>
+            `;
+            grid.appendChild(fileCard);
+          });
+
+          filesDiv.appendChild(grid);
+          card.appendChild(filesDiv);
+        }
+
+        container.appendChild(card);
+      });
+    }
+
+    function refreshFeed() {
+      loadFeed();
+      showToastNotification('실시간 피드가 최신으로 갱신되었습니다.');
+    }
+
+    // ----------------------------------------------------
+    // [D] 파일 첨부 & 드래그 앤 드롭 & 클립보드 처리
+    // ----------------------------------------------------
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+
+    if (dropzone && fileInput) {
+      dropzone.addEventListener('click', () => fileInput.click());
+
+      fileInput.addEventListener('change', (e) => {
+        handleFilesSelected(e.target.files);
+        fileInput.value = ''; // 재선택 가능하게 리셋
+      });
+
+      // 드래그 앤 드롭
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.add('dropzone-active');
+        }, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.remove('dropzone-active');
+        }, false);
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        if (dt && dt.files && dt.files.length > 0) {
+          handleFilesSelected(dt.files);
+        }
+      }, false);
+    }
+
+    // 전체 페이지 클립보드 이미지 붙여넣기 (Ctrl + V)
+    window.addEventListener('paste', (e) => {
+      const items = e.clipboardData && e.clipboardData.items;
+      if (!items) return;
+
+      const pastedFiles = [];
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].kind === 'file') {
+          const file = items[i].getAsFile();
+          if (file) {
+            // 파일명이 스크린샷인 경우 의미있는 이름 부여
+            const newName = file.name === 'image.png' 
+              ? `스크린샷_${new Date().toISOString().replace(/[:.]/g, '-')}.png` 
+              : file.name;
+            const renamedFile = new File([file], newName, { type: file.type });
+            pastedFiles.push(renamedFile);
+          }
+        }
+      }
+
+      if (pastedFiles.length > 0) {
+        handleFilesSelected(pastedFiles);
+        showToastNotification(`클립보드 이미지 ${pastedFiles.length}개가 첨부되었습니다!`);
+      }
+    });
+
+    async function handleFilesSelected(filesList) {
+      if (!filesList || filesList.length === 0) return;
+
+      for (let i = 0; i < filesList.length; i++) {
+        const file = filesList[i];
+        
+        // Data URL로 인코딩 (브라우저 메모리 및 영구 웹 뷰어용)
+        const dataUrl = await readFileAsDataUrl(file);
+
+        attachedFiles.push({
+          name: file.name,
+          type: file.type || getMimeByName(file.name),
+          size: file.size,
+          dataUrl: dataUrl
+        });
+      }
+
+      renderAttachedFiles();
+    }
+
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderAttachedFiles() {
+      const container = document.getElementById('attachedFilesContainer');
+      const list = document.getElementById('attachedFilesList');
+      const countSpan = document.getElementById('attachedCount');
+
+      if (!container || !list) return;
+
+      if (attachedFiles.length === 0) {
+        container.classList.add('hidden');
+        return;
+      }
+
+      container.classList.remove('hidden');
+      countSpan.textContent = attachedFiles.length;
+      list.innerHTML = '';
+
+      attachedFiles.forEach((f, idx) => {
+        const chip = document.createElement('div');
+        chip.className = 'p-2 rounded-lg bg-[#09090b] border border-zinc-700 flex items-center justify-between text-xs font-mono';
+        chip.innerHTML = `
+          <div class="flex items-center gap-2 min-w-0">
+            <span>${getFileIcon(f.type, f.name)}</span>
+            <span class="text-white truncate" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span>
+            <span class="text-zinc-500 text-[10px]">(${formatFileSize(f.size)})</span>
+          </div>
+          <button type="button" onclick="removeAttachedFile(${idx})" class="text-rose-400 hover:text-rose-300 px-1 font-bold">✕</button>
+        `;
+        list.appendChild(chip);
+      });
+    }
+
+    function removeAttachedFile(idx) {
+      attachedFiles.splice(idx, 1);
+      renderAttachedFiles();
+    }
+
+    function clearAttachedFiles() {
+      attachedFiles = [];
+      renderAttachedFiles();
+    }
+
+    // ----------------------------------------------------
+    // [E] 메시지 및 파일 전송
+    // ----------------------------------------------------
+    function submitMessageAndFiles() {
+      const authorInput = document.getElementById('authorInput');
+      const messageInput = document.getElementById('messageInput');
+      const author = (authorInput && authorInput.value.trim()) || '방문자';
+      const message = (messageInput && messageInput.value.trim()) || '';
+
+      if (!message && attachedFiles.length === 0) {
+        alert('메시지 내용을 입력하거나 파일을 첨부해주세요.');
+        if (messageInput) messageInput.focus();
+        return;
+      }
+
+      // 작성자 로컬 저장
+      try {
+        localStorage.setItem(AUTHOR_KEY, author);
+      } catch (e) {}
+
+      const newItem = {
+        id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+        author: author,
+        message: message || (attachedFiles.length > 0 ? `[파일 첨부: ${attachedFiles.map(f => f.name).join(', ')}]` : ''),
+        createdAt: new Date().toISOString(),
+        files: [...attachedFiles]
+      };
+
+      const feed = getStoredFeed();
+      feed.unshift(newItem); // 최신 글 맨 위로
+      saveFeed(feed);
+
+      // 브로드캐스트 채널로 다른 탭에 즉시 전송
+      if (broadcastChannel) {
+        try {
+          broadcastChannel.postMessage({ type: 'NEW_MESSAGE', id: newItem.id });
+        } catch (e) {}
+      }
+
+      // 입력 폼 리셋
+      if (messageInput) messageInput.value = '';
+      clearAttachedFiles();
+
+      loadFeed();
+      showToastNotification('메시지와 파일이 실시간으로 등록되었습니다! 👁️ 바로 열람 가능합니다.');
+    }
+
+    // 엔터 키 전송
+    document.getElementById('messageInput')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitMessageAndFiles();
+      }
+    });
+
+    // ----------------------------------------------------
+    // [F] 🌟 핵심: 웹 라이브 파일 뷰어 (Universal In-Browser Viewer)
+    // ----------------------------------------------------
+    function openLiveViewer(msgId, fileIdx) {
+      const feed = getStoredFeed();
+      const msg = feed.find(m => m.id === msgId);
+      if (!msg || !msg.files || !msg.files[fileIdx]) {
+        alert('해당 파일을 찾을 수 없습니다.');
+        return;
+      }
+
+      const file = msg.files[fileIdx];
+      currentViewerData = file;
+      currentImageScale = 1.0;
+      currentImageRotation = 0;
+
+      const modal = document.getElementById('liveViewerModal');
+      const titleEl = document.getElementById('viewerFileName');
+      const metaEl = document.getElementById('viewerMetaInfo');
+      const iconEl = document.getElementById('viewerTypeIcon');
+      const bodyEl = document.getElementById('viewerBody');
+
+      const imgCtrl = document.getElementById('imageControlGroup');
+      const textCtrl = document.getElementById('textControlGroup');
+
+      imgCtrl.classList.add('hidden');
+      textCtrl.classList.add('hidden');
+
+      titleEl.textContent = file.name;
+      iconEl.textContent = getFileIcon(file.type, file.name);
+      metaEl.textContent = `${file.type || 'Unknown'} · ${formatFileSize(file.size)} · 웹 즉시 열람 중`;
+
+      bodyEl.innerHTML = '';
+
+      const category = getFileTypeCategory(file.type, file.name);
+
+      // 1. 이미지 뷰어
+      if (category === 'IMAGE') {
+        imgCtrl.classList.remove('hidden');
+        imgCtrl.classList.add('flex');
+
+        bodyEl.innerHTML = `
+          <div class="w-full h-full flex items-center justify-center overflow-auto p-4 select-none">
+            <img 
+              id="liveViewerImageEl" 
+              src="${file.dataUrl}" 
+              alt="${escapeHtml(file.name)}"
+              class="max-h-full max-w-full object-contain transition-transform duration-200 shadow-2xl rounded-lg"
+              style="transform: scale(1) rotate(0deg);"
+            >
+          </div>
+        `;
+      } 
+      // 2. PDF 문서 뷰어 (내장 브라우저 PDF 뷰어)
+      else if (category === 'PDF') {
+        bodyEl.innerHTML = `
+          <iframe 
+            src="${file.dataUrl}#view=FitH" 
+            class="w-full h-full rounded-lg border border-zinc-800 bg-white"
+            title="${escapeHtml(file.name)}"
+          ></iframe>
+        `;
+      } 
+      // 3. 코드 & 텍스트 뷰어 (라인 넘버 & 구문 뷰)
+      else if (category === 'CODE' || category === 'TEXT') {
+        textCtrl.classList.remove('hidden');
+        textCtrl.classList.add('flex');
+
+        const textContent = decodeDataUrlText(file.dataUrl);
+        const lines = textContent.split('\n');
+
+        let linesHtml = lines.map((l, i) => `
+          <div class="table-row hover:bg-zinc-800/40">
+            <span class="table-cell text-right pr-4 text-zinc-600 select-none text-[11px] font-mono">${i + 1}</span>
+            <span class="table-cell whitespace-pre text-zinc-200 text-xs font-mono">${escapeHtml(l)}</span>
+          </div>
+        `).join('');
+
+        bodyEl.innerHTML = `
+          <div class="w-full h-full bg-[#0d0d10] p-4 rounded-lg border border-zinc-800 overflow-auto font-mono">
+            <div class="table w-full">
+              ${linesHtml}
+            </div>
+          </div>
+        `;
+      } 
+      // 4. CSV 스프레드시트 표 뷰어
+      else if (category === 'CSV') {
+        const textContent = decodeDataUrlText(file.dataUrl);
+        const rows = parseCSV(textContent);
+
+        let tableHtml = '<table class="min-w-full border-collapse border border-zinc-800 text-xs font-mono text-left">';
+        rows.forEach((row, rIdx) => {
+          tableHtml += `<tr class="${rIdx === 0 ? 'bg-zinc-800 font-bold text-brown-main' : 'hover:bg-zinc-800/40 border-b border-zinc-800/60 text-zinc-200'}">`;
+          row.forEach(cell => {
+            tableHtml += `<td class="p-2.5 border border-zinc-800">${escapeHtml(cell)}</td>`;
+          });
+          tableHtml += '</tr>';
+        });
+        tableHtml += '</table>';
+
+        bodyEl.innerHTML = `
+          <div class="w-full h-full bg-[#0d0d10] p-4 rounded-lg border border-zinc-800 overflow-auto">
+            ${tableHtml}
+          </div>
+        `;
+      } 
+      // 5. 오디오 미디어 플레이어
+      else if (category === 'AUDIO') {
+        bodyEl.innerHTML = `
+          <div class="flex flex-col items-center justify-center gap-6 p-8 bg-[#0d0d10] rounded-2xl border border-zinc-800 w-full max-w-md">
+            <span class="text-6xl animate-bounce">🎵</span>
+            <div class="text-center">
+              <p class="text-sm font-bold text-white font-mono">${escapeHtml(file.name)}</p>
+              <p class="text-xs text-zinc-500 font-mono mt-1">${formatFileSize(file.size)}</p>
+            </div>
+            <audio controls autoplay class="w-full">
+              <source src="${file.dataUrl}" type="${file.type}">
+              브라우저가 오디오 재생을 지원하지 않습니다.
+            </audio>
+          </div>
+        `;
+      } 
+      // 6. 비디오 미디어 플레이어
+      else if (category === 'VIDEO') {
+        bodyEl.innerHTML = `
+          <div class="w-full h-full flex items-center justify-center p-2 bg-black rounded-lg">
+            <video controls autoplay class="max-h-full max-w-full rounded-lg shadow-2xl">
+              <source src="${file.dataUrl}" type="${file.type}">
+              브라우저가 비디오 재생을 지원하지 않습니다.
+            </video>
+          </div>
+        `;
+      } 
+      // 7. 기타 바이너리 파일: 안전한 텍스트/바이트 덤프 미리보기
+      else {
+        bodyEl.innerHTML = `
+          <div class="flex flex-col items-center justify-center p-8 bg-[#0d0d10] rounded-2xl border border-zinc-800 max-w-lg text-center space-y-4">
+            <span class="text-5xl">📦</span>
+            <div>
+              <h4 class="text-base font-bold text-white font-mono">${escapeHtml(file.name)}</h4>
+              <p class="text-xs text-zinc-400 font-mono mt-1">파일 유형: ${escapeHtml(file.type || '바이너리 데이터')}</p>
+            </div>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              이 파일은 브라우저 내장 렌더러가 없으나 데이터가 웹 세션에 안전하게 보존되어 있습니다.
+            </p>
+            <div class="pt-2">
+              <button onclick="openViewerInNewTab()" class="px-4 py-2 bg-brown-main text-zinc-950 font-bold font-mono text-xs rounded-lg">
+                브라우저 네이티브 스트림으로 열기 ↗
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      modal.classList.remove('hidden');
+      modal.focus();
+    }
+
+    function closeLiveViewer() {
+      const modal = document.getElementById('liveViewerModal');
+      const bodyEl = document.getElementById('viewerBody');
+      if (modal) modal.classList.add('hidden');
+      if (bodyEl) bodyEl.innerHTML = ''; // 미디어 재생 정지
+      currentViewerData = null;
+    }
+
+    // ESC 키로 뷰어 닫기
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeLiveViewer();
+      }
+    });
+
+    // 이미지 조작 함수
+    function zoomViewerImage(factor) {
+      currentImageScale *= factor;
+      updateImageTransform();
+    }
+
+    function resetViewerImage() {
+      currentImageScale = 1.0;
+      currentImageRotation = 0;
+      updateImageTransform();
+    }
+
+    function rotateViewerImage() {
+      currentImageRotation = (currentImageRotation + 90) % 360;
+      updateImageTransform();
+    }
+
+    function updateImageTransform() {
+      const img = document.getElementById('liveViewerImageEl');
+      if (img) {
+        img.style.transform = `scale(${currentImageScale}) rotate(${currentImageRotation}deg)`;
+      }
+    }
+
+    function copyViewerText() {
+      if (!currentViewerData) return;
+      const text = decodeDataUrlText(currentViewerData.dataUrl);
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('btnCopyText');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<span>✅ 복사 완료!</span>';
+        setTimeout(() => btn.innerHTML = orig, 2000);
+      });
+    }
+
+    function openViewerInNewTab() {
+      if (!currentViewerData || !currentViewerData.dataUrl) return;
+      const win = window.open();
+      if (win) {
+        win.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head><title>${currentViewerData.name}</title></head>
+          <body style="margin:0; background:#09090b; display:flex; align-items:center; justify-content:center; height:100vh;">
+            <iframe src="${currentViewerData.dataUrl}" style="width:100%; height:100%; border:none;"></iframe>
+          </body>
+          </html>
+        `);
+      }
+    }
+
+    // ----------------------------------------------------
+    // [G] 유틸리티 함수들
+    // ----------------------------------------------------
+    function getFileTypeCategory(mime, name) {
+      const m = (mime || '').toLowerCase();
+      const n = (name || '').toLowerCase();
+
+      if (m.startsWith('image/') || /\.(png|jpe?g|gif|webp|svg|bmp)$/i.test(n)) return 'IMAGE';
+      if (m === 'application/pdf' || n.endsWith('.pdf')) return 'PDF';
+      if (n.endsWith('.csv') || m === 'text/csv') return 'CSV';
+      if (m.startsWith('text/') || /\.(txt|md|log|json|js|ts|py|html|css|sql|sh)$/i.test(n)) return 'CODE';
+      if (m.startsWith('audio/') || /\.(mp3|wav|ogg|m4a)$/i.test(n)) return 'AUDIO';
+      if (m.startsWith('video/') || /\.(mp4|webm|mov|mkv)$/i.test(n)) return 'VIDEO';
+      return 'FILE';
+    }
+
+    function getFileIcon(mime, name) {
+      const cat = getFileTypeCategory(mime, name);
+      switch(cat) {
+        case 'IMAGE': return '🖼️';
+        case 'PDF': return '📄';
+        case 'CSV': return '📊';
+        case 'CODE': return '💻';
+        case 'AUDIO': return '🎵';
+        case 'VIDEO': return '🎬';
+        default: return '📁';
+      }
+    }
+
+    function formatFileSize(bytes) {
+      if (!bytes || bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+    }
+
+    function formatTime(isoStr) {
+      if (!isoStr) return '';
+      const d = new Date(isoStr);
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const h = String(d.getHours()).padStart(2, '0');
+      const min = String(d.getMinutes()).padStart(2, '0');
+      return `${m}/${day} ${h}:${min}`;
+    }
+
+    function decodeDataUrlText(dataUrl) {
+      try {
+        if (!dataUrl) return '';
+        const commaIdx = dataUrl.indexOf(',');
+        if (commaIdx === -1) return '';
+        const meta = dataUrl.substring(0, commaIdx);
+        const data = dataUrl.substring(commaIdx + 1);
+
+        if (meta.includes(';base64')) {
+          return decodeURIComponent(escape(atob(data)));
+        } else {
+          return decodeURIComponent(data);
+        }
+      } catch (e) {
+        return atob(dataUrl.split(',')[1] || '');
+      }
+    }
+
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      return lines.map(line => {
+        // 간단한 쉼표 분리 (따옴표 고려)
+        return line.split(',').map(cell => cell.trim().replace(/^["']|["']$/g, ''));
+      });
+    }
+
+    function getMimeByName(name) {
+      const n = (name || '').toLowerCase();
+      if (n.endsWith('.pdf')) return 'application/pdf';
+      if (n.endsWith('.png')) return 'image/png';
+      if (n.endsWith('.jpg') || n.endsWith('.jpeg')) return 'image/jpeg';
+      if (n.endsWith('.gif')) return 'image/gif';
+      if (n.endsWith('.svg')) return 'image/svg+xml';
+      if (n.endsWith('.txt')) return 'text/plain';
+      if (n.endsWith('.json')) return 'application/json';
+      if (n.endsWith('.js')) return 'application/javascript';
+      if (n.endsWith('.csv')) return 'text/csv';
+      return 'application/octet-stream';
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    function showToastNotification(msg) {
+      let toast = document.getElementById('chatToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'chatToast';
+        toast.className = 'fixed bottom-6 right-6 z-50 bg-[#141418] border border-brown-main text-white px-4 py-2.5 rounded-xl shadow-2xl font-mono text-xs flex items-center gap-2 transition-all duration-300';
+        document.body.appendChild(toast);
+      }
+      toast.innerHTML = `<span>✨</span><span>${escapeHtml(msg)}</span>`;
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+      }, 3000);
+    }
+
+    // ----------------------------------------------------
+    // [H] 초기 실행 구동
+    // ----------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      // 작성자 기억 복원
+      try {
+        const savedAuthor = localStorage.getItem(AUTHOR_KEY);
+        if (savedAuthor) {
+          const authorInput = document.getElementById('authorInput');
+          if (authorInput) authorInput.value = savedAuthor;
+        }
+      } catch (e) {}
+
+      loadFeed();
+    });
+  </script>
+
+</body>
+</html>

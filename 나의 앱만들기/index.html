@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CertiFlow | 수험생 맞춤형 자격증 시험 스케줄링 SaaS</title>
+  
+  <!-- Pretendard & Fonts -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+          },
+          colors: {
+            certi: {
+              blue: '#3B82F6',
+              indigo: '#6366F1',
+              violet: '#8B5CF6',
+              emerald: '#10B981',
+              amber: '#F59E0B',
+              rose: '#EF4444'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      color: #0f172a;
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* 휴식일 대각선 빗금 스트라이프 패턴 */
+    .diagonal-stripes {
+      background-image: repeating-linear-gradient(
+        45deg,
+        rgba(148, 163, 184, 0.15),
+        rgba(148, 163, 184, 0.15) 6px,
+        transparent 6px,
+        transparent 12px
+      );
+    }
+
+    /* 커스텀 스크롤바 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.4);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+  <!-- ====================================================
+       1. 네비게이션 헤더 (Navbar)
+       ==================================================== -->
+  <header class="sticky top-0 z-40 w-full border-b border-zinc-200 bg-white/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- 로고 & 플랜 타이틀 -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 font-bold text-lg tracking-wider">
+          CF
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-lg text-zinc-900 tracking-tight">CertiFlow</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-mono font-semibold border border-blue-200">
+              AI SaaS
+            </span>
+          </div>
+          <p id="navPlanTitle" class="text-xs text-zinc-500 font-medium truncate max-w-[200px] sm:max-w-sm">
+            정보처리기사 필기 한달 단기완성 (EIP Master)
+          </p>
+        </div>
+      </div>
+
+      <!-- D-Day 뱃지 -->
+      <div class="hidden md:flex items-center gap-2">
+        <div id="navDDayBadge" class="px-3 py-1 rounded-full text-xs font-bold font-mono border flex items-center gap-1.5 shadow-sm bg-indigo-50 text-indigo-600 border-indigo-200">
+          <span class="w-2 h-2 rounded-full bg-current"></span>
+          <span id="navDDayText">D-21</span>
+        </div>
+        <span id="navPeriodText" class="text-xs text-zinc-400 font-mono">2026-09-24 ~ 2026-10-22</span>
+      </div>
+
+      <!-- 액션 버튼 -->
+      <div class="flex items-center gap-2">
+        <button
+          id="btnNavReschedule"
+          onclick="openRescheduleModal()"
+          class="hidden px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold font-mono transition-all items-center gap-1.5 shadow-sm"
+        >
+          <span>⚡ 지연 재배치</span>
+          <span id="navOverdueCountBadge" class="px-1.5 py-0.2 rounded-full bg-amber-700 text-[10px]">1</span>
+        </button>
+
+        <button
+          onclick="openOnboardingModal()"
+          class="px-3.5 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold tracking-tight transition-all shadow-md shadow-blue-500/25 flex items-center gap-1.5"
+        >
+          <span>✨</span>
+          <span>새 스케줄 생성</span>
+        </button>
+
+        <button
+          onclick="resetToMockData()"
+          class="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-600 transition-colors text-xs"
+          title="4주 모의 데이터로 초기화"
+        >
+          🔄
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- 실시간 알림 토스트 -->
+  <div id="toastContainer" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 w-full">
+    <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs font-mono flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span>🔔</span>
+        <span id="toastMessage">안내 메시지</span>
+      </div>
+      <button onclick="hideToast()" class="text-blue-500 hover:text-blue-700 font-bold ml-4">✕</button>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       2. 메인 대시보드 (7:5 Split Grid Layout)
+       ==================================================== -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- [좌측 7컬럼] 대형 인터랙티브 캘린더 -->
+      <section class="lg:col-span-7 h-full">
+        <div class="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden flex flex-col h-full">
+          
+          <!-- 캘린더 상단 월 제어 바 -->
+          <div class="p-4 sm:p-5 border-b border-zinc-100 flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <h2 id="calMonthTitle" class="text-lg sm:text-xl font-extrabold font-mono text-zinc-900">
+                2026년 10월
+              </h2>
+              <span class="text-xs px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-600 font-mono font-medium">
+                3단계 역산 로드맵
+              </span>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+              <button onclick="goToday()" class="px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-xs font-semibold text-zinc-700 transition-colors">
+                오늘
+              </button>
+              <button onclick="prevMonth()" class="p-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 transition-colors text-sm">
+                ◀
+              </button>
+              <button onclick="nextMonth()" class="p-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 transition-colors text-sm">
+                ▶
+              </button>
+            </div>
+          </div>
+
+          <!-- 단계별 범례 -->
+          <div class="px-4 py-2 bg-zinc-50/70 border-b border-zinc-100 flex items-center justify-between text-[11px] font-mono text-zinc-500 overflow-x-auto gap-4">
+            <div class="flex items-center gap-3">
+              <span class="flex items-center gap-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                <span>1단계: 기본개념(1회독)</span>
+              </span>
+              <span class="flex items-center gap-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                <span>2단계: 핵심압축(2회독)</span>
+              </span>
+              <span class="flex items-center gap-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                <span>3단계: 기출파이널(3회독)</span>
+              </span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="flex items-center gap-1">
+                <span class="w-3 h-3 rounded bg-zinc-200 diagonal-stripes"></span>
+                <span>휴식일</span>
+              </span>
+              <span class="flex items-center gap-1">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <span>완료</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- 요일 헤더 -->
+          <div class="grid grid-cols-7 border-b border-zinc-100 text-center text-xs font-bold font-mono py-2 bg-zinc-50">
+            <div class="text-rose-500">일</div>
+            <div class="text-zinc-500">월</div>
+            <div class="text-zinc-500">화</div>
+            <div class="text-zinc-500">수</div>
+            <div class="text-zinc-500">목</div>
+            <div class="text-zinc-500">금</div>
+            <div class="text-blue-500">토</div>
+          </div>
+
+          <!-- 날짜 그리드 -->
+          <div id="calendarGrid" class="grid grid-cols-7 auto-rows-fr flex-grow divide-x divide-y divide-zinc-100 border-b border-zinc-100 min-h-[500px]">
+            <!-- JS 동적 렌더링 -->
+          </div>
+
+        </div>
+      </section>
+
+      <!-- [우측 5컬럼] 선택 날짜 상세 패널 (Sticky) -->
+      <section class="lg:col-span-5 h-full">
+        <div class="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 flex flex-col h-full sticky top-20">
+          
+          <!-- 미완료 지연 감지 알림 바 -->
+          <div id="overdueAlertBanner" class="hidden mb-4 p-3.5 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">⚠️</span>
+              <div class="text-xs">
+                <p id="overdueAlertTitle" class="font-bold text-amber-800">
+                  완료하지 못한 1개의 공부가 밀려있습니다!
+                </p>
+                <p class="text-amber-600 font-mono text-[11px]">
+                  휴식일 또는 잔여 일정에 지연 분량을 자동 재배치하세요.
+                </p>
+              </div>
+            </div>
+            <button
+              onclick="openRescheduleModal()"
+              class="shrink-0 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-mono text-xs font-bold transition-all shadow-sm"
+            >
+              스마트 재조정 ➔
+            </button>
+          </div>
+
+          <!-- 패널 헤더: 선택 날짜, D-Day, 진도율 프로그레스 바 -->
+          <div class="border-b border-zinc-100 pb-4 mb-4">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 id="panelDateStr" class="text-xl font-extrabold font-mono text-zinc-900">
+                    2026-10-01
+                  </h3>
+                  <span id="panelDayOfWeek" class="text-xs font-bold px-2 py-0.5 rounded bg-zinc-100 text-zinc-600">
+                    목요일
+                  </span>
+                </div>
+                <p id="panelDDayText" class="text-xs text-blue-600 font-mono font-bold mt-1">
+                  🎯 시험까지 D-21
+                </p>
+              </div>
+
+              <div class="text-right">
+                <span id="panelPercentText" class="text-2xl font-black font-mono text-zinc-900">
+                  0%
+                </span>
+                <span id="panelRatioText" class="block text-[11px] font-mono text-zinc-400">
+                  0 / 1 완료
+                </span>
+              </div>
+            </div>
+
+            <!-- 프로그레스 바 -->
+            <div class="w-full bg-zinc-100 h-2 rounded-full overflow-hidden mt-3">
+              <div
+                id="panelProgressBar"
+                class="bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500 h-full rounded-full transition-all duration-500"
+                style="width: 0%;"
+              ></div>
+            </div>
+          </div>
+
+          <!-- 태스크 카드 리스트 -->
+          <div id="panelTaskList" class="flex-grow overflow-y-auto space-y-3 pr-1 max-h-[520px]">
+            <!-- JS 동적 렌더링 -->
+          </div>
+
+          <!-- 하단 상태 정보 -->
+          <div class="pt-3 border-t border-zinc-100 text-[11px] font-mono text-zinc-400 flex items-center justify-between mt-4">
+            <span class="flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span>Supabase RLS & LocalStorage 동기화</span>
+            </span>
+            <span>CertiFlow v1.0</span>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ====================================================
+       3. 온보딩 모달 (AI 3단계 역산 스케줄 생성)
+       ==================================================== -->
+  <div id="onboardingModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="bg-white border border-zinc-200 rounded-2xl max-w-xl w-full p-6 shadow-2xl relative my-8">
+      
+      <button onclick="closeOnboardingModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600 text-lg p-1">
+        ✕
+      </button>
+
+      <div class="mb-5">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+            ✨
+          </span>
+          <h3 class="text-xl font-extrabold text-zinc-900">
+            AI 자격증 시험 스케줄 생성
+          </h3>
+        </div>
+        <p class="text-xs text-zinc-500 mt-1 font-mono">
+          수험 기간을 50% 개념정독, 30% 핵심회독, 20% 기출스프린트로 완벽 역산 배치합니다.
+        </p>
+      </div>
+
+      <form id="onboardingForm" onsubmit="handleOnboardingSubmit(event)" class="space-y-4">
+        
+        <!-- 프리셋 선택 -->
+        <div>
+          <label class="block text-xs font-mono font-bold text-zinc-700 mb-1.5">
+            자격증 프리셋 선택:
+          </label>
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              type="button"
+              onclick="applyPreset('eip')"
+              id="presetBtn_eip"
+              class="p-2.5 rounded-xl border text-left transition-all border-blue-600 bg-blue-50/50 text-blue-700 ring-2 ring-blue-500/20"
+            >
+              <p class="font-bold text-xs truncate">정보처리기사</p>
+              <p class="text-[10px] text-zinc-400 truncate">5개 과목 완벽대비</p>
+            </button>
+            <button
+              type="button"
+              onclick="applyPreset('sqld')"
+              id="presetBtn_sqld"
+              class="p-2.5 rounded-xl border text-left transition-all border-zinc-200 hover:border-zinc-300 text-zinc-700"
+            >
+              <p class="font-bold text-xs truncate">SQLD</p>
+              <p class="text-[10px] text-zinc-400 truncate">데이터베이스 실무</p>
+            </button>
+            <button
+              type="button"
+              onclick="applyPreset('net2')"
+              id="presetBtn_net2"
+              class="p-2.5 rounded-xl border text-left transition-all border-zinc-200 hover:border-zinc-300 text-zinc-700"
+            >
+              <p class="font-bold text-xs truncate">네트워크2급</p>
+              <p class="text-[10px] text-zinc-400 truncate">서버/네트워크</p>
+            </button>
+          </div>
+        </div>
+
+        <!-- 시험명 -->
+        <div>
+          <label class="block text-xs font-mono font-bold text-zinc-700 mb-1">
+            목표 자격증 명칭:
+          </label>
+          <input
+            type="text"
+            id="inputExamTitle"
+            value="정보처리기사 (EIP)"
+            class="w-full px-3 py-2 rounded-lg border border-zinc-200 bg-zinc-50 text-sm font-semibold text-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+
+        <!-- 날짜 -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-mono font-bold text-zinc-700 mb-1">
+              학습 시작일:
+            </label>
+            <input
+              type="date"
+              id="inputStartDate"
+              class="w-full px-3 py-2 rounded-lg border border-zinc-200 bg-zinc-50 text-xs font-mono text-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-mono font-bold text-zinc-700 mb-1">
+              시험 목표일 (D-Day):
+            </label>
+            <input
+              type="date"
+              id="inputExamDate"
+              class="w-full px-3 py-2 rounded-lg border border-zinc-200 bg-zinc-50 text-xs font-mono text-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- 하루 공부시간 -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-xs font-mono font-bold text-zinc-700">
+              하루 가능 공부 시간:
+            </label>
+            <span id="dailyHoursText" class="text-xs font-mono font-extrabold text-blue-600">
+              3.0시간 (180분)
+            </span>
+          </div>
+          <input
+            type="range"
+            id="inputDailyHours"
+            min="1.0"
+            max="10.0"
+            step="0.5"
+            value="3.0"
+            oninput="document.getElementById('dailyHoursText').textContent = `${this.value}시간 (${Math.round(this.value * 60)}분)`"
+            class="w-full accent-blue-600"
+          />
+        </div>
+
+        <!-- 주간 정기 휴식일 -->
+        <div>
+          <label class="block text-xs font-mono font-bold text-zinc-700 mb-1.5">
+            정기 휴식 요일 (캘린더 빗금 휴식일 처리):
+          </label>
+          <div class="flex gap-1.5" id="restDaysBtnGroup">
+            <!-- 일(0) ~ 토(6) 버튼 -->
+          </div>
+        </div>
+
+        <!-- 커리큘럼 텍스트 -->
+        <div>
+          <label class="block text-xs font-mono font-bold text-zinc-700 mb-1">
+            목차 및 과목 원문:
+          </label>
+          <textarea
+            id="inputCurriculumText"
+            rows="3"
+            class="w-full px-3 py-2 rounded-lg border border-zinc-200 bg-zinc-50 text-xs font-mono text-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          ></textarea>
+        </div>
+
+        <!-- 버튼 -->
+        <div class="pt-2">
+          <button
+            type="submit"
+            id="btnSubmitSchedule"
+            class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-mono font-bold text-sm tracking-wide shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-2"
+          >
+            <span>🚀</span>
+            <span>스마트 3단계 스케줄 생성 완료</span>
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ====================================================
+       4. 지연 일정 스마트 재배치 모달 (RescheduleDialog)
+       ==================================================== -->
+  <div id="rescheduleModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="bg-white border border-zinc-200 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+      
+      <button onclick="closeRescheduleModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600 text-lg p-1">
+        ✕
+      </button>
+
+      <div class="flex items-center gap-2 mb-4">
+        <span class="w-8 h-8 rounded-lg bg-amber-500 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+          ⚡
+        </span>
+        <div>
+          <h3 class="text-lg font-extrabold text-zinc-900">
+            지연된 공부 스마트 재배치
+          </h3>
+          <p class="text-xs text-zinc-500 font-mono">
+            미완료 과제를 분석하여 시험 일정에 지장 없도록 최적 재편성합니다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 미완료 과제 요약 목록 -->
+      <div id="rescheduleOverdueList" class="mb-5 p-3 rounded-xl bg-zinc-50 border border-zinc-200 max-h-36 overflow-y-auto space-y-1.5 text-xs font-mono">
+        <!-- JS 동적 주입 -->
+      </div>
+
+      <!-- 2개 옵션 선택 -->
+      <div class="space-y-3 mb-6">
+        <label class="text-xs font-mono font-bold text-zinc-700 block">
+          재배치 방식 선택:
+        </label>
+
+        <!-- USE_REST_DAY -->
+        <div
+          onclick="selectRescheduleMode('USE_REST_DAY')"
+          id="modeCard_USE_REST_DAY"
+          class="p-3.5 rounded-xl border cursor-pointer transition-all border-blue-600 bg-blue-50/50 ring-2 ring-blue-500/20 flex items-start gap-3"
+        >
+          <input type="radio" name="rescheduleRadio" id="radio_USE_REST_DAY" checked class="mt-1 accent-blue-600" />
+          <div>
+            <p class="text-xs font-bold text-zinc-900">☕ 다가오는 휴식일을 '보충 학습일'로 전환 (권장)</p>
+            <p class="text-[11px] text-zinc-500 leading-relaxed font-mono mt-0.5">
+              가장 가까운 주말/휴식일을 특별 보충 학습일로 지정하여 밀린 핵심 분량을 한 번에 몰입해 완벽 소화합니다.
+            </p>
+          </div>
+        </div>
+
+        <!-- DISTRIBUTE -->
+        <div
+          onclick="selectRescheduleMode('DISTRIBUTE')"
+          id="modeCard_DISTRIBUTE"
+          class="p-3.5 rounded-xl border cursor-pointer transition-all border-zinc-200 hover:border-zinc-300 flex items-start gap-3"
+        >
+          <input type="radio" name="rescheduleRadio" id="radio_DISTRIBUTE" class="mt-1 accent-blue-600" />
+          <div>
+            <p class="text-xs font-bold text-zinc-900">🏃 잔여 학습일들에 균등 분할 배분 (일일 +25분)</p>
+            <p class="text-[11px] text-zinc-500 leading-relaxed font-mono mt-0.5">
+              휴식일을 유지하면서 남은 정상 학습일에 미완료 키포인트를 골고루 나누어 일일 공부시간을 조금씩 늘립니다.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 버튼 -->
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          onclick="closeRescheduleModal()"
+          class="flex-1 py-2.5 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-xs font-mono font-bold text-zinc-600 transition-colors"
+        >
+          취소
+        </button>
+        <button
+          type="button"
+          onclick="applyRescheduleAction()"
+          class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white text-xs font-mono font-bold shadow-md shadow-amber-500/25 transition-all flex items-center justify-center gap-1.5"
+        >
+          <span>⚡</span>
+          <span>스케줄 재조정 적용</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <footer class="border-t border-zinc-200 py-4 text-center text-xs font-mono text-zinc-500 bg-white/50 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>© 2026 CertiFlow. 수험생 맞춤형 자격증 시험 스케줄링 SaaS</p>
+      <div class="flex items-center gap-3">
+        <span>Next.js 14 App Router</span>
+        <span>•</span>
+        <span>Supabase PostgreSQL & RLS</span>
+        <span>•</span>
+        <span>OpenAI Structured Outputs</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ====================================================
+       5. 클라이언트 애플리케이션 상태 & 엔진 스크립트
+       ==================================================== -->
+  <script>
+    // --------------------------------------------------
+    // A. 프리셋 데이터 & 과목 색상
+    // --------------------------------------------------
+    const PRESETS = {
+      eip: {
+        title: '정보처리기사 (EIP)',
+        hours: 3.0,
+        subjects: [
+          { name: '소프트웨어 설계', color: '#3B82F6', chapters: [
+            { title: '요구사항 확인', points: ['유스케이스 모델링', '요구사항 분석/명세/검증 절차', 'UML 다이어그램 분류'] },
+            { title: '화면 및 애플리케이션 설계', points: ['UI 설계 4대 원칙', 'MVC 아키텍처 패턴', 'GoF 디자인 패턴'] }
+          ]},
+          { name: '소프트웨어 개발', color: '#8B5CF6', chapters: [
+            { title: '데이터 입출력 및 자료구조', points: ['트리 순회(전위/중위/후위)', '정렬 알고리즘 시간복잡도'] },
+            { title: '통합 구현 및 패키징', points: ['EAI/ESB 연계 아키텍처', 'Git 형상 관리 4단계', '화이트/블랙박스 테스트'] }
+          ]},
+          { name: '데이터베이스 구축', color: '#10B981', chapters: [
+            { title: 'SQL 응용 및 트랜잭션', points: ['SELECT 서브쿼리 및 JOIN', 'ACID 원칙', '트랜잭션 격리수준'] },
+            { title: '정규화 이론 및 인덱스', points: ['1NF ~ BCNF 무손실 분해', 'B-Tree 인덱스', '이상현상(삽입/삭제/갱신)'] }
+          ]},
+          { name: '프로그래밍 언어 활용', color: '#F59E0B', chapters: [
+            { title: 'C/C++ 포인터 & Java 객체지향', points: ['포인터와 배열 메모리', 'Java 상속/다형성/캡슐화', '스택 vs 힙 메모리'] },
+            { title: 'Python 스크립트 및 운영체제', points: ['리스트 컴프리헨션', '프로세스 스케줄링(FCFS, RR)', '페이징 가상메모리'] }
+          ]},
+          { name: '정보시스템 구축관리', color: '#EC4899', chapters: [
+            { title: '소프트웨어 개발 보안 구축', points: ['SQL 인젝션 & XSS 방어', '대칭키/비대칭키 암호화(AES, RSA)', '시큐어 코딩'] },
+            { title: 'IT 프로젝트 시스템 관리', points: ['방화벽, IDS, IPS 보안 솔루션', '클라우드 컴퓨팅(IaaS, PaaS, SaaS)', '애자일 스크럼'] }
+          ]}
+        ]
+      },
+      sqld: {
+        title: 'SQL 개발자 (SQLD)',
+        hours: 2.5,
+        subjects: [
+          { name: '데이터 모델링의 이해', color: '#6366F1', chapters: [
+            { title: '데이터 모델과 성능', points: ['3단계 스키마(외부/개념/내부)', 'ERD 표준', '주식별자/외래식별자'] },
+            { title: '정규화와 성능 최적화', points: ['1NF~3NF 및 BCNF 분해', '반정규화 기법과 주의점'] }
+          ]},
+          { name: 'SQL 기본 및 활용', color: '#14B8A6', chapters: [
+            { title: 'SQL DDL/DML/TCL 핵심', points: ['NULL의 특성과 연산', 'WHERE 조건절 우선순위', 'COMMIT & ROLLBACK'] },
+            { title: '윈도우 함수 및 고급 조인', points: ['ROW_NUMBER, RANK, DENSE_RANK', '스칼라 서브쿼리', '계층형 질의 CONNECT BY'] }
+          ]}
+        ]
+      },
+      net2: {
+        title: '네트워크관리사 2급',
+        hours: 2.0,
+        subjects: [
+          { name: '네트워크 일반 & TCP/IP', color: '#06B6D4', chapters: [
+            { title: 'OSI 7계층 및 프로토콜', points: ['TCP 3-Way Handshake', 'UDP 헤더', 'IP 서브넷 마스킹 계산'] },
+            { title: 'IP 주소 체계와 서브네팅', points: ['IPv4 클래스 분류', 'VLSM 서브네팅', 'IPv6 구조 및 특징'] }
+          ]},
+          { name: 'NOS & 네트워크 기기', color: '#84CC16', chapters: [
+            { title: '서버 운용 및 라우팅', points: ['Windows Server DNS/DHCP', 'Linux 기본 명령어', '라우터 정적 라우팅/VLAN'] }
+          ]}
+        ]
+      }
+    };
+
+    function getSubjectColor(subj) {
+      for (const p of Object.values(PRESETS)) {
+        for (const s of p.subjects) {
+          if (s.name === subj) return s.color;
+        }
+      }
+      return '#3B82F6';
+    }
+
+    // --------------------------------------------------
+    // B. 전역 상태 (Global State)
+    // --------------------------------------------------
+    let state = {
+      plan: null,
+      tasks: [],
+      selectedDate: '',
+      calYear: 2026,
+      calMonth: 9, // 0~11 (9: 10월)
+      openAccordions: {},
+      selectedPreset: 'eip',
+      restDaysWeekly: [0, 6], // 일(0), 토(6)
+      rescheduleMode: 'USE_REST_DAY'
+    };
+
+    const STORAGE_KEY = 'certiflow_standalone_storage_v1';
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          plan: state.plan,
+          tasks: state.tasks,
+          selectedDate: state.selectedDate
+        }));
+      } catch (e) {}
+    }
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.plan && parsed.tasks) {
+            state.plan = parsed.plan;
+            state.tasks = parsed.tasks;
+            state.selectedDate = parsed.selectedDate || getTodayStr();
+            const d = new Date(state.selectedDate);
+            state.calYear = d.getFullYear();
+            state.calMonth = d.getMonth();
+            return true;
+          }
+        }
+      } catch (e) {}
+      return false;
+    }
+
+    function getTodayStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    // --------------------------------------------------
+    // C. 3단계 역산 배치 알고리즘 엔진
+    // --------------------------------------------------
+    function generateTasksEngine(plan, presetKey) {
+      const allDays = [];
+      const curr = new Date(plan.startDate);
+      const end = new Date(plan.examDate);
+
+      while (curr <= end) {
+        const y = curr.getFullYear();
+        const m = String(curr.getMonth() + 1).padStart(2, '0');
+        const day = String(curr.getDate()).padStart(2, '0');
+        const dateStr = `${y}-${m}-${day}`;
+        const dayOfWeek = curr.getDay();
+        const isRest = plan.restDaysWeekly.includes(dayOfWeek);
+
+        allDays.push({ dateStr, dayOfWeek, isRest });
+        curr.setDate(curr.getDate() + 1);
+      }
+
+      const validStudyDays = allDays.filter(d => !d.isRest);
+      const totalValid = validStudyDays.length;
+      if (totalValid === 0) return [];
+
+      const p3Count = Math.max(3, Math.min(14, Math.round(totalValid * 0.2)));
+      const remaining = totalValid - p3Count;
+      const p1Count = Math.max(1, Math.round(remaining * (0.5 / 0.8)));
+      const p2Count = Math.max(1, remaining - p1Count);
+
+      const preset = PRESETS[presetKey] || PRESETS.eip;
+      const chapters = [];
+      preset.subjects.forEach(s => {
+        s.chapters.forEach(c => {
+          chapters.push({ subject: s.name, title: c.title, points: c.points });
+        });
+      });
+
+      const tasks = [];
+      let validIdx = 0;
+
+      allDays.forEach(day => {
+        if (day.isRest) {
+          tasks.push({
+            id: `task-rest-${day.dateStr}`,
+            taskDate: day.dateStr,
+            phase: 1,
+            subject: '정기 휴식일',
+            chapter: '재충전 및 컨디션 관리',
+            learningPoints: ['충분한 수면 및 뇌 휴식', '주간 학습 리듬 점검', '가벼운 스트레칭'],
+            estimatedMinutes: 0,
+            reviewCount: 0,
+            isCompleted: true,
+            isRestDay: true
+          });
+        } else {
+          let phase = 1;
+          let reviewCount = 1;
+          let chapterInfo;
+
+          if (validIdx < p1Count) {
+            phase = 1;
+            reviewCount = 1;
+            chapterInfo = chapters[validIdx % chapters.length];
+          } else if (validIdx < p1Count + p2Count) {
+            phase = 2;
+            reviewCount = 2;
+            const orig = chapters[(validIdx - p1Count) % chapters.length];
+            chapterInfo = {
+              subject: orig.subject,
+              title: `[핵심회독] ${orig.title}`,
+              points: orig.points.map(p => `🔥 빈출 압축: ${p}`)
+            };
+          } else {
+            phase = 3;
+            reviewCount = 3;
+            const p3Idx = validIdx - (p1Count + p2Count);
+            const year = 2026 - (p3Idx % 4);
+            const round = (p3Idx % 3) + 1;
+            chapterInfo = {
+              subject: '전 범위 실전모의',
+              title: `${year}년 제${round}회 기출 실전 풀이 & 오답노트`,
+              points: [
+                '실전 타이머 150분 측정 풀이 (합격 기준 60점)',
+                '틀린 문항 오답노트 작성 및 취약 과목 단권화',
+                '신경향 출제 포인트 키워드 암기 체크'
+              ]
+            };
+          }
+
+          tasks.push({
+            id: `task-${day.dateStr}-${validIdx}`,
+            taskDate: day.dateStr,
+            phase,
+            subject: chapterInfo.subject,
+            chapter: chapterInfo.title,
+            learningPoints: chapterInfo.points,
+            estimatedMinutes: Math.round(plan.dailyStudyHours * 60),
+            reviewCount,
+            isCompleted: false,
+            isRestDay: false
+          });
+
+          validIdx++;
+        }
+      });
+
+      return tasks;
+    }
+
+    // --------------------------------------------------
+    // D. 4주 모의 데이터 초기화
+    // --------------------------------------------------
+    function resetToMockData() {
+      const today = new Date();
+      const start = new Date(today);
+      start.setDate(today.getDate() - 7);
+      const exam = new Date(today);
+      exam.setDate(today.getDate() + 21);
+
+      const fmt = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const startDateStr = fmt(start);
+      const examDateStr = fmt(exam);
+      const todayStr = fmt(today);
+
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      const yesterdayStr = fmt(yesterday);
+
+      state.plan = {
+        title: '정보처리기사 필기 한달 단기완성 (EIP Master)',
+        startDate: startDateStr,
+        examDate: examDateStr,
+        dailyStudyHours: 3.0,
+        restDaysWeekly: [0, 6]
+      };
+
+      const tasks = generateTasksEngine(state.plan, 'eip');
+
+      // 과거 과제 완료 처리 및 어제 과제 1건 미완료 유지 (지연 알림 시연)
+      tasks.forEach(t => {
+        if (t.isRestDay) return;
+        if (t.taskDate < yesterdayStr) {
+          t.isCompleted = true;
+        } else if (t.taskDate === yesterdayStr) {
+          t.isCompleted = false; // 지연 알림 배너 트리거!
+        } else {
+          t.isCompleted = false;
+        }
+      });
+
+      state.tasks = tasks;
+      state.selectedDate = todayStr;
+      state.calYear = today.getFullYear();
+      state.calMonth = today.getMonth();
+
+      saveState();
+      renderAll();
+      showToast('정보처리기사 4주 분량의 실감형 모의 데이터로 초기화되었습니다.');
+    }
+
+    // --------------------------------------------------
+    // E. 렌더링 함수들
+    // --------------------------------------------------
+    function renderAll() {
+      renderNav();
+      renderCalendar();
+      renderPanel();
+      renderOverdueAlert();
+    }
+
+    function renderNav() {
+      if (!state.plan) return;
+      document.getElementById('navPlanTitle').textContent = state.plan.title;
+      document.getElementById('navPeriodText').textContent = `${state.plan.startDate} ~ ${state.plan.examDate}`;
+
+      // D-Day
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const exam = new Date(state.plan.examDate);
+      exam.setHours(0,0,0,0);
+      const diff = Math.ceil((exam.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+      const dDayBadge = document.getElementById('navDDayBadge');
+      const dDayText = document.getElementById('navDDayText');
+      if (diff > 0) {
+        dDayText.textContent = `D-${diff}`;
+        if (diff <= 14) {
+          dDayBadge.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono border flex items-center gap-1.5 shadow-sm bg-rose-50 text-rose-600 border-rose-200 animate-pulse';
+        } else {
+          dDayBadge.className = 'px-3 py-1 rounded-full text-xs font-bold font-mono border flex items-center gap-1.5 shadow-sm bg-indigo-50 text-indigo-600 border-indigo-200';
+        }
+      } else if (diff === 0) {
+        dDayText.textContent = 'D-DAY!';
+      } else {
+        dDayText.textContent = `D+${Math.abs(diff)}`;
+      }
+    }
+
+    function getOverdueTasks() {
+      const todayStr = getTodayStr();
+      return state.tasks.filter(t => t.taskDate < todayStr && !t.isRestDay && !t.isCompleted);
+    }
+
+    function renderOverdueAlert() {
+      const overdue = getOverdueTasks();
+      const banner = document.getElementById('overdueAlertBanner');
+      const navBtn = document.getElementById('btnNavReschedule');
+      const badge = document.getElementById('navOverdueCountBadge');
+
+      if (overdue.length > 0) {
+        banner.classList.remove('hidden');
+        document.getElementById('overdueAlertTitle').textContent = `완료하지 못한 ${overdue.length}개의 공부가 밀려있습니다!`;
+        navBtn.classList.remove('hidden');
+        navBtn.classList.add('flex');
+        badge.textContent = overdue.length;
+      } else {
+        banner.classList.add('hidden');
+        navBtn.classList.add('hidden');
+        navBtn.classList.remove('flex');
+      }
+    }
+
+    function renderCalendar() {
+      document.getElementById('calMonthTitle').textContent = `${state.calYear}년 ${state.calMonth + 1}월`;
+
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+
+      const firstDay = new Date(state.calYear, state.calMonth, 1).getDay();
+      const daysInMonth = new Date(state.calYear, state.calMonth + 1, 0).getDate();
+      const daysInPrev = new Date(state.calYear, state.calMonth, 0).getDate();
+
+      const todayStr = getTodayStr();
+
+      // 태스크 날짜별 맵
+      const map = {};
+      state.tasks.forEach(t => {
+        if (!map[t.taskDate]) map[t.taskDate] = [];
+        map[t.taskDate].push(t);
+      });
+
+      const cells = [];
+
+      // 이전 달
+      for (let i = firstDay - 1; i >= 0; i--) {
+        const dNum = daysInPrev - i;
+        const prevM = state.calMonth === 0 ? 11 : state.calMonth - 1;
+        const prevY = state.calMonth === 0 ? state.calYear - 1 : state.calYear;
+        const dStr = `${prevY}-${String(prevM + 1).padStart(2, '0')}-${String(dNum).padStart(2, '0')}`;
+        cells.push({ dStr, dNum, isCurrent: false });
+      }
+
+      // 이번 달
+      for (let dNum = 1; dNum <= daysInMonth; dNum++) {
+        const dStr = `${state.calYear}-${String(state.calMonth + 1).padStart(2, '0')}-${String(dNum).padStart(2, '0')}`;
+        cells.push({ dStr, dNum, isCurrent: true });
+      }
+
+      // 다음 달
+      const remaining = (7 - (cells.length % 7)) % 7;
+      for (let dNum = 1; dNum <= remaining; dNum++) {
+        const nextM = state.calMonth === 11 ? 0 : state.calMonth + 1;
+        const nextY = state.calMonth === 11 ? state.calYear + 1 : state.calYear;
+        const dStr = `${nextY}-${String(nextM + 1).padStart(2, '0')}-${String(dNum).padStart(2, '0')}`;
+        cells.push({ dStr, dNum, isCurrent: false });
+      }
+
+      cells.forEach(c => {
+        const dayTasks = map[c.dStr] || [];
+        const isSelected = state.selectedDate === c.dStr;
+        const isToday = todayStr === c.dStr;
+        const hasRest = dayTasks.some(t => t.isRestDay);
+        const studyTasks = dayTasks.filter(t => !t.isRestDay);
+        const isAllComp = studyTasks.length > 0 && studyTasks.every(t => t.isCompleted);
+        const isOverdue = studyTasks.some(t => !t.isCompleted) && c.dStr < todayStr;
+        const isExam = state.plan && state.plan.examDate === c.dStr;
+
+        const cellEl = document.createElement('div');
+        cellEl.className = `min-h-[92px] sm:min-h-[105px] p-1.5 sm:p-2 cursor-pointer transition-all flex flex-col justify-between relative ${
+          !c.isCurrent ? 'bg-zinc-50/40 text-zinc-300' : ''
+        } ${
+          hasRest ? 'diagonal-stripes bg-zinc-50/60' : ''
+        } ${
+          isSelected ? 'ring-2 ring-blue-500 bg-blue-50/30 z-10' : 'hover:bg-zinc-50'
+        } ${
+          isAllComp ? 'bg-emerald-50/20' : ''
+        }`;
+
+        cellEl.onclick = () => {
+          state.selectedDate = c.dStr;
+          saveState();
+          renderAll();
+        };
+
+        // 상단 날짜 및 상태
+        let statusBadgeHtml = '';
+        if (isExam) {
+          statusBadgeHtml += '<span class="text-[10px] px-1 py-0.2 rounded font-mono font-extrabold bg-rose-600 text-white animate-pulse">시험!</span>';
+        }
+        if (isAllComp) {
+          statusBadgeHtml += '<span class="text-emerald-500 text-xs font-bold">✓</span>';
+        }
+        if (isOverdue) {
+          statusBadgeHtml += '<span class="w-2 h-2 rounded-full bg-amber-500 animate-ping" title="미완료 과제"></span>';
+        }
+
+        let numClass = 'text-xs font-mono font-bold w-6 h-6 rounded-full flex items-center justify-center ';
+        if (isToday) numClass += 'bg-blue-600 text-white shadow-sm';
+        else if (isSelected) numClass += 'bg-blue-100 text-blue-700 font-extrabold';
+        else if (c.isCurrent) numClass += 'text-zinc-700';
+        else numClass += 'text-zinc-400';
+
+        // 태스크 뱃지 렌더
+        let tasksHtml = '';
+        if (hasRest) {
+          tasksHtml = '<div class="text-[11px] font-mono text-zinc-400 py-1 text-center font-medium opacity-80">☕ 휴식일</div>';
+        } else {
+          studyTasks.slice(0, 2).forEach(t => {
+            const color = getSubjectColor(t.subject);
+            const compClass = t.isCompleted ? 'line-through opacity-50 bg-zinc-100 text-zinc-400 border-zinc-200' : 'text-zinc-800 border-zinc-200/80 shadow-xs';
+            const phaseTag = t.phase === 1 ? '[1회]' : t.phase === 2 ? '[2회]' : '[기출]';
+            tasksHtml += `
+              <div class="text-[10px] font-mono px-1.5 py-0.5 rounded truncate border transition-all flex items-center justify-between ${compClass}" style="border-left-width: 3px; border-left-color: ${color}; background-color: ${!t.isCompleted ? color + '15' : ''}">
+                <span class="truncate">${t.subject}</span>
+                <span class="text-[9px] font-bold opacity-75 ml-1 shrink-0">${phaseTag}</span>
+              </div>
+            `;
+          });
+          if (studyTasks.length > 2) {
+            tasksHtml += `<div class="text-[9px] font-mono text-zinc-400 text-right pr-1">+${studyTasks.length - 2}개</div>`;
+          }
+        }
+
+        // 하단 Phase 뱃지
+        let phaseTagHtml = '';
+        if (!hasRest && studyTasks.length > 0) {
+          const p = studyTasks[0].phase;
+          const pClass = p === 1 ? 'bg-blue-100 text-blue-600' : p === 2 ? 'bg-indigo-100 text-indigo-600' : 'bg-rose-100 text-rose-600';
+          const pText = p === 1 ? 'Phase 1 개념' : p === 2 ? 'Phase 2 회독' : 'Phase 3 기출';
+          phaseTagHtml = `<div class="pt-1 border-t border-zinc-100"><span class="text-[9px] font-mono px-1 py-0.2 rounded font-bold ${pClass}">${pText}</span></div>`;
+        }
+
+        cellEl.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="${numClass}">${c.dNum}</span>
+            <div class="flex items-center gap-1">${statusBadgeHtml}</div>
+          </div>
+          <div class="space-y-1 my-1 flex-grow overflow-hidden">${tasksHtml}</div>
+          ${phaseTagHtml}
+        `;
+
+        grid.appendChild(cellEl);
+      });
+    }
+
+    function renderPanel() {
+      const dateStr = state.selectedDate || getTodayStr();
+      document.getElementById('panelDateStr').textContent = dateStr;
+
+      const d = new Date(dateStr);
+      const names = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+      document.getElementById('panelDayOfWeek').textContent = names[d.getDay()] || '';
+
+      // D-Day
+      if (state.plan) {
+        const curr = new Date(dateStr);
+        const exam = new Date(state.plan.examDate);
+        curr.setHours(0,0,0,0);
+        exam.setHours(0,0,0,0);
+        const diff = Math.ceil((exam.getTime() - curr.getTime()) / (1000 * 60 * 60 * 24));
+        document.getElementById('panelDDayText').textContent = diff > 0 ? `🎯 시험까지 D-${diff}` : (diff === 0 ? '🎯 D-Day 시험일!' : `🎯 시험 완료 D+${Math.abs(diff)}`);
+      }
+
+      // 태스크 리스트
+      const dayTasks = state.tasks.filter(t => t.taskDate === dateStr);
+      const studyTasks = dayTasks.filter(t => !t.isRestDay);
+      const isRest = dayTasks.some(t => t.isRestDay);
+
+      const completed = studyTasks.filter(t => t.isCompleted).length;
+      const percent = studyTasks.length > 0 ? Math.round((completed / studyTasks.length) * 100) : (isRest ? 100 : 0);
+
+      document.getElementById('panelPercentText').textContent = `${percent}%`;
+      document.getElementById('panelRatioText').textContent = `${completed} / ${studyTasks.length} 완료`;
+      document.getElementById('panelProgressBar').style.width = `${percent}%`;
+
+      const listEl = document.getElementById('panelTaskList');
+      listEl.innerHTML = '';
+
+      if (isRest) {
+        listEl.innerHTML = `
+          <div class="p-6 rounded-xl border border-dashed border-zinc-300 bg-zinc-50/50 text-center space-y-3">
+            <span class="text-4xl block">☕</span>
+            <h4 class="font-extrabold text-base text-zinc-800">오늘은 정기 휴식일입니다</h4>
+            <p class="text-xs text-zinc-500 leading-relaxed font-mono">
+              수험 기간 동안 뇌가 학습 내용을 장기 기억으로 고착화하기 위해 온전한 휴식이 필수적입니다. 충분한 휴식과 수면을 취하세요.
+            </p>
+            <div class="pt-2">
+              <span class="text-[11px] font-mono px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 font-bold border border-emerald-200">
+                컨디션 회복 충전 중 🔋
+              </span>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      if (studyTasks.length === 0) {
+        listEl.innerHTML = '<div class="p-8 text-center text-zinc-400 font-mono text-xs">등록된 학습 일정이 없습니다.</div>';
+        return;
+      }
+
+      studyTasks.forEach(task => {
+        const color = getSubjectColor(task.subject);
+        const isOpen = !!state.openAccordions[task.id];
+
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-xl border transition-all ${
+          task.isCompleted ? 'bg-zinc-50/60 border-zinc-200 opacity-80' : 'bg-white border-zinc-200 shadow-sm hover:border-blue-400'
+        }`;
+
+        const phaseBadgeText = task.phase === 1 ? '1단계 개념정독' : task.phase === 2 ? '2단계 핵심회독' : '3단계 기출스프린트';
+        const phaseBadgeClass = task.phase === 1 ? 'bg-blue-50 text-blue-700 border-blue-200' : task.phase === 2 ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-rose-50 text-rose-700 border-rose-200';
+
+        let pointsHtml = '';
+        if (task.learningPoints && task.learningPoints.length > 0) {
+          const listItems = task.learningPoints.map(p => `
+            <li class="leading-relaxed flex items-start gap-1.5">
+              <span class="text-blue-500 font-bold">•</span>
+              <span>${p}</span>
+            </li>
+          `).join('');
+
+          pointsHtml = `
+            <div class="mt-3 pt-2 border-t border-zinc-100">
+              <button onclick="toggleAccordion('${task.id}')" class="w-full flex items-center justify-between text-xs font-mono text-zinc-500 hover:text-zinc-800 py-1 transition-colors">
+                <span class="font-semibold flex items-center gap-1">
+                  <span>💡 핵심 암기 포인트</span>
+                  <span class="text-[10px] px-1.5 py-0.2 rounded-full bg-zinc-100 text-zinc-600">${task.learningPoints.length}</span>
+                </span>
+                <span>${isOpen ? '▲ 접기' : '▼ 펼치기'}</span>
+              </button>
+              ${isOpen ? `<ul class="mt-2 space-y-1.5 pl-2 text-xs font-mono text-zinc-700 border-l-2 border-blue-400">${listItems}</ul>` : ''}
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-3 flex-grow">
+              <button
+                onclick="toggleTaskComplete('${task.id}')"
+                class="mt-0.5 w-5 h-5 rounded-md flex items-center justify-center border transition-all ${
+                  task.isCompleted ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-zinc-300 hover:border-emerald-500 bg-white'
+                }"
+              >
+                ${task.isCompleted ? '✓' : ''}
+              </button>
+
+              <div class="flex-grow">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                  <span class="text-[11px] font-mono px-2 py-0.5 rounded-full font-bold text-white shadow-xs" style="background-color: ${color}">
+                    ${task.subject}
+                  </span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded border ${phaseBadgeClass}">
+                    ${phaseBadgeText}
+                  </span>
+                  <span class="text-[11px] font-mono text-zinc-400">⏱️ ${task.estimatedMinutes}분</span>
+                </div>
+
+                <h4 class="text-sm font-bold text-zinc-900 transition-all ${task.isCompleted ? 'line-through text-zinc-400' : ''}">
+                  ${task.chapter}
+                </h4>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-zinc-100 text-zinc-700 font-bold border border-zinc-200">
+                ${task.reviewCount}회독
+              </span>
+              <button
+                onclick="incrementReview('${task.id}')"
+                class="px-1.5 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-600 text-[10px] font-mono font-bold border border-blue-200 transition-colors"
+                title="계획 외 복습 시 회독수 추가"
+              >
+                +1회독
+              </button>
+            </div>
+          </div>
+          ${pointsHtml}
+        `;
+
+        listEl.appendChild(card);
+      });
+    }
+
+    // --------------------------------------------------
+    // F. 인터랙션 이벤트 핸들러
+    // --------------------------------------------------
+    function toggleTaskComplete(taskId) {
+      const match = state.tasks.find(t => t.id === taskId);
+      if (match) {
+        match.isCompleted = !match.isCompleted;
+        saveState();
+        renderAll();
+      }
+    }
+
+    function incrementReview(taskId) {
+      const match = state.tasks.find(t => t.id === taskId);
+      if (match) {
+        match.reviewCount++;
+        saveState();
+        renderPanel();
+      }
+    }
+
+    function toggleAccordion(taskId) {
+      state.openAccordions[taskId] = !state.openAccordions[taskId];
+      renderPanel();
+    }
+
+    function prevMonth() {
+      if (state.calMonth === 0) {
+        state.calYear--;
+        state.calMonth = 11;
+      } else {
+        state.calMonth--;
+      }
+      renderCalendar();
+    }
+
+    function nextMonth() {
+      if (state.calMonth === 11) {
+        state.calYear++;
+        state.calMonth = 0;
+      } else {
+        state.calMonth++;
+      }
+      renderCalendar();
+    }
+
+    function goToday() {
+      const today = new Date();
+      state.calYear = today.getFullYear();
+      state.calMonth = today.getMonth();
+      state.selectedDate = getTodayStr();
+      renderAll();
+    }
+
+    // --------------------------------------------------
+    // G. 온보딩 모달 인터랙션
+    // --------------------------------------------------
+    function openOnboardingModal() {
+      document.getElementById('onboardingModal').classList.remove('hidden');
+      initRestDaysButtons();
+    }
+
+    function closeOnboardingModal() {
+      document.getElementById('onboardingModal').classList.add('hidden');
+    }
+
+    function applyPreset(key) {
+      state.selectedPreset = key;
+      const p = PRESETS[key];
+      if (!p) return;
+
+      ['eip', 'sqld', 'net2'].forEach(k => {
+        const btn = document.getElementById(`presetBtn_${k}`);
+        if (k === key) {
+          btn.className = 'p-2.5 rounded-xl border text-left transition-all border-blue-600 bg-blue-50/50 text-blue-700 ring-2 ring-blue-500/20';
+        } else {
+          btn.className = 'p-2.5 rounded-xl border text-left transition-all border-zinc-200 hover:border-zinc-300 text-zinc-700';
+        }
+      });
+
+      document.getElementById('inputExamTitle').value = p.title;
+      document.getElementById('inputDailyHours').value = p.hours;
+      document.getElementById('dailyHoursText').textContent = `${p.hours}시간 (${Math.round(p.hours * 60)}분)`;
+
+      const text = p.subjects.map(s => 
+        `[과목: ${s.name}]\n` + s.chapters.map(c => `- ${c.title}: ${c.points.join(', ')}`).join('\n')
+      ).join('\n\n');
+      document.getElementById('inputCurriculumText').value = text;
+    }
+
+    function initRestDaysButtons() {
+      const container = document.getElementById('restDaysBtnGroup');
+      container.innerHTML = '';
+      const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+
+      dayNames.forEach((name, idx) => {
+        const isSel = state.restDaysWeekly.includes(idx);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `flex-1 py-1.5 rounded-lg border text-xs font-mono font-bold transition-all ${
+          isSel ? 'bg-zinc-800 text-white border-zinc-900 shadow-xs' : 'border-zinc-200 text-zinc-600 hover:bg-zinc-100'
+        }`;
+        btn.textContent = name;
+        btn.onclick = () => {
+          if (state.restDaysWeekly.includes(idx)) {
+            state.restDaysWeekly = state.restDaysWeekly.filter(d => d !== idx);
+          } else {
+            state.restDaysWeekly.push(idx);
+            state.restDaysWeekly.sort();
+          }
+          initRestDaysButtons();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function handleOnboardingSubmit(e) {
+      e.preventDefault();
+      const title = document.getElementById('inputExamTitle').value;
+      const start = document.getElementById('inputStartDate').value;
+      const exam = document.getElementById('inputExamDate').value;
+      const hours = parseFloat(document.getElementById('inputDailyHours').value);
+
+      const submitBtn = document.getElementById('btnSubmitSchedule');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>AI 역산 스케줄 편성 중...';
+
+      setTimeout(() => {
+        state.plan = {
+          title,
+          startDate: start,
+          examDate: exam,
+          dailyStudyHours: hours,
+          restDaysWeekly: [...state.restDaysWeekly]
+        };
+
+        state.tasks = generateTasksEngine(state.plan, state.selectedPreset);
+        state.selectedDate = start;
+
+        const d = new Date(start);
+        state.calYear = d.getFullYear();
+        state.calMonth = d.getMonth();
+
+        saveState();
+        closeOnboardingModal();
+        renderAll();
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>🚀</span><span>스마트 3단계 스케줄 생성 완료</span>';
+        showToast('🎉 수험생 맞춤 3단계 역산 스케줄이 성공적으로 생성되었습니다!');
+      }, 700);
+    }
+
+    // --------------------------------------------------
+    // H. 지연 일정 스마트 재배치 모달 (Reschedule)
+    // --------------------------------------------------
+    function openRescheduleModal() {
+      const overdue = getOverdueTasks();
+      const listContainer = document.getElementById('rescheduleOverdueList');
+      listContainer.innerHTML = `
+        <span class="text-zinc-400 block text-[10px] font-bold uppercase tracking-wider mb-1">
+          재배치 대상 미완료 목록 (${overdue.length}건):
+        </span>
+      `;
+
+      if (overdue.length === 0) {
+        listContainer.innerHTML += '<p class="text-zinc-400 italic">지연된 과제가 없습니다.</p>';
+      } else {
+        overdue.forEach(t => {
+          listContainer.innerHTML += `
+            <div class="flex items-center justify-between text-zinc-700">
+              <span class="truncate max-w-[280px]">[${t.taskDate}] ${t.subject} - ${t.chapter}</span>
+              <span class="text-[10px] text-amber-500 font-bold">미완료</span>
+            </div>
+          `;
+        });
+      }
+
+      document.getElementById('rescheduleModal').classList.remove('hidden');
+    }
+
+    function closeRescheduleModal() {
+      document.getElementById('rescheduleModal').classList.add('hidden');
+    }
+
+    function selectRescheduleMode(mode) {
+      state.rescheduleMode = mode;
+      const cRest = document.getElementById('modeCard_USE_REST_DAY');
+      const cDist = document.getElementById('modeCard_DISTRIBUTE');
+      const rRest = document.getElementById('radio_USE_REST_DAY');
+      const rDist = document.getElementById('radio_DISTRIBUTE');
+
+      if (mode === 'USE_REST_DAY') {
+        cRest.className = 'p-3.5 rounded-xl border cursor-pointer transition-all border-blue-600 bg-blue-50/50 ring-2 ring-blue-500/20 flex items-start gap-3';
+        cDist.className = 'p-3.5 rounded-xl border cursor-pointer transition-all border-zinc-200 hover:border-zinc-300 flex items-start gap-3';
+        rRest.checked = true;
+        rDist.checked = false;
+      } else {
+        cDist.className = 'p-3.5 rounded-xl border cursor-pointer transition-all border-blue-600 bg-blue-50/50 ring-2 ring-blue-500/20 flex items-start gap-3';
+        cRest.className = 'p-3.5 rounded-xl border cursor-pointer transition-all border-zinc-200 hover:border-zinc-300 flex items-start gap-3';
+        rDist.checked = true;
+        rRest.checked = false;
+      }
+    }
+
+    function applyRescheduleAction() {
+      const overdue = getOverdueTasks();
+      if (overdue.length === 0) {
+        closeRescheduleModal();
+        return;
+      }
+
+      const todayStr = getTodayStr();
+
+      if (state.rescheduleMode === 'USE_REST_DAY') {
+        // 다가오는 휴식일 탐색
+        const nextRest = state.tasks.find(t => t.taskDate >= todayStr && t.isRestDay);
+        if (nextRest) {
+          nextRest.isRestDay = false;
+          nextRest.isCompleted = false;
+          nextRest.phase = 2;
+          nextRest.subject = '⚡ 특별 보충 학습일';
+          nextRest.chapter = `[지연 만회] ${overdue.map(u => u.chapter).slice(0, 2).join(' / ')}`;
+          nextRest.learningPoints = overdue.flatMap(u => u.learningPoints).slice(0, 5);
+          nextRest.estimatedMinutes = 180;
+          nextRest.reviewCount = 2;
+
+          overdue.forEach(u => {
+            u.chapter = `[이관완료 -> ${nextRest.taskDate}] ${u.chapter}`;
+            u.isCompleted = true;
+          });
+
+          showToast(`다가오는 휴식일(${nextRest.taskDate})을 보충 학습일로 전환하여 미완료 과제 ${overdue.length}개를 성공적으로 이관했습니다!`);
+        } else {
+          // 휴식일이 없는 경우 분할 모드로 실행
+          distributeAction(overdue);
+        }
+      } else {
+        distributeAction(overdue);
+      }
+
+      saveState();
+      closeRescheduleModal();
+      renderAll();
+    }
+
+    function distributeAction(overdue) {
+      const todayStr = getTodayStr();
+      const futureStudy = state.tasks.filter(t => t.taskDate > todayStr && !t.isRestDay && !t.isCompleted);
+      if (futureStudy.length === 0) {
+        showToast('남은 미래 학습일이 없어 분할 재배치가 어렵습니다.');
+        return;
+      }
+
+      const points = overdue.flatMap(u => u.learningPoints.map(p => `[보충] ${p}`));
+      let dIdx = 0;
+      points.forEach(pt => {
+        const target = futureStudy[dIdx % futureStudy.length];
+        if (!target.learningPoints.includes(pt)) {
+          target.learningPoints.push(pt);
+          target.estimatedMinutes += 25;
+        }
+        dIdx++;
+      });
+
+      overdue.forEach(u => {
+        u.chapter = `[분할 재배치 완료] ${u.chapter}`;
+        u.isCompleted = true;
+      });
+
+      showToast(`미완료 과제 ${overdue.length}개의 핵심 포인트를 잔여 ${futureStudy.length}일에 균등하게 분할 재배치했습니다.`);
+    }
+
+    // --------------------------------------------------
+    // I. 토스트 알림
+    // --------------------------------------------------
+    function showToast(msg) {
+      document.getElementById('toastMessage').textContent = msg;
+      document.getElementById('toastContainer').classList.remove('hidden');
+    }
+
+    function hideToast() {
+      document.getElementById('toastContainer').classList.add('hidden');
+    }
+
+    // --------------------------------------------------
+    // J. 초기 실행 구동
+    // --------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      // 시작일/시험일 인풋 기본값
+      const today = new Date();
+      const startStr = getTodayStr();
+      const exam = new Date(today);
+      exam.setDate(today.getDate() + 35);
+      const examStr = `${exam.getFullYear()}-${String(exam.getMonth() + 1).padStart(2, '0')}-${String(exam.getDate()).padStart(2, '0')}`;
+
+      document.getElementById('inputStartDate').value = startStr;
+      document.getElementById('inputExamDate').value = examStr;
+      applyPreset('eip');
+
+      // 저장된 상태 로드 시도, 없으면 4주 모의 데이터로 초기화
+      if (!loadState()) {
+        resetToMockData();
+      } else {
+        renderAll();
+      }
+    });
+  </script>
+
+</body>
+</html>
