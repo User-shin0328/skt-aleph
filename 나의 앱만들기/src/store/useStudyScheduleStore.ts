@@ -12,6 +12,17 @@ interface StudyScheduleState {
   isRescheduleOpen: boolean;
   isLoading: boolean;
   feedbackMessage: string | null;
+  savedSchedules: Array<{
+    id: string;
+    savedAt: string;
+    title: string;
+    startDate: string;
+    examDate: string;
+    taskCount: number;
+    completedCount: number;
+    plan: StudyPlan;
+    tasks: StudyTask[];
+  }>;
 
   // Actions
   setSelectedDate: (date: string) => void;
@@ -25,6 +36,10 @@ interface StudyScheduleState {
   toggleRestDayForDate: (dateStr: string) => void;
   searchAndCreateSchedule: (query: string) => Promise<void>;
   getOverdueTasks: () => StudyTask[];
+
+  saveCurrentSchedule: () => void;
+  loadSavedSchedule: (id: string) => void;
+  deleteSavedSchedule: (id: string) => void;
 
   generateSchedule: (payload: GenerateScheduleRequest, presetId?: string) => Promise<void>;
   rescheduleTasks: (mode: RescheduleMode) => Promise<void>;
@@ -46,6 +61,7 @@ export const useStudyScheduleStore = create<StudyScheduleState>()(
         isRescheduleOpen: false,
         isLoading: false,
         feedbackMessage: null,
+        savedSchedules: [],
 
         setSelectedDate: (date: string) => set({ selectedDate: date }),
         setIsOnboardingOpen: (open: boolean) => set({ isOnboardingOpen: open }),
@@ -132,19 +148,13 @@ export const useStudyScheduleStore = create<StudyScheduleState>()(
           });
         },
 
-        // 오른쪽 상단 자격증 검색으로 해당 자격증 스케줄 생성
+        // 오른쪽 상단 자격증 검색으로 해당 자격증 스케줄 생성 (미지원 자격증은 생성하지 않고 안내)
         searchAndCreateSchedule: async (query: string) => {
           const q = query.trim().toLowerCase();
           if (!q) return;
 
-          const today = new Date();
-          const startStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-          const exam = new Date(today);
-          exam.setDate(today.getDate() + 35);
-          const examStr = `${exam.getFullYear()}-${String(exam.getMonth() + 1).padStart(2, '0')}-${String(exam.getDate()).padStart(2, '0')}`;
-
-          let presetId = 'eip';
-          let title = `${query} 자격증`;
+          let presetId: string | null = null;
+          let title = '';
 
           if (q.includes('보안') || q.includes('sec')) {
             presetId = 'sec';
@@ -157,6 +167,19 @@ export const useStudyScheduleStore = create<StudyScheduleState>()(
             title = '정보처리기사 (EIP)';
           }
 
+          if (!presetId) {
+            set({
+              feedbackMessage: `❌ 검색하신 '${query}' 자격증 정보를 찾을 수 없습니다. (현재 지원 자격증: 정보처리기사, 정보보안기사, 전기기사)`
+            });
+            return;
+          }
+
+          const today = new Date();
+          const startStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+          const exam = new Date(today);
+          exam.setDate(today.getDate() + 35);
+          const examStr = `${exam.getFullYear()}-${String(exam.getMonth() + 1).padStart(2, '0')}-${String(exam.getDate()).padStart(2, '0')}`;
+
           const { generateSchedule } = get();
           await generateSchedule({
             examTitle: title,
@@ -167,6 +190,62 @@ export const useStudyScheduleStore = create<StudyScheduleState>()(
             customRestDates: [],
             presetId
           }, presetId);
+        },
+
+        // 내 스케줄 저장 기능
+        saveCurrentSchedule: () => {
+          const { currentPlan, tasks, savedSchedules } = get();
+          if (!currentPlan) return;
+
+          const now = new Date();
+          const savedAtStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+          const studyTasks = tasks.filter(t => !t.isRestDay);
+          const completedCount = studyTasks.filter(t => t.isCompleted).length;
+
+          const newSaveItem = {
+            id: `saved-${Date.now()}`,
+            savedAt: savedAtStr,
+            title: currentPlan.title,
+            startDate: currentPlan.startDate,
+            examDate: currentPlan.examDate,
+            taskCount: studyTasks.length,
+            completedCount,
+            plan: { ...currentPlan },
+            tasks: [...tasks]
+          };
+
+          // 같은 제목의 이전 저장이 있다면 덮어쓰거나 최신순으로 앞단에 추가
+          const filtered = (savedSchedules || []).filter(s => s.title !== currentPlan.title);
+          const updated = [newSaveItem, ...filtered];
+
+          set({
+            savedSchedules: updated,
+            feedbackMessage: `💾 '${currentPlan.title}' 스케줄이 성공적으로 저장되었습니다! (저장일시: ${savedAtStr})`
+          });
+        },
+
+        // 저장된 스케줄 불러오기
+        loadSavedSchedule: (id: string) => {
+          const { savedSchedules } = get();
+          const target = (savedSchedules || []).find(s => s.id === id);
+          if (!target) return;
+
+          set({
+            currentPlan: target.plan,
+            tasks: target.tasks,
+            selectedDate: target.plan.startDate,
+            feedbackMessage: `📂 '${target.title}' 저장 스케줄을 성공적으로 불러왔습니다!`
+          });
+        },
+
+        // 저장된 스케줄 삭제
+        deleteSavedSchedule: (id: string) => {
+          const { savedSchedules } = get();
+          const updated = (savedSchedules || []).filter(s => s.id !== id);
+          set({
+            savedSchedules: updated,
+            feedbackMessage: '🗑️ 선택한 스케줄이 보관함에서 삭제되었습니다.'
+          });
         },
 
         // 미완료 지연 태스크 감지 (오늘 이전 날짜의 미완료 학습)

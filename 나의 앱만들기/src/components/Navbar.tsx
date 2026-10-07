@@ -11,7 +11,8 @@ export const Navbar: React.FC = () => {
     setIsRescheduleOpen, 
     getOverdueTasks,
     resetToMockData,
-    searchAndCreateSchedule
+    searchAndCreateSchedule,
+    saveCurrentSchedule
   } = useStudyScheduleStore();
 
   const handleSearch = () => {
@@ -112,6 +113,15 @@ export const Navbar: React.FC = () => {
               <span className="px-1.5 py-0.2 rounded-full bg-amber-700 text-[10px]">{overdueCount}</span>
             </button>
           )}
+
+          <button
+            onClick={saveCurrentSchedule}
+            className="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold tracking-tight transition-all shadow-md shadow-emerald-500/25 flex items-center gap-1.5"
+            title="현재 스케줄을 브라우저에 안전하게 보관"
+          >
+            <span>💾</span>
+            <span className="hidden sm:inline">내 스케줄 저장</span>
+          </button>
 
           <button
             onClick={() => setIsOnboardingOpen(true)}
