@@ -56,11 +56,7 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p>© 2026 CertiFlow. 수험생 맞춤형 자격증 시험 스케줄링 SaaS</p>
           <div className="flex items-center gap-3">
-            <span>Next.js 14 App Router</span>
-            <span>•</span>
-            <span>Supabase PostgreSQL & RLS</span>
-            <span>•</span>
-            <span>OpenAI Structured Outputs</span>
+            <span>CertiFlow AI Scheduler</span>
           </div>
         </div>
       </footer>

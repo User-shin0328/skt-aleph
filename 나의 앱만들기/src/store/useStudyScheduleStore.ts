@@ -21,6 +21,9 @@ interface StudyScheduleState {
   
   toggleTaskComplete: (taskId: string) => void;
   incrementReviewCount: (taskId: string) => void;
+  decrementReviewCount: (taskId: string) => void;
+  toggleRestDayForDate: (dateStr: string) => void;
+  searchAndCreateSchedule: (query: string) => Promise<void>;
   getOverdueTasks: () => StudyTask[];
 
   generateSchedule: (payload: GenerateScheduleRequest, presetId?: string) => Promise<void>;
@@ -75,6 +78,95 @@ export const useStudyScheduleStore = create<StudyScheduleState>()(
               t.id === taskId ? { ...t, reviewCount: t.reviewCount + 1 } : t
             )
           }));
+        },
+
+        // 회독 감소 (-1회독, 최소 1 유지)
+        decrementReviewCount: (taskId: string) => {
+          set(state => ({
+            tasks: state.tasks.map(t => 
+              t.id === taskId ? { ...t, reviewCount: Math.max(1, t.reviewCount - 1) } : t
+            )
+          }));
+        },
+
+        // 메인 달력 클릭으로 특정 날짜 쉬는 날 지정/해제 및 스케줄 재배치
+        toggleRestDayForDate: (dateStr: string) => {
+          const { currentPlan, tasks } = get();
+          if (!currentPlan) return;
+
+          const isCurrentlyRest = tasks.some(t => t.taskDate === dateStr && t.isRestDay);
+          const customRest = currentPlan.customRestDates || [];
+          let nextCustomRest: string[];
+
+          if (isCurrentlyRest) {
+            // 쉬는 날 해제 -> 학습일로 전환
+            nextCustomRest = customRest.filter(d => d !== dateStr);
+          } else {
+            // 쉬는 날로 설정
+            nextCustomRest = [...customRest, dateStr];
+          }
+
+          const updatedPlan: StudyPlan = {
+            ...currentPlan,
+            customRestDates: nextCustomRest
+          };
+
+          // 해당 일자를 제외/포함하여 전체 스케줄 재배치
+          const reTasks = generateRuleBasedTasks({
+            planId: updatedPlan.id,
+            startDate: updatedPlan.startDate,
+            examDate: updatedPlan.examDate,
+            dailyHours: updatedPlan.dailyStudyHours,
+            restDaysWeekly: updatedPlan.restDaysWeekly,
+            customRestDates: nextCustomRest,
+            curriculumText: updatedPlan.curriculumSource,
+            presetId: updatedPlan.title.includes('보안') ? 'sec' : updatedPlan.title.includes('전기') ? 'elec' : 'eip'
+          });
+
+          set({
+            currentPlan: updatedPlan,
+            tasks: reTasks,
+            feedbackMessage: isCurrentlyRest
+              ? `✏️ ${dateStr} 일자가 정상 학습일로 전환되어 스케줄이 재배치되었습니다.`
+              : `☕ ${dateStr} 일자가 쉬는 날로 설정되어 해당 날을 제외하고 스케줄이 재배치되었습니다.`
+          });
+        },
+
+        // 오른쪽 상단 자격증 검색으로 해당 자격증 스케줄 생성
+        searchAndCreateSchedule: async (query: string) => {
+          const q = query.trim().toLowerCase();
+          if (!q) return;
+
+          const today = new Date();
+          const startStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+          const exam = new Date(today);
+          exam.setDate(today.getDate() + 35);
+          const examStr = `${exam.getFullYear()}-${String(exam.getMonth() + 1).padStart(2, '0')}-${String(exam.getDate()).padStart(2, '0')}`;
+
+          let presetId = 'eip';
+          let title = `${query} 자격증`;
+
+          if (q.includes('보안') || q.includes('sec')) {
+            presetId = 'sec';
+            title = '정보보안기사 (Sec)';
+          } else if (q.includes('전기') || q.includes('elec')) {
+            presetId = 'elec';
+            title = '전기기사 (Elec)';
+          } else if (q.includes('정보') || q.includes('처리') || q.includes('eip')) {
+            presetId = 'eip';
+            title = '정보처리기사 (EIP)';
+          }
+
+          const { generateSchedule } = get();
+          await generateSchedule({
+            examTitle: title,
+            startDate: startStr,
+            examDate: examStr,
+            dailyHours: 3.0,
+            restDaysWeekly: [0, 6],
+            customRestDates: [],
+            presetId
+          }, presetId);
         },
 
         // 미완료 지연 태스크 감지 (오늘 이전 날짜의 미완료 학습)

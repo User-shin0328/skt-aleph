@@ -105,13 +105,33 @@
         <span id="navPeriodText" class="text-xs text-zinc-400 font-mono">2026-09-24 ~ 2026-10-22</span>
       </div>
 
-      <!-- 액션 버튼 -->
+      <!-- 오른쪽 상단: 자격증 검색 & 액션 컨트롤 -->
       <div class="flex items-center gap-2">
+        <!-- 자격증 실시간 검색창 -->
+        <div class="relative flex items-center">
+          <input
+            type="text"
+            id="headerCertSearch"
+            placeholder="자격증 검색 (예: 전기기사, 정보보안)"
+            onkeydown="if(event.key==='Enter') handleHeaderCertSearch()"
+            class="w-48 sm:w-64 px-3 py-1.5 pl-8 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-white text-xs font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-xs"
+          />
+          <span class="absolute left-2.5 text-zinc-400 text-xs pointer-events-none">🔍</span>
+          <button
+            type="button"
+            onclick="handleHeaderCertSearch()"
+            class="ml-1 px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-mono font-bold text-xs transition-colors shadow-xs shrink-0"
+            title="검색한 자격증에 맞게 스케줄 자동 생성"
+          >
+            검색
+          </button>
+        </div>
+
         <!-- 3대 자격증 빠른 전환 탭 -->
-        <div class="hidden sm:flex items-center gap-1 bg-zinc-100 p-1 rounded-lg text-xs font-mono font-bold">
-          <button onclick="resetToMockData('eip')" class="px-2 py-1 rounded hover:bg-white text-zinc-700 transition-all" title="정보처리기사 5과목 모의 스케줄">정보처리</button>
-          <button onclick="resetToMockData('sec')" class="px-2 py-1 rounded hover:bg-white text-zinc-700 transition-all" title="정보보안기사 5과목 모의 스케줄">정보보안</button>
-          <button onclick="resetToMockData('elec')" class="px-2 py-1 rounded hover:bg-white text-zinc-700 transition-all" title="전기기사 5과목 모의 스케줄">전기기사</button>
+        <div class="hidden lg:flex items-center gap-1 bg-zinc-100 p-1 rounded-lg text-xs font-mono font-bold">
+          <button onclick="searchAndApplyCert('정보처리기사')" class="px-2 py-1 rounded hover:bg-white text-zinc-700 transition-all" title="정보처리기사 스케줄 생성">정보처리</button>
+          <button onclick="searchAndApplyCert('정보보안기사')" class="px-2 py-1 rounded hover:bg-white text-zinc-700 transition-all" title="정보보안기사 스케줄 생성">정보보안</button>
+          <button onclick="searchAndApplyCert('전기기사')" class="px-2 py-1 rounded hover:bg-white text-zinc-700 transition-all" title="전기기사 스케줄 생성">전기기사</button>
         </div>
 
         <button
@@ -125,18 +145,11 @@
 
         <button
           onclick="openOnboardingModal()"
-          class="px-3.5 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold tracking-tight transition-all shadow-md shadow-blue-500/25 flex items-center gap-1.5"
+          class="hidden sm:flex px-3 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-xs font-bold transition-all items-center gap-1"
+          title="날짜 및 세부 설정 직접 입력"
         >
-          <span>✨</span>
-          <span>새 스케줄 생성</span>
-        </button>
-
-        <button
-          onclick="resetToMockData(state.selectedPreset || 'eip')"
-          class="p-2 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-600 transition-colors text-xs"
-          title="현재 자격증 모의 데이터로 초기화"
-        >
-          🔄
+          <span>⚙️</span>
+          <span>상세설정</span>
         </button>
       </div>
 
@@ -170,9 +183,6 @@
               <h2 id="calMonthTitle" class="text-lg sm:text-xl font-extrabold font-mono text-zinc-900">
                 2026년 10월
               </h2>
-              <span class="text-xs px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-600 font-mono font-medium">
-                3단계 역산 로드맵
-              </span>
             </div>
 
             <div class="flex items-center gap-1.5">
@@ -264,13 +274,23 @@
           <div class="border-b border-zinc-100 pb-4 mb-4">
             <div class="flex items-start justify-between">
               <div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                   <h3 id="panelDateStr" class="text-xl font-extrabold font-mono text-zinc-900">
                     2026-10-01
                   </h3>
                   <span id="panelDayOfWeek" class="text-xs font-bold px-2 py-0.5 rounded bg-zinc-100 text-zinc-600">
                     목요일
                   </span>
+                  <!-- 쉬는 날 토글 버튼 -->
+                  <button
+                    type="button"
+                    id="btnToggleRestDay"
+                    onclick="toggleRestDayForSelectedDate()"
+                    class="px-2 py-0.5 rounded text-xs font-mono font-bold border transition-colors bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border-zinc-200"
+                    title="이 날을 쉬는 날로 설정/해제하고 스케줄 재배치"
+                  >
+                    ☕ 쉬는 날로 설정
+                  </button>
                 </div>
                 <p id="panelDDayText" class="text-xs text-blue-600 font-mono font-bold mt-1">
                   🎯 시험까지 D-21
@@ -306,9 +326,9 @@
           <div class="pt-3 border-t border-zinc-100 text-[11px] font-mono text-zinc-400 flex items-center justify-between mt-4">
             <span class="flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <span>Supabase RLS & LocalStorage 동기화</span>
+              <span>스케줄 자동 동기화</span>
             </span>
-            <span>CertiFlow v1.0</span>
+            <span>CertiFlow</span>
           </div>
 
         </div>
@@ -576,13 +596,11 @@
   <!-- 푸터 -->
   <footer class="border-t border-zinc-200 py-4 text-center text-xs font-mono text-zinc-500 bg-white/50 mt-auto">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-      <p>© 2026 CertiFlow. 수험생 맞춤형 자격증 시험 스케줄링 SaaS</p>
+      <p>© 2026 CertiFlow. 수험생 맞춤형 자격증 시험 스케줄링</p>
       <div class="flex items-center gap-3">
-        <span>Next.js 14 App Router</span>
+        <span>자격증 수험 일정 자동화</span>
         <span>•</span>
-        <span>Supabase PostgreSQL & RLS</span>
-        <span>•</span>
-        <span>OpenAI Structured Outputs</span>
+        <span>스마트 회독 관리</span>
       </div>
     </div>
   </footer>
@@ -783,7 +801,10 @@
         const day = String(curr.getDate()).padStart(2, '0');
         const dateStr = `${y}-${m}-${day}`;
         const dayOfWeek = curr.getDay();
-        const isRest = plan.restDaysWeekly.includes(dayOfWeek);
+        const isWeeklyRest = plan.restDaysWeekly.includes(dayOfWeek);
+        const isCustomRest = (plan.customRestDates || []).includes(dateStr);
+        const isCustomWork = (plan.customWorkDates || []).includes(dateStr);
+        const isRest = (isWeeklyRest || isCustomRest) && !isCustomWork;
 
         allDays.push({ dateStr, dayOfWeek, isRest });
         curr.setDate(curr.getDate() + 1);
@@ -1096,6 +1117,11 @@
           renderAll();
         };
 
+        cellEl.ondblclick = (e) => {
+          e.stopPropagation();
+          toggleRestDayForDate(c.dStr);
+        };
+
         // 상단 날짜 및 상태
         let statusBadgeHtml = '';
         if (isExam) {
@@ -1107,6 +1133,19 @@
         if (isOverdue) {
           statusBadgeHtml += '<span class="w-2 h-2 rounded-full bg-amber-500 animate-ping" title="미완료 과제"></span>';
         }
+        // 쉬는 날 토글 미니 버튼
+        statusBadgeHtml += `
+          <button
+            type="button"
+            onclick="event.stopPropagation(); toggleRestDayForDate('${c.dStr}')"
+            class="text-[10px] px-1 py-0.2 rounded font-mono font-bold transition-all ${
+              hasRest ? 'bg-blue-100 hover:bg-blue-200 text-blue-700' : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-600'
+            }"
+            title="${hasRest ? '학습일로 변경' : '쉬는 날로 설정'}"
+          >
+            ${hasRest ? '✏️' : '☕'}
+          </button>
+        `;
 
         let numClass = 'text-xs font-mono font-bold w-6 h-6 rounded-full flex items-center justify-center ';
         if (isToday) numClass += 'bg-blue-600 text-white shadow-sm';
@@ -1181,6 +1220,20 @@
       const dayTasks = state.tasks.filter(t => t.taskDate === dateStr);
       const studyTasks = dayTasks.filter(t => !t.isRestDay);
       const isRest = dayTasks.some(t => t.isRestDay);
+
+      // 쉬는 날 토글 버튼 텍스트 & 스타일 업데이트
+      const toggleRestBtn = document.getElementById('btnToggleRestDay');
+      if (toggleRestBtn) {
+        if (isRest) {
+          toggleRestBtn.innerHTML = '✏️ 학습일로 변경';
+          toggleRestBtn.className = 'px-2 py-0.5 rounded text-xs font-mono font-bold border transition-colors bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 shadow-xs';
+          toggleRestBtn.title = '이 날을 학습일로 전환하고 스케줄 자동 재배치';
+        } else {
+          toggleRestBtn.innerHTML = '☕ 쉬는 날로 설정';
+          toggleRestBtn.className = 'px-2 py-0.5 rounded text-xs font-mono font-bold border transition-colors bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border-zinc-200 shadow-xs';
+          toggleRestBtn.title = '이 날을 쉬는 날로 설정하고 스케줄 자동 재배치';
+        }
+      }
 
       const completed = studyTasks.filter(t => t.isCompleted).length;
       const percent = studyTasks.length > 0 ? Math.round((completed / studyTasks.length) * 100) : (isRest ? 100 : 0);
@@ -1303,6 +1356,20 @@
                 ${task.reviewCount}회독
               </span>
               <button
+                type="button"
+                onclick="decrementReview('${task.id}')"
+                class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold border transition-colors ${
+                  task.reviewCount <= 1
+                    ? 'bg-zinc-100 text-zinc-300 border-zinc-200 cursor-not-allowed'
+                    : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-600 border-zinc-200'
+                }"
+                ${task.reviewCount <= 1 ? 'disabled' : ''}
+                title="회독수 차감 (최소 1회독 유지)"
+              >
+                -1회독
+              </button>
+              <button
+                type="button"
                 onclick="incrementReview('${task.id}')"
                 class="px-1.5 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-600 text-[10px] font-mono font-bold border border-blue-200 transition-colors"
                 title="계획 외 복습 시 회독수 추가"
@@ -1337,6 +1404,203 @@
         saveState();
         renderPanel();
       }
+    }
+
+    function decrementReview(taskId) {
+      const match = state.tasks.find(t => t.id === taskId);
+      if (match && match.reviewCount > 1) {
+        match.reviewCount = Math.max(1, match.reviewCount - 1);
+        saveState();
+        renderPanel();
+      }
+    }
+
+    // 쉬는 날 토글 및 스케줄 자동 재배치
+    function toggleRestDayForDate(dateStr) {
+      if (!state.plan) return;
+      if (!state.plan.customRestDates) state.plan.customRestDates = [];
+      if (!state.plan.customWorkDates) state.plan.customWorkDates = [];
+
+      const targetDate = new Date(dateStr);
+      const dayOfWeek = targetDate.getDay();
+      const isWeeklyRest = state.plan.restDaysWeekly.includes(dayOfWeek);
+
+      const isCurrentlyRest = (isWeeklyRest || state.plan.customRestDates.includes(dateStr)) && !state.plan.customWorkDates.includes(dateStr);
+
+      if (isCurrentlyRest) {
+        // 학습일로 전환
+        if (isWeeklyRest) {
+          if (!state.plan.customWorkDates.includes(dateStr)) {
+            state.plan.customWorkDates.push(dateStr);
+          }
+        }
+        state.plan.customRestDates = state.plan.customRestDates.filter(d => d !== dateStr);
+      } else {
+        // 휴식일로 전환
+        if (!state.plan.customRestDates.includes(dateStr)) {
+          state.plan.customRestDates.push(dateStr);
+        }
+        state.plan.customWorkDates = state.plan.customWorkDates.filter(d => d !== dateStr);
+      }
+
+      // 기존 진행 상태(완료 여부, 회독수) 보존
+      const completedMap = {};
+      const reviewMap = {};
+      state.tasks.forEach(t => {
+        if (t.chapter) {
+          completedMap[t.chapter] = t.isCompleted;
+          reviewMap[t.chapter] = t.reviewCount;
+        }
+      });
+
+      // 스케줄 재배치
+      state.tasks = generateTasksEngine(state.plan, state.selectedPreset);
+
+      // 상태 복원
+      state.tasks.forEach(t => {
+        if (t.chapter && completedMap[t.chapter] !== undefined) {
+          t.isCompleted = completedMap[t.chapter];
+          if (reviewMap[t.chapter]) t.reviewCount = reviewMap[t.chapter];
+        }
+      });
+
+      state.selectedDate = dateStr;
+      saveState();
+      renderAll();
+      showToast(`${dateStr} 날짜가 ${isCurrentlyRest ? '✏️ 학습일' : '☕ 휴식일'}로 변경되어 전체 스케줄이 자동 재배치되었습니다!`);
+    }
+
+    function toggleRestDayForSelectedDate() {
+      const dateStr = state.selectedDate || getTodayStr();
+      toggleRestDayForDate(dateStr);
+    }
+
+    // 우측 상단 자격증 검색 & 스케줄 자동 생성
+    function handleHeaderCertSearch() {
+      const input = document.getElementById('headerCertSearch');
+      if (!input) return;
+      const q = input.value.trim();
+      if (!q) {
+        showToast('검색할 자격증 명칭을 입력해 주세요 (예: 전기기사, 정보보안기사, 빅데이터분석기사)');
+        return;
+      }
+      searchAndApplyCert(q);
+    }
+
+    function searchAndApplyCert(query) {
+      const q = query.trim();
+      if (!q) return;
+
+      const input = document.getElementById('headerCertSearch');
+      if (input) input.value = q;
+
+      const today = new Date();
+      const startStr = getTodayStr();
+      const examDate = new Date(today);
+      examDate.setDate(today.getDate() + 35);
+      const examStr = `${examDate.getFullYear()}-${String(examDate.getMonth() + 1).padStart(2, '0')}-${String(examDate.getDate()).padStart(2, '0')}`;
+
+      // 1. 기존 PRESETS 매칭
+      let matchedKey = null;
+      if (q.includes('정보처리') || q.toLowerCase().includes('eip')) matchedKey = 'eip';
+      else if (q.includes('정보보안') || q.toLowerCase().includes('sec')) matchedKey = 'sec';
+      else if (q.includes('전기기사') || q.includes('전기') || q.toLowerCase().includes('elec')) matchedKey = 'elec';
+
+      if (matchedKey && PRESETS[matchedKey]) {
+        state.selectedPreset = matchedKey;
+        const p = PRESETS[matchedKey];
+        state.plan = {
+          title: p.title,
+          startDate: startStr,
+          examDate: examStr,
+          dailyStudyHours: p.hours || 3,
+          restDaysWeekly: [0, 6],
+          customRestDates: [],
+          customWorkDates: []
+        };
+        state.tasks = generateTasksEngine(state.plan, matchedKey);
+        state.selectedDate = startStr;
+        state.calYear = today.getFullYear();
+        state.calMonth = today.getMonth();
+
+        saveState();
+        renderAll();
+        showToast(`🎯 '${p.title}' 자격증의 5개 정규 과목 기반 맞춤 스케줄이 생성되었습니다!`);
+        return;
+      }
+
+      // 2. 새로운 자격증 동적 생성 (5개 과목 및 난이도·빈출도 가중치)
+      const dynKey = 'custom_' + Date.now();
+      const dynSubjects = [
+        {
+          name: `${q} 핵심이론`,
+          color: '#3B82F6',
+          chapters: [
+            { title: `${q} 기초 개념 및 원리`, difficulty: '중', frequency: 4, points: ['핵심 용어 정의 및 체계', '기본 원리 및 구성 요소', '핵심 출제 포인트'] },
+            { title: `${q} 기술 개요 및 기본 구조`, difficulty: '중', frequency: 5, points: ['주요 구조 모델링', '핵심 기능 및 동작 절차', '표준 규격 확인'] },
+            { title: `${q} 핵심 이론 심화`, difficulty: '상', frequency: 4, points: ['상세 동작 메커니즘', '주요 파라미터 계산', '빈출 핵심 정리'] }
+          ]
+        },
+        {
+          name: `${q} 실무기술`,
+          color: '#10B981',
+          chapters: [
+            { title: `${q} 실무 프로세스 및 설계`, difficulty: '중', frequency: 5, points: ['실무 절차 및 체크리스트', '요구분석 및 모델링', '아키텍처 분석'] },
+            { title: `${q} 기술 적용 및 구축`, difficulty: '상', frequency: 5, points: ['실제 시스템 구축 절차', '성능 최적화 기법', '신뢰성 확보'] },
+            { title: `${q} 운영 및 장애 대응`, difficulty: '상', frequency: 4, points: ['모니터링 지표 분석', '장애 진단 및 트러블슈팅', '복구 전략'] }
+          ]
+        },
+        {
+          name: `${q} 심화분석`,
+          color: '#F59E0B',
+          chapters: [
+            { title: `${q} 심화 계산 및 해석`, difficulty: '상', frequency: 5, points: ['핵심 수식 및 단위 환산', '정량 데이터 분석', '오류율 최소화'] },
+            { title: `${q} 최신 동향 및 응용`, difficulty: '중', frequency: 4, points: ['신기술 적용 사례', '산업 표준 프로토콜', '응용 문제 풀이'] }
+          ]
+        },
+        {
+          name: `${q} 관리체계`,
+          color: '#8B5CF6',
+          chapters: [
+            { title: `${q} 품질 및 위험관리`, difficulty: '중', frequency: 4, points: ['품질 보증 프레임워크', '위험 평가 및 경감 대책', '감사 및 인증 기준'] },
+            { title: `${q} 안전 및 통제 관리`, difficulty: '상', frequency: 5, points: ['위험 통제 조치', '작업 안전 수칙', '비상 대응 절차'] }
+          ]
+        },
+        {
+          name: `${q} 관련법규`,
+          color: '#EC4899',
+          chapters: [
+            { title: `${q} 관련 법령 및 규정`, difficulty: '중', frequency: 5, points: ['국가 기술 기준 요건', '인허가 절차 및 의무 사항', '벌칙 및 행정 처분 기준'] },
+            { title: `${q} 국가기술표준(KS/ISO)`, difficulty: '중', frequency: 4, points: ['표준 가이드라인 준수', '적합성 평가 기준', '최신 개정 사항'] }
+          ]
+        }
+      ];
+
+      PRESETS[dynKey] = {
+        title: q,
+        hours: 3,
+        subjects: dynSubjects
+      };
+
+      state.selectedPreset = dynKey;
+      state.plan = {
+        title: q,
+        startDate: startStr,
+        examDate: examStr,
+        dailyStudyHours: 3,
+        restDaysWeekly: [0, 6],
+        customRestDates: [],
+        customWorkDates: []
+      };
+
+      state.tasks = generateTasksEngine(state.plan, dynKey);
+      state.selectedDate = startStr;
+      state.calYear = today.getFullYear();
+      state.calMonth = today.getMonth();
+
+      saveState();
+      renderAll();
+      showToast(`✨ '${q}' 자격증의 5개 정규 과목 및 난이도·빈출도 분석 기반 스케줄이 생성되었습니다!`);
     }
 
     function toggleAccordion(taskId) {

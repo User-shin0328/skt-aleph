@@ -1,16 +1,24 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useStudyScheduleStore } from '@/store/useStudyScheduleStore';
 
 export const Navbar: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState('');
   const { 
     currentPlan, 
     setIsOnboardingOpen, 
     setIsRescheduleOpen, 
     getOverdueTasks,
-    resetToMockData 
+    resetToMockData,
+    searchAndCreateSchedule
   } = useStudyScheduleStore();
+
+  const handleSearch = () => {
+    if (!searchQuery.trim()) return;
+    searchAndCreateSchedule(searchQuery.trim());
+    setSearchQuery('');
+  };
 
   const overdueCount = getOverdueTasks().length;
 
@@ -52,7 +60,7 @@ export const Navbar: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium truncate max-w-[200px] sm:max-w-sm">
-              {currentPlan?.title || '수험생 맞춤형 3단계 역산 스케줄러'}
+              {currentPlan?.title || '수험생 맞춤형 스케줄러'}
             </p>
           </div>
         </div>
@@ -72,8 +80,27 @@ export const Navbar: React.FC = () => {
           </span>
         </div>
 
-        {/* 우측 액션 버튼 그룹 */}
+        {/* 우측 액션 버튼 및 자격증 검색 */}
         <div className="flex items-center gap-2">
+          {/* 자격증 검색 인풋 */}
+          <div className="relative flex items-center">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              placeholder="자격증 검색 (전기, 보안, 정보처리)"
+              className="w-36 sm:w-56 px-2.5 py-1.5 text-xs rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500 text-zinc-900 dark:text-white"
+            />
+            <button
+              type="button"
+              onClick={handleSearch}
+              className="ml-1 px-2 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-mono font-bold"
+            >
+              검색
+            </button>
+          </div>
+
           {overdueCount > 0 && (
             <button
               onClick={() => setIsRescheduleOpen(true)}
@@ -91,7 +118,7 @@ export const Navbar: React.FC = () => {
             className="px-3.5 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold tracking-tight transition-all shadow-md shadow-blue-500/25 flex items-center gap-1.5"
           >
             <span>✨</span>
-            <span>새 스케줄 생성</span>
+            <span className="hidden sm:inline">새 스케줄 생성</span>
           </button>
 
           <button

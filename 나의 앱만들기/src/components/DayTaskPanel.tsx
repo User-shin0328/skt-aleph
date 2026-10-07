@@ -11,6 +11,8 @@ export const DayTaskPanel: React.FC = () => {
     tasks, 
     toggleTaskComplete, 
     incrementReviewCount, 
+    decrementReviewCount,
+    toggleRestDayForDate,
     currentPlan, 
     getOverdueTasks,
     setIsRescheduleOpen 
@@ -85,17 +87,30 @@ export const DayTaskPanel: React.FC = () => {
         </div>
       )}
 
-      {/* 2. 헤더: 선택 날짜, D-Day, 진도율 */}
+      {/* 2. 헤더: 선택 날짜, D-Day, 진도율, 쉬는 날 설정 버튼 */}
       <div className="border-b border-zinc-100 dark:border-zinc-800 pb-4 mb-4">
         <div className="flex items-start justify-between">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-xl font-extrabold font-mono text-zinc-900 dark:text-white">
                 {selectedDate}
               </h3>
               <span className="text-xs font-bold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
                 {dayOfWeekStr}
               </span>
+              {/* 쉬는 날 설정 / 해제 버튼 */}
+              <button
+                type="button"
+                onClick={() => toggleRestDayForDate(selectedDate)}
+                className={`px-2 py-0.5 rounded text-xs font-mono font-bold border transition-colors ${
+                  isRestDay
+                    ? 'bg-amber-100 hover:bg-amber-200 text-amber-800 border-amber-300 dark:bg-amber-950 dark:text-amber-200'
+                    : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-300'
+                }`}
+                title={isRestDay ? "이 날을 학습일로 전환하고 스케줄 재배치" : "이 날을 쉬는 날로 설정하고 스케줄 재배치"}
+              >
+                {isRestDay ? '✏️ 학습일로 변경' : '☕ 쉬는 날로 설정'}
+              </button>
             </div>
             <p className="text-xs text-blue-600 dark:text-blue-400 font-mono font-bold mt-1">
               🎯 {dDayText}
@@ -236,12 +251,22 @@ export const DayTaskPanel: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* 회독수 뱃지 및 +1회독 버튼 */}
-                  <div className="flex items-center gap-1.5 shrink-0">
+                  {/* 회독수 뱃지 및 -1회독 / +1회독 버튼 */}
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => decrementReviewCount(task.id)}
+                      disabled={task.reviewCount <= 1}
+                      className="px-1.5 py-0.5 rounded bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 text-[10px] font-mono font-bold border border-zinc-200 dark:border-zinc-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      title="회독수 1회 감소 (최소 1회독 유지)"
+                    >
+                      -1회독
+                    </button>
                     <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold border border-zinc-200 dark:border-zinc-700">
                       {task.reviewCount}회독
                     </span>
                     <button
+                      type="button"
                       onClick={() => incrementReviewCount(task.id)}
                       className="px-1.5 py-0.5 rounded bg-blue-50 hover:bg-blue-100 dark:bg-blue-950 dark:hover:bg-blue-900 text-blue-600 dark:text-blue-300 text-[10px] font-mono font-bold border border-blue-200 dark:border-blue-800 transition-colors"
                       title="계획 외 복습 시 회독수 1회 추가"
@@ -286,13 +311,13 @@ export const DayTaskPanel: React.FC = () => {
         )}
       </div>
 
-      {/* 하단 Supabase RLS 연동 안내 */}
+      {/* 하단 상태 안내 */}
       <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800 text-[11px] font-mono text-zinc-400 flex items-center justify-between">
         <span className="flex items-center gap-1">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-          <span>Supabase RLS & LocalStorage 동기화</span>
+          <span>스케줄 자동 동기화</span>
         </span>
-        <span>CertiFlow v1.0</span>
+        <span>CertiFlow</span>
       </div>
 
     </div>

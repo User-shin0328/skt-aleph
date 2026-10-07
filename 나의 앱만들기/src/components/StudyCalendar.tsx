@@ -6,7 +6,7 @@ import { getSubjectColor } from '@/lib/curriculumPresets';
 import { StudyTask } from '@/lib/types';
 
 export const StudyCalendar: React.FC = () => {
-  const { tasks, selectedDate, setSelectedDate, currentPlan } = useStudyScheduleStore();
+  const { tasks, selectedDate, setSelectedDate, toggleRestDayForDate, currentPlan } = useStudyScheduleStore();
 
   // 캘린더 기준 월 상태 (초기값: 현재 선택된 날짜의 연/월)
   const [currentYear, setCurrentYear] = useState(() => {
@@ -116,9 +116,6 @@ export const StudyCalendar: React.FC = () => {
           <h2 className="text-lg sm:text-xl font-extrabold font-mono text-zinc-900 dark:text-white">
             {currentYear}년 {currentMonth + 1}월
           </h2>
-          <span className="text-xs px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-mono font-medium">
-            3단계 역산 로드맵
-          </span>
         </div>
 
         <div className="flex items-center gap-1.5">
