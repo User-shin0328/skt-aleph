@@ -75,48 +75,34 @@
   <!-- ====================================================
        1. 네비게이션 헤더 (Navbar)
        ==================================================== -->
-  <header class="sticky top-0 z-40 w-full border-b border-zinc-200 bg-white/80 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+  <header class="sticky top-0 z-40 w-full border-b border-zinc-200 bg-white/95 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-3 overflow-x-auto no-scrollbar whitespace-nowrap">
       
-      <!-- 로고 & 플랜 타이틀 -->
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 font-bold text-lg tracking-wider">
-          CF
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="font-extrabold text-lg text-zinc-900 tracking-tight">CertiFlow</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-mono font-semibold border border-blue-200">
-              AI SaaS
-            </span>
-          </div>
-          <p id="navPlanTitle" class="text-xs text-zinc-500 font-medium truncate max-w-[200px] sm:max-w-sm">
-            정보처리기사 필기 한달 단기완성 (EIP Master)
-          </p>
-        </div>
-      </div>
-
-      <!-- D-Day 뱃지 -->
-      <div class="hidden md:flex items-center gap-2">
-        <div id="navDDayBadge" class="px-3 py-1 rounded-full text-xs font-bold font-mono border flex items-center gap-1.5 shadow-sm bg-indigo-50 text-indigo-600 border-indigo-200">
-          <span class="w-2 h-2 rounded-full bg-current"></span>
+      <!-- 좌측: 현재 자격증명 & D-Day 뱃지 (단 한 줄 심플 구성) -->
+      <div class="flex items-center gap-2 shrink-0">
+        <span class="text-lg">🎯</span>
+        <h1 id="navPlanTitle" class="font-extrabold text-sm sm:text-base text-zinc-900 tracking-tight whitespace-nowrap">
+          정보처리기사
+        </h1>
+        <div id="navDDayBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold font-mono border flex items-center gap-1 shadow-xs bg-indigo-50 text-indigo-600 border-indigo-200 shrink-0">
+          <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
           <span id="navDDayText">D-21</span>
         </div>
-        <span id="navPeriodText" class="text-xs text-zinc-400 font-mono">2026-09-24 ~ 2026-10-22</span>
+        <span id="navPeriodText" class="hidden xl:inline text-[11px] text-zinc-400 font-mono">2026-09-24 ~ 2026-10-22</span>
       </div>
 
-      <!-- 오른쪽 상단: 자격증 검색 & 액션 컨트롤 -->
-      <div class="flex items-center gap-2">
+      <!-- 우측: 자격증 검색 & 빠른 탭 & 액션 버튼 (글자 겹침 방지 한 줄 정렬) -->
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
         <!-- 자격증 실시간 검색창 -->
         <div class="relative flex items-center">
           <input
             type="text"
             id="headerCertSearch"
-            placeholder="자격증 검색 (예: 전기기사, 정보보안)"
+            placeholder="자격증 검색..."
             onkeydown="if(event.key==='Enter') handleHeaderCertSearch()"
-            class="w-48 sm:w-64 px-3 py-1.5 pl-8 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-white text-xs font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-xs"
+            class="w-32 sm:w-44 px-2.5 py-1.5 pl-7 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-white text-xs font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-xs"
           />
-          <span class="absolute left-2.5 text-zinc-400 text-xs pointer-events-none">🔍</span>
+          <span class="absolute left-2 text-zinc-400 text-xs pointer-events-none">🔍</span>
           <button
             type="button"
             onclick="handleHeaderCertSearch()"
@@ -128,49 +114,50 @@
         </div>
 
         <!-- 3대 자격증 빠른 전환 탭 -->
-        <div class="hidden lg:flex items-center gap-1 bg-zinc-100 p-1 rounded-lg text-xs font-mono font-bold">
-          <button onclick="searchAndApplyCert('정보처리기사')" class="px-2 py-1 rounded hover:bg-white text-zinc-700 transition-all" title="정보처리기사 스케줄 생성">정보처리</button>
-          <button onclick="searchAndApplyCert('정보보안기사')" class="px-2 py-1 rounded hover:bg-white text-zinc-700 transition-all" title="정보보안기사 스케줄 생성">정보보안</button>
-          <button onclick="searchAndApplyCert('전기기사')" class="px-2 py-1 rounded hover:bg-white text-zinc-700 transition-all" title="전기기사 스케줄 생성">전기기사</button>
+        <div class="hidden md:flex items-center gap-1 bg-zinc-100 p-1 rounded-lg text-xs font-mono font-bold shrink-0">
+          <button onclick="searchAndApplyCert('정보처리기사')" class="px-2 py-0.5 rounded hover:bg-white text-zinc-700 transition-all" title="정보처리기사 스케줄 생성">정보처리</button>
+          <button onclick="searchAndApplyCert('정보보안기사')" class="px-2 py-0.5 rounded hover:bg-white text-zinc-700 transition-all" title="정보보안기사 스케줄 생성">정보보안</button>
+          <button onclick="searchAndApplyCert('전기기사')" class="px-2 py-0.5 rounded hover:bg-white text-zinc-700 transition-all" title="전기기사 스케줄 생성">전기기사</button>
         </div>
 
         <!-- 내 스케줄 저장 & 보관함 버튼 -->
         <button
           type="button"
           onclick="saveCurrentSchedule()"
-          class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-mono font-bold text-xs transition-all shadow-xs flex items-center gap-1"
+          class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-mono font-bold text-xs transition-all shadow-xs flex items-center gap-1 shrink-0 whitespace-nowrap"
           title="현재 스케줄 및 학습 진도 저장"
         >
           <span>💾</span>
-          <span class="hidden sm:inline">스케줄 저장</span>
+          <span>저장</span>
         </button>
 
         <button
           type="button"
           onclick="openSavedSchedulesModal()"
-          class="px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-zinc-700 font-mono font-bold text-xs transition-all shadow-xs flex items-center gap-1"
+          class="px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-zinc-700 font-mono font-bold text-xs transition-all shadow-xs flex items-center gap-1 shrink-0 whitespace-nowrap"
           title="저장된 스케줄 보관함 열기"
         >
           <span>📂</span>
-          <span class="hidden sm:inline">보관함</span>
+          <span>보관함</span>
         </button>
 
         <button
           id="btnNavReschedule"
           onclick="openRescheduleModal()"
-          class="hidden px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold font-mono transition-all items-center gap-1.5 shadow-sm"
+          class="hidden px-2.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold font-mono transition-all items-center gap-1 shadow-sm shrink-0 whitespace-nowrap"
         >
-          <span>⚡ 지연 재배치</span>
+          <span>⚡</span>
+          <span>재배치</span>
           <span id="navOverdueCountBadge" class="px-1.5 py-0.2 rounded-full bg-amber-700 text-[10px]">1</span>
         </button>
 
         <button
           onclick="openOnboardingModal()"
-          class="hidden sm:flex px-3 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-xs font-bold transition-all items-center gap-1"
+          class="px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-zinc-700 text-xs font-bold transition-all flex items-center gap-1 shrink-0 whitespace-nowrap"
           title="날짜 및 세부 설정 직접 입력"
         >
           <span>⚙️</span>
-          <span>상세설정</span>
+          <span>설정</span>
         </button>
       </div>
 
