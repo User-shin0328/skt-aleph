@@ -6,3 +6,5 @@ team/
 *.bin
 *.code-workspace
 .DS_Store
+.venv/
+
